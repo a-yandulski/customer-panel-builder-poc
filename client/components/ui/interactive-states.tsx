@@ -10,11 +10,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/95 hover:shadow-md hover:-translate-y-0.5",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/95 hover:shadow-md",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground active:bg-accent/80 hover:shadow-sm hover:border-primary/50",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 active:bg-secondary/90 hover:shadow-sm",
-        ghost: "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+        default:
+          "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/95 hover:shadow-md hover:-translate-y-0.5",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/95 hover:shadow-md",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground active:bg-accent/80 hover:shadow-sm hover:border-primary/50",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 active:bg-secondary/90 hover:shadow-sm",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
@@ -28,7 +33,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 export interface ButtonProps
@@ -40,9 +45,22 @@ export interface ButtonProps
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, loading = false, loadingText, children, disabled, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      loading = false,
+      loadingText,
+      children,
+      disabled,
+      ...props
+    },
+    ref,
+  ) => {
     const Comp = asChild ? Slot : "button";
-    
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
@@ -50,13 +68,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         {...props}
       >
-        {loading && (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        )}
-        {loading ? (loadingText || "Loading...") : children}
+        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {loading ? loadingText || "Loading..." : children}
       </Comp>
     );
-  }
+  },
 );
 Button.displayName = "Button";
 
@@ -69,13 +85,14 @@ const linkVariants = cva(
         none: "",
         always: "underline underline-offset-4",
         hover: "hover:underline underline-offset-4",
-        animated: "relative after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full",
+        animated:
+          "relative after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full",
       },
     },
     defaultVariants: {
       underline: "animated",
     },
-  }
+  },
 );
 
 export interface LinkProps
@@ -95,13 +112,23 @@ const Link = forwardRef<HTMLAnchorElement, LinkProps>(
       >
         {children}
         {external && (
-          <svg className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          <svg
+            className="h-3 w-3 ml-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
           </svg>
         )}
       </a>
     );
-  }
+  },
 );
 Link.displayName = "Link";
 
@@ -117,10 +144,25 @@ export interface ToggleProps {
 }
 
 const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(
-  ({ checked, onCheckedChange, disabled, size = "default", label, description, className }, ref) => {
+  (
+    {
+      checked,
+      onCheckedChange,
+      disabled,
+      size = "default",
+      label,
+      description,
+      className,
+    },
+    ref,
+  ) => {
     const sizes = {
       sm: { switch: "h-4 w-7", thumb: "h-3 w-3", translate: "translate-x-3" },
-      default: { switch: "h-5 w-9", thumb: "h-4 w-4", translate: "translate-x-4" },
+      default: {
+        switch: "h-5 w-9",
+        thumb: "h-4 w-4",
+        translate: "translate-x-4",
+      },
       lg: { switch: "h-6 w-11", thumb: "h-5 w-5", translate: "translate-x-5" },
     };
 
@@ -138,38 +180,55 @@ const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(
           className={cn(
             "relative inline-flex items-center rounded-full border-2 border-transparent transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
             checked ? "bg-primary" : "bg-gray-200",
-            sizeClasses.switch
+            sizeClasses.switch,
           )}
         >
           <span
             className={cn(
               "inline-block transform rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out",
               checked ? sizeClasses.translate : "translate-x-0",
-              sizeClasses.thumb
+              sizeClasses.thumb,
             )}
           />
         </button>
         {(label || description) && (
           <div className="flex-1">
-            {label && <label className="text-sm font-medium text-gray-900">{label}</label>}
-            {description && <p className="text-xs text-gray-500">{description}</p>}
+            {label && (
+              <label className="text-sm font-medium text-gray-900">
+                {label}
+              </label>
+            )}
+            {description && (
+              <p className="text-xs text-gray-500">{description}</p>
+            )}
           </div>
         )}
       </div>
     );
-  }
+  },
 );
 Toggle.displayName = "Toggle";
 
 // Enhanced Card with Hover Effects
-export interface InteractiveCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface InteractiveCardProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   hover?: boolean;
   clickable?: boolean;
   selected?: boolean;
 }
 
 const InteractiveCard = forwardRef<HTMLDivElement, InteractiveCardProps>(
-  ({ className, hover = false, clickable = false, selected = false, children, ...props }, ref) => {
+  (
+    {
+      className,
+      hover = false,
+      clickable = false,
+      selected = false,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
     return (
       <div
         ref={ref}
@@ -178,14 +237,14 @@ const InteractiveCard = forwardRef<HTMLDivElement, InteractiveCardProps>(
           hover && "hover:shadow-lg hover:-translate-y-1",
           clickable && "cursor-pointer hover:shadow-lg hover:-translate-y-1",
           selected && "ring-2 ring-primary ring-offset-2",
-          className
+          className,
         )}
         {...props}
       >
         {children}
       </div>
     );
-  }
+  },
 );
 InteractiveCard.displayName = "InteractiveCard";
 
@@ -197,10 +256,12 @@ export function FocusTrap({ children }: { children: React.ReactNode }) {
         if (e.key === "Tab") {
           // Handle tab navigation within the trap
           const focusableElements = e.currentTarget.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
           );
           const firstElement = focusableElements[0] as HTMLElement;
-          const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+          const lastElement = focusableElements[
+            focusableElements.length - 1
+          ] as HTMLElement;
 
           if (!e.shiftKey && document.activeElement === lastElement) {
             e.preventDefault();
@@ -220,7 +281,13 @@ export function FocusTrap({ children }: { children: React.ReactNode }) {
 }
 
 // Skip Link for Accessibility
-export function SkipLink({ href = "#main-content", children = "Skip to main content" }: { href?: string; children?: React.ReactNode }) {
+export function SkipLink({
+  href = "#main-content",
+  children = "Skip to main content",
+}: {
+  href?: string;
+  children?: React.ReactNode;
+}) {
   return (
     <a
       href={href}

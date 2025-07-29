@@ -20,7 +20,12 @@ import {
   MarkdownIcon as MarkAsRead,
 } from "lucide-react";
 
-type NotificationType = "service" | "billing" | "support" | "security" | "maintenance";
+type NotificationType =
+  | "service"
+  | "billing"
+  | "support"
+  | "security"
+  | "maintenance";
 
 type Notification = {
   id: string;
@@ -39,7 +44,8 @@ export default function NotificationCenter() {
       id: "1",
       type: "service",
       title: "Domain Renewal Due Soon",
-      message: "Your domain example.com expires in 7 days. Renew now to avoid service interruption.",
+      message:
+        "Your domain example.com expires in 7 days. Renew now to avoid service interruption.",
       timestamp: "2 hours ago",
       isRead: false,
       actionUrl: "/services",
@@ -49,7 +55,8 @@ export default function NotificationCenter() {
       id: "2",
       type: "support",
       title: "Support Ticket Updated",
-      message: "Your ticket #TKT-2024-001 has been updated by our support team.",
+      message:
+        "Your ticket #TKT-2024-001 has been updated by our support team.",
       timestamp: "4 hours ago",
       isRead: false,
       actionUrl: "/support",
@@ -59,7 +66,8 @@ export default function NotificationCenter() {
       id: "3",
       type: "billing",
       title: "Payment Successful",
-      message: "Your payment of $47.00 for hosting services has been processed successfully.",
+      message:
+        "Your payment of $47.00 for hosting services has been processed successfully.",
       timestamp: "1 day ago",
       isRead: true,
       actionUrl: "/billing",
@@ -69,7 +77,8 @@ export default function NotificationCenter() {
       id: "4",
       type: "security",
       title: "New Login Detected",
-      message: "A new login to your account was detected from New York, NY. If this wasn't you, please secure your account.",
+      message:
+        "A new login to your account was detected from New York, NY. If this wasn't you, please secure your account.",
       timestamp: "2 days ago",
       isRead: false,
       actionUrl: "/account",
@@ -79,57 +88,74 @@ export default function NotificationCenter() {
       id: "5",
       type: "maintenance",
       title: "Scheduled Maintenance",
-      message: "Server maintenance is scheduled for tonight from 2:00 AM to 4:00 AM EST.",
+      message:
+        "Server maintenance is scheduled for tonight from 2:00 AM to 4:00 AM EST.",
       timestamp: "3 days ago",
       isRead: true,
       priority: "low",
     },
   ]);
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
-      case "service": return <Clock className="h-4 w-4 text-primary" />;
-      case "billing": return <CreditCard className="h-4 w-4 text-success" />;
-      case "support": return <MessageCircle className="h-4 w-4 text-info" />;
-      case "security": return <Shield className="h-4 w-4 text-error" />;
-      case "maintenance": return <Server className="h-4 w-4 text-warning" />;
-      default: return <Bell className="h-4 w-4 text-gray-500" />;
+      case "service":
+        return <Clock className="h-4 w-4 text-primary" />;
+      case "billing":
+        return <CreditCard className="h-4 w-4 text-success" />;
+      case "support":
+        return <MessageCircle className="h-4 w-4 text-info" />;
+      case "security":
+        return <Shield className="h-4 w-4 text-error" />;
+      case "maintenance":
+        return <Server className="h-4 w-4 text-warning" />;
+      default:
+        return <Bell className="h-4 w-4 text-gray-500" />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgent": return "border-l-error";
-      case "high": return "border-l-warning";
-      case "normal": return "border-l-primary";
-      case "low": return "border-l-gray-300";
-      default: return "border-l-gray-300";
+      case "urgent":
+        return "border-l-error";
+      case "high":
+        return "border-l-warning";
+      case "normal":
+        return "border-l-primary";
+      case "low":
+        return "border-l-gray-300";
+      default:
+        return "border-l-gray-300";
     }
   };
 
   const markAsRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(notification =>
-        notification.id === id ? { ...notification, isRead: true } : notification
-      )
+    setNotifications((prev) =>
+      prev.map((notification) =>
+        notification.id === id
+          ? { ...notification, isRead: true }
+          : notification,
+      ),
     );
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev =>
-      prev.map(notification => ({ ...notification, isRead: true }))
+    setNotifications((prev) =>
+      prev.map((notification) => ({ ...notification, isRead: true })),
     );
   };
 
-  const categoryNotifications = notifications.reduce((acc, notification) => {
-    if (!acc[notification.type]) {
-      acc[notification.type] = [];
-    }
-    acc[notification.type].push(notification);
-    return acc;
-  }, {} as Record<NotificationType, Notification[]>);
+  const categoryNotifications = notifications.reduce(
+    (acc, notification) => {
+      if (!acc[notification.type]) {
+        acc[notification.type] = [];
+      }
+      acc[notification.type].push(notification);
+      return acc;
+    },
+    {} as Record<NotificationType, Notification[]>,
+  );
 
   return (
     <DropdownMenu>
@@ -137,8 +163,8 @@ export default function NotificationCenter() {
         <Button variant="ghost" size="sm" className="relative">
           <Bell className="h-5 w-5 text-gray-600" />
           {unreadCount > 0 && (
-            <Badge 
-              variant="destructive" 
+            <Badge
+              variant="destructive"
               className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
             >
               {unreadCount > 9 ? "9+" : unreadCount}
@@ -146,7 +172,10 @@ export default function NotificationCenter() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
+      <DropdownMenuContent
+        align="end"
+        className="w-80 max-h-96 overflow-y-auto"
+      >
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="font-semibold text-gray-900">Notifications</h3>
           {unreadCount > 0 && (
@@ -175,7 +204,9 @@ export default function NotificationCenter() {
                   className={`p-3 hover:bg-gray-50 transition-colors cursor-pointer border-l-4 ${getPriorityColor(notification.priority)} ${
                     !notification.isRead ? "bg-primary/5" : ""
                   }`}
-                  onClick={() => !notification.isRead && markAsRead(notification.id)}
+                  onClick={() =>
+                    !notification.isRead && markAsRead(notification.id)
+                  }
                 >
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0 mt-0.5">
@@ -183,7 +214,9 @@ export default function NotificationCenter() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h4 className={`text-sm font-medium ${!notification.isRead ? "text-gray-900" : "text-gray-700"}`}>
+                        <h4
+                          className={`text-sm font-medium ${!notification.isRead ? "text-gray-900" : "text-gray-700"}`}
+                        >
                           {notification.title}
                         </h4>
                         {!notification.isRead && (
@@ -194,9 +227,15 @@ export default function NotificationCenter() {
                         {notification.message}
                       </p>
                       <div className="flex items-center justify-between mt-2">
-                        <span className="text-xs text-gray-500">{notification.timestamp}</span>
+                        <span className="text-xs text-gray-500">
+                          {notification.timestamp}
+                        </span>
                         {notification.actionUrl && (
-                          <Button variant="ghost" size="sm" className="text-xs h-6 px-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs h-6 px-2"
+                          >
                             <ExternalLink className="h-3 w-3 mr-1" />
                             View
                           </Button>

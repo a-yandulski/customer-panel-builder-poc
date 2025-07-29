@@ -49,7 +49,7 @@ export default function TopNavigation() {
                 key={item.href}
                 to={item.href}
                 className={`text-gray-700 hover:text-primary transition-colors duration-200 font-semibold ${
-                  location.pathname === item.href ? 'text-primary' : ''
+                  location.pathname === item.href ? "text-primary" : ""
                 }`}
               >
                 {item.label}
@@ -137,7 +137,9 @@ function MobileNavigation({ onItemClick }: MobileNavigationProps) {
               to={item.href}
               onClick={onItemClick}
               className={`flex items-center px-4 py-4 text-gray-700 hover:bg-gray-100 hover:text-primary rounded-lg transition-all duration-200 font-semibold min-h-[44px] ${
-                location.pathname === item.href ? 'bg-primary/10 text-primary border-l-4 border-primary' : ''
+                location.pathname === item.href
+                  ? "bg-primary/10 text-primary border-l-4 border-primary"
+                  : ""
               }`}
             >
               {item.label}

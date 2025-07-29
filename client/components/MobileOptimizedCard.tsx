@@ -1,5 +1,11 @@
 import { ReactNode, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,11 +33,8 @@ export default function MobileOptimizedCard({
 
   return (
     <Card className={cn("shadow-md", className)}>
-      <CardHeader 
-        className={cn(
-          "pb-3",
-          collapsible && "cursor-pointer select-none"
-        )}
+      <CardHeader
+        className={cn("pb-3", collapsible && "cursor-pointer select-none")}
         onClick={collapsible ? () => setIsCollapsed(!isCollapsed) : undefined}
       >
         <div className="flex items-center justify-between">
@@ -48,7 +51,11 @@ export default function MobileOptimizedCard({
           <div className="flex items-center space-x-2">
             {headerActions}
             {collapsible && (
-              <Button variant="ghost" size="sm" className="p-2 min-h-[44px] min-w-[44px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-2 min-h-[44px] min-w-[44px]"
+              >
                 {isCollapsed ? (
                   <ChevronDown className="h-4 w-4" />
                 ) : (
@@ -60,9 +67,7 @@ export default function MobileOptimizedCard({
         </div>
       </CardHeader>
       {(!collapsible || !isCollapsed) && (
-        <CardContent className="pt-0">
-          {children}
-        </CardContent>
+        <CardContent className="pt-0">{children}</CardContent>
       )}
     </Card>
   );

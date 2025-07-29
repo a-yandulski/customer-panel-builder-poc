@@ -3,20 +3,26 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { 
-  AlertTriangle, 
-  Wifi, 
-  Lock, 
-  CreditCard, 
+import {
+  AlertTriangle,
+  Wifi,
+  Lock,
+  CreditCard,
   RefreshCw,
   MessageCircle,
-  X
+  X,
 } from "lucide-react";
 
 // Form Field Error
-export function FormFieldError({ error, className }: { error?: string; className?: string }) {
+export function FormFieldError({
+  error,
+  className,
+}: {
+  error?: string;
+  className?: string;
+}) {
   if (!error) return null;
-  
+
   return (
     <div className={cn("flex items-center space-x-2 mt-1", className)}>
       <AlertTriangle className="h-4 w-4 text-error flex-shrink-0" />
@@ -26,23 +32,33 @@ export function FormFieldError({ error, className }: { error?: string; className
 }
 
 // Inline Error Message
-export function InlineError({ 
-  message, 
+export function InlineError({
+  message,
   onDismiss,
-  className 
-}: { 
-  message: string; 
+  className,
+}: {
+  message: string;
   onDismiss?: () => void;
   className?: string;
 }) {
   return (
-    <div className={cn("flex items-center justify-between p-3 bg-error/10 border border-error/20 rounded-lg", className)}>
+    <div
+      className={cn(
+        "flex items-center justify-between p-3 bg-error/10 border border-error/20 rounded-lg",
+        className,
+      )}
+    >
       <div className="flex items-center space-x-2">
         <AlertTriangle className="h-4 w-4 text-error" />
         <span className="text-sm text-error font-medium">{message}</span>
       </div>
       {onDismiss && (
-        <Button variant="ghost" size="sm" onClick={onDismiss} className="h-6 w-6 p-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onDismiss}
+          className="h-6 w-6 p-0"
+        >
           <X className="h-4 w-4" />
         </Button>
       )}
@@ -51,15 +67,15 @@ export function InlineError({
 }
 
 // API Error Component
-export function ApiError({ 
+export function ApiError({
   title = "Something went wrong",
-  message, 
+  message,
   onRetry,
   onContactSupport,
-  className 
-}: { 
+  className,
+}: {
   title?: string;
-  message: string; 
+  message: string;
   onRetry?: () => void;
   onContactSupport?: () => void;
   className?: string;
@@ -97,7 +113,8 @@ export function NetworkError({ onRetry }: { onRetry: () => void }) {
       <AlertTitle>Connection Problem</AlertTitle>
       <AlertDescription className="mt-2">
         <p className="mb-3">
-          Unable to connect to our servers. Please check your internet connection and try again.
+          Unable to connect to our servers. Please check your internet
+          connection and try again.
         </p>
         <Button variant="outline" size="sm" onClick={onRetry}>
           <RefreshCw className="mr-2 h-4 w-4" />
@@ -109,10 +126,10 @@ export function NetworkError({ onRetry }: { onRetry: () => void }) {
 }
 
 // Permission Error
-export function PermissionError({ 
+export function PermissionError({
   message = "You don't have permission to access this resource.",
-  onContactSupport 
-}: { 
+  onContactSupport,
+}: {
   message?: string;
   onContactSupport?: () => void;
 }) {
@@ -134,12 +151,12 @@ export function PermissionError({
 }
 
 // Payment Error
-export function PaymentError({ 
+export function PaymentError({
   errorCode,
   message,
   onRetry,
-  onUpdatePayment 
-}: { 
+  onUpdatePayment,
+}: {
   errorCode?: string;
   message: string;
   onRetry?: () => void;
@@ -147,11 +164,16 @@ export function PaymentError({
 }) {
   const getErrorTitle = (code?: string) => {
     switch (code) {
-      case "card_declined": return "Card Declined";
-      case "insufficient_funds": return "Insufficient Funds";
-      case "expired_card": return "Card Expired";
-      case "invalid_card": return "Invalid Card";
-      default: return "Payment Failed";
+      case "card_declined":
+        return "Card Declined";
+      case "insufficient_funds":
+        return "Insufficient Funds";
+      case "expired_card":
+        return "Card Expired";
+      case "invalid_card":
+        return "Invalid Card";
+      default:
+        return "Payment Failed";
     }
   };
 
@@ -204,10 +226,10 @@ export function PaymentError({
 }
 
 // Error Boundary Fallback
-export function ErrorBoundaryFallback({ 
+export function ErrorBoundaryFallback({
   error,
-  resetError 
-}: { 
+  resetError,
+}: {
   error: Error;
   resetError: () => void;
 }) {
@@ -217,9 +239,12 @@ export function ErrorBoundaryFallback({
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-error/10">
           <AlertTriangle className="h-8 w-8 text-error" />
         </div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">Something went wrong</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">
+          Something went wrong
+        </h2>
         <p className="text-gray-600 mb-4">
-          An unexpected error occurred. This has been automatically reported to our team.
+          An unexpected error occurred. This has been automatically reported to
+          our team.
         </p>
         <details className="text-left bg-gray-50 p-3 rounded-lg mb-4">
           <summary className="cursor-pointer text-sm font-medium text-gray-700">
@@ -244,10 +269,10 @@ export function ErrorBoundaryFallback({
 }
 
 // Validation Error Summary
-export function ValidationErrorSummary({ 
+export function ValidationErrorSummary({
   errors,
-  onDismiss 
-}: { 
+  onDismiss,
+}: {
   errors: string[];
   onDismiss?: () => void;
 }) {
@@ -259,7 +284,12 @@ export function ValidationErrorSummary({
       <div className="flex items-center justify-between">
         <AlertTitle>Please fix the following errors:</AlertTitle>
         {onDismiss && (
-          <Button variant="ghost" size="sm" onClick={onDismiss} className="h-6 w-6 p-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onDismiss}
+            className="h-6 w-6 p-0"
+          >
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -267,7 +297,9 @@ export function ValidationErrorSummary({
       <AlertDescription className="mt-2">
         <ul className="list-disc list-inside space-y-1">
           {errors.map((error, index) => (
-            <li key={index} className="text-sm">{error}</li>
+            <li key={index} className="text-sm">
+              {error}
+            </li>
           ))}
         </ul>
       </AlertDescription>

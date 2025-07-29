@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import { X, CheckCircle, AlertTriangle, AlertCircle, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
@@ -21,10 +27,22 @@ interface ToastContextType {
   toasts: Toast[];
   addToast: (toast: Omit<Toast, "id">) => void;
   removeToast: (id: string) => void;
-  success: (message: string, options?: Partial<Omit<Toast, "id" | "type" | "message">>) => void;
-  error: (message: string, options?: Partial<Omit<Toast, "id" | "type" | "message">>) => void;
-  warning: (message: string, options?: Partial<Omit<Toast, "id" | "type" | "message">>) => void;
-  info: (message: string, options?: Partial<Omit<Toast, "id" | "type" | "message">>) => void;
+  success: (
+    message: string,
+    options?: Partial<Omit<Toast, "id" | "type" | "message">>,
+  ) => void;
+  error: (
+    message: string,
+    options?: Partial<Omit<Toast, "id" | "type" | "message">>,
+  ) => void;
+  warning: (
+    message: string,
+    options?: Partial<Omit<Toast, "id" | "type" | "message">>,
+  ) => void;
+  info: (
+    message: string,
+    options?: Partial<Omit<Toast, "id" | "type" | "message">>,
+  ) => void;
 }
 
 const ToastContext = createContext<ToastContextType | null>(null);
@@ -35,8 +53,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const addToast = useCallback((toast: Omit<Toast, "id">) => {
     const id = Math.random().toString(36).substr(2, 9);
     const newToast = { ...toast, id };
-    
-    setToasts(prev => [...prev, newToast]);
+
+    setToasts((prev) => [...prev, newToast]);
 
     // Auto remove after duration
     if (toast.duration !== 0) {
@@ -47,27 +65,53 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
-  const success = useCallback((message: string, options?: Partial<Omit<Toast, "id" | "type" | "message">>) => {
-    addToast({ type: "success", message, ...options });
-  }, [addToast]);
+  const success = useCallback(
+    (
+      message: string,
+      options?: Partial<Omit<Toast, "id" | "type" | "message">>,
+    ) => {
+      addToast({ type: "success", message, ...options });
+    },
+    [addToast],
+  );
 
-  const error = useCallback((message: string, options?: Partial<Omit<Toast, "id" | "type" | "message">>) => {
-    addToast({ type: "error", message, duration: 0, ...options });
-  }, [addToast]);
+  const error = useCallback(
+    (
+      message: string,
+      options?: Partial<Omit<Toast, "id" | "type" | "message">>,
+    ) => {
+      addToast({ type: "error", message, duration: 0, ...options });
+    },
+    [addToast],
+  );
 
-  const warning = useCallback((message: string, options?: Partial<Omit<Toast, "id" | "type" | "message">>) => {
-    addToast({ type: "warning", message, ...options });
-  }, [addToast]);
+  const warning = useCallback(
+    (
+      message: string,
+      options?: Partial<Omit<Toast, "id" | "type" | "message">>,
+    ) => {
+      addToast({ type: "warning", message, ...options });
+    },
+    [addToast],
+  );
 
-  const info = useCallback((message: string, options?: Partial<Omit<Toast, "id" | "type" | "message">>) => {
-    addToast({ type: "info", message, ...options });
-  }, [addToast]);
+  const info = useCallback(
+    (
+      message: string,
+      options?: Partial<Omit<Toast, "id" | "type" | "message">>,
+    ) => {
+      addToast({ type: "info", message, ...options });
+    },
+    [addToast],
+  );
 
   return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast, success, error, warning, info }}>
+    <ToastContext.Provider
+      value={{ toasts, addToast, removeToast, success, error, warning, info }}
+    >
       {children}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>
@@ -82,7 +126,13 @@ export function useToast() {
   return context;
 }
 
-function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: string) => void }) {
+function ToastContainer({
+  toasts,
+  onRemove,
+}: {
+  toasts: Toast[];
+  onRemove: (id: string) => void;
+}) {
   if (toasts.length === 0) return null;
 
   return (
@@ -94,7 +144,13 @@ function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: 
   );
 }
 
-function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) => void }) {
+function ToastItem({
+  toast,
+  onRemove,
+}: {
+  toast: Toast;
+  onRemove: (id: string) => void;
+}) {
   const getIcon = () => {
     switch (toast.type) {
       case "success":
@@ -126,22 +182,18 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
       className={cn(
         "rounded-lg border p-4 shadow-lg toast-slide-in",
         "bg-white border-gray-200",
-        getStyles()
+        getStyles(),
       )}
     >
       <div className="flex items-start space-x-3">
-        <div className="flex-shrink-0">
-          {getIcon()}
-        </div>
+        <div className="flex-shrink-0">{getIcon()}</div>
         <div className="flex-1 min-w-0">
           {toast.title && (
             <h4 className="text-sm font-semibold text-gray-900 mb-1">
               {toast.title}
             </h4>
           )}
-          <p className="text-sm text-gray-700">
-            {toast.message}
-          </p>
+          <p className="text-sm text-gray-700">{toast.message}</p>
           {toast.action && (
             <div className="mt-3">
               <Button
@@ -170,17 +222,41 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
 
 // Pre-built toast helpers
 export const toast = {
-  success: (message: string, options?: { title?: string; action?: { label: string; onClick: () => void } }) => {
+  success: (
+    message: string,
+    options?: {
+      title?: string;
+      action?: { label: string; onClick: () => void };
+    },
+  ) => {
     // This will be replaced by the actual toast context when used
     console.log("Success:", message, options);
   },
-  error: (message: string, options?: { title?: string; action?: { label: string; onClick: () => void } }) => {
+  error: (
+    message: string,
+    options?: {
+      title?: string;
+      action?: { label: string; onClick: () => void };
+    },
+  ) => {
     console.log("Error:", message, options);
   },
-  warning: (message: string, options?: { title?: string; action?: { label: string; onClick: () => void } }) => {
+  warning: (
+    message: string,
+    options?: {
+      title?: string;
+      action?: { label: string; onClick: () => void };
+    },
+  ) => {
     console.log("Warning:", message, options);
   },
-  info: (message: string, options?: { title?: string; action?: { label: string; onClick: () => void } }) => {
+  info: (
+    message: string,
+    options?: {
+      title?: string;
+      action?: { label: string; onClick: () => void };
+    },
+  ) => {
     console.log("Info:", message, options);
   },
 };

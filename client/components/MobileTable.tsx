@@ -42,7 +42,7 @@ export default function MobileTable({
                   key={column.key}
                   className={cn(
                     "text-left py-3 px-4 font-semibold text-gray-700 text-sm",
-                    column.className
+                    column.className,
                   )}
                 >
                   {column.header}
@@ -56,7 +56,7 @@ export default function MobileTable({
                 key={index}
                 className={cn(
                   "border-b border-gray-100 hover:bg-gray-50 transition-colors",
-                  onRowClick && "cursor-pointer"
+                  onRowClick && "cursor-pointer",
                 )}
                 onClick={() => onRowClick?.(row)}
               >
@@ -81,7 +81,7 @@ export default function MobileTable({
             className={cn(
               "shadow-md",
               onRowClick && "cursor-pointer hover:shadow-lg transition-shadow",
-              mobileCardClassName
+              mobileCardClassName,
             )}
             onClick={() => onRowClick?.(row)}
           >
@@ -92,13 +92,18 @@ export default function MobileTable({
                   {row[primaryColumn]}
                 </h3>
               )}
-              
+
               {/* Other columns as key-value pairs */}
               <div className="space-y-3">
                 {columns
-                  .filter(col => !col.hideOnMobile && col.key !== primaryColumn)
+                  .filter(
+                    (col) => !col.hideOnMobile && col.key !== primaryColumn,
+                  )
                   .map((column) => (
-                    <div key={column.key} className="flex items-center justify-between">
+                    <div
+                      key={column.key}
+                      className="flex items-center justify-between"
+                    >
                       <span className="text-sm font-medium text-gray-600">
                         {column.mobileLabel || column.header}:
                       </span>
@@ -110,12 +115,12 @@ export default function MobileTable({
                     </div>
                   ))}
               </div>
-              
+
               {/* Action buttons */}
-              {columns.some(col => col.key === 'actions') && (
+              {columns.some((col) => col.key === "actions") && (
                 <div className="mt-4 pt-3 border-t border-gray-200">
                   {columns
-                    .find(col => col.key === 'actions')
+                    .find((col) => col.key === "actions")
                     ?.render?.(row.actions, row)}
                 </div>
               )}
@@ -128,12 +133,12 @@ export default function MobileTable({
 }
 
 // Helper components for common table cell types
-export function TableBadge({ 
-  children, 
-  variant = "default" 
-}: { 
-  children: ReactNode; 
-  variant?: "default" | "secondary" | "destructive" | "outline" 
+export function TableBadge({
+  children,
+  variant = "default",
+}: {
+  children: ReactNode;
+  variant?: "default" | "secondary" | "destructive" | "outline";
 }) {
   return (
     <Badge variant={variant} className="whitespace-nowrap">
@@ -142,12 +147,12 @@ export function TableBadge({
   );
 }
 
-export function TableActions({ 
-  children, 
-  className 
-}: { 
-  children: ReactNode; 
-  className?: string 
+export function TableActions({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
 }) {
   return (
     <div className={cn("flex items-center space-x-2", className)}>
@@ -156,14 +161,14 @@ export function TableActions({
   );
 }
 
-export function MobileActionButton({ 
-  children, 
-  onClick, 
+export function MobileActionButton({
+  children,
+  onClick,
   variant = "outline",
-  className 
-}: { 
-  children: ReactNode; 
-  onClick: () => void; 
+  className,
+}: {
+  children: ReactNode;
+  onClick: () => void;
   variant?: "default" | "outline" | "ghost";
   className?: string;
 }) {

@@ -35,9 +35,9 @@ export default function Dashboard() {
   });
 
   const handleRenewalToggle = (domain: string) => {
-    setRenewalToggles(prev => ({
+    setRenewalToggles((prev) => ({
       ...prev,
-      [domain]: !prev[domain as keyof typeof prev]
+      [domain]: !prev[domain as keyof typeof prev],
     }));
   };
 
@@ -50,7 +50,8 @@ export default function Dashboard() {
             Welcome back, John!
           </h1>
           <p className="body sm:body-large text-gray-700">
-            Great to see you again. Here's what's happening with your services today.
+            Great to see you again. Here's what's happening with your services
+            today.
           </p>
         </div>
 
@@ -63,12 +64,19 @@ export default function Dashboard() {
                   <Globe className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">🎉 Special Offer: 25% off new domain registrations!</h3>
-                  <p className="text-white/90 body-sm">Valid until December 31st. Use code WINTER25</p>
+                  <h3 className="font-semibold">
+                    🎉 Special Offer: 25% off new domain registrations!
+                  </h3>
+                  <p className="text-white/90 body-sm">
+                    Valid until December 31st. Use code WINTER25
+                  </p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <Button variant="outline" className="bg-white text-primary hover:bg-white/90">
+                <Button
+                  variant="outline"
+                  className="bg-white text-primary hover:bg-white/90"
+                >
                   Register Now
                 </Button>
                 <Button
@@ -123,11 +131,17 @@ export default function Dashboard() {
               <div className="flex items-center space-x-2">
                 <div className="text-2xl font-bold text-gray-900">2</div>
                 <div className="flex space-x-1">
-                  <Badge variant="destructive" className="text-xs">1 Open</Badge>
-                  <Badge variant="secondary" className="text-xs">1 Pending</Badge>
+                  <Badge variant="destructive" className="text-xs">
+                    1 Open
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    1 Pending
+                  </Badge>
                 </div>
               </div>
-              <p className="body-sm text-gray-500 mt-1">Last updated 2 hours ago</p>
+              <p className="body-sm text-gray-500 mt-1">
+                Last updated 2 hours ago
+              </p>
             </CardContent>
           </Card>
 
@@ -185,7 +199,9 @@ export default function Dashboard() {
                     className="p-4 bg-gray-50 rounded-lg border space-y-3"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                      <h4 className="font-semibold text-gray-900 text-lg">{item.domain}</h4>
+                      <h4 className="font-semibold text-gray-900 text-lg">
+                        {item.domain}
+                      </h4>
                       <Badge
                         variant={item.urgent ? "destructive" : "secondary"}
                         className="body-sm w-fit"
@@ -199,15 +215,28 @@ export default function Dashboard() {
                     </div>
                     <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center space-x-3">
-                        <span className="body-sm text-gray-700">Auto-renew:</span>
+                        <span className="body-sm text-gray-700">
+                          Auto-renew:
+                        </span>
                         <Switch
-                          checked={renewalToggles[item.domain as keyof typeof renewalToggles]}
-                          onCheckedChange={() => handleRenewalToggle(item.domain)}
+                          checked={
+                            renewalToggles[
+                              item.domain as keyof typeof renewalToggles
+                            ]
+                          }
+                          onCheckedChange={() =>
+                            handleRenewalToggle(item.domain)
+                          }
                         />
                       </div>
                       <div className="flex items-center space-x-3">
-                        <span className="font-semibold text-gray-900 text-lg">{item.price}</span>
-                        <Button size="sm" className="bg-primary hover:bg-primary/90 mobile-touch-target">
+                        <span className="font-semibold text-gray-900 text-lg">
+                          {item.price}
+                        </span>
+                        <Button
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90 mobile-touch-target"
+                        >
                           Renew Now
                         </Button>
                       </div>
@@ -215,7 +244,10 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-              <Button variant="outline" className="w-full mt-4 mobile-touch-target">
+              <Button
+                variant="outline"
+                className="w-full mt-4 mobile-touch-target"
+              >
                 View All Renewals
               </Button>
             </MobileOptimizedCard>
@@ -264,18 +296,26 @@ export default function Dashboard() {
                       key={index}
                       className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg border"
                     >
-                      <div className={`p-2 rounded-full ${
-                        activity.type === "success"
-                          ? "bg-success/10 text-success"
-                          : "bg-primary/10 text-primary"
-                      }`}>
+                      <div
+                        className={`p-2 rounded-full ${
+                          activity.type === "success"
+                            ? "bg-success/10 text-success"
+                            : "bg-primary/10 text-primary"
+                        }`}
+                      >
                         <activity.icon className="h-4 w-4" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900">{activity.action}</p>
-                        <p className="body-sm text-gray-600 truncate">{activity.target}</p>
+                        <p className="font-medium text-gray-900">
+                          {activity.action}
+                        </p>
+                        <p className="body-sm text-gray-600 truncate">
+                          {activity.target}
+                        </p>
                       </div>
-                      <span className="body-sm text-gray-500 whitespace-nowrap">{activity.time}</span>
+                      <span className="body-sm text-gray-500 whitespace-nowrap">
+                        {activity.time}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -295,15 +335,24 @@ export default function Dashboard() {
                   <Globe className="mr-2 h-4 w-4" />
                   Register New Domain
                 </Button>
-                <Button variant="outline" className="w-full justify-start mobile-touch-target">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start mobile-touch-target"
+                >
                   <LifeBuoy className="mr-2 h-4 w-4" />
                   Contact Support
                 </Button>
-                <Button variant="outline" className="w-full justify-start mobile-touch-target">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start mobile-touch-target"
+                >
                   <FileText className="mr-2 h-4 w-4" />
                   View Invoices
                 </Button>
-                <Button variant="outline" className="w-full justify-start mobile-touch-target">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start mobile-touch-target"
+                >
                   <Settings className="mr-2 h-4 w-4" />
                   Manage DNS
                 </Button>

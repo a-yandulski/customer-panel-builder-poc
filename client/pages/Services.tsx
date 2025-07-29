@@ -101,7 +101,9 @@ export default function Services() {
   });
   const [showAddRecord, setShowAddRecord] = useState(false);
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
-  const [editingNameservers, setEditingNameservers] = useState<{[key: string]: string[]}>({});
+  const [editingNameservers, setEditingNameservers] = useState<{
+    [key: string]: string[];
+  }>({});
 
   const [domains, setDomains] = useState<Domain[]>([
     {
@@ -116,8 +118,20 @@ export default function Services() {
       nameservers: ["ns1.domainhost.com", "ns2.domainhost.com"],
       dnsRecords: [
         { id: "1", type: "A", name: "@", value: "192.168.1.1", ttl: "3600" },
-        { id: "2", type: "CNAME", name: "www", value: "example.com", ttl: "3600" },
-        { id: "3", type: "MX", name: "@", value: "10 mail.example.com", ttl: "3600" },
+        {
+          id: "2",
+          type: "CNAME",
+          name: "www",
+          value: "example.com",
+          ttl: "3600",
+        },
+        {
+          id: "3",
+          type: "MX",
+          name: "@",
+          value: "10 mail.example.com",
+          ttl: "3600",
+        },
       ],
     },
     {
@@ -132,7 +146,13 @@ export default function Services() {
       nameservers: ["ns1.domainhost.com", "ns2.domainhost.com"],
       dnsRecords: [
         { id: "4", type: "A", name: "@", value: "192.168.1.2", ttl: "3600" },
-        { id: "5", type: "CNAME", name: "www", value: "mysite.org", ttl: "3600" },
+        {
+          id: "5",
+          type: "CNAME",
+          name: "www",
+          value: "mysite.org",
+          ttl: "3600",
+        },
       ],
     },
     {
@@ -154,24 +174,35 @@ export default function Services() {
   };
 
   const toggleAutoRenewal = (domainId: string) => {
-    setDomains(domains.map(domain =>
-      domain.id === domainId ? { ...domain, autoRenew: !domain.autoRenew } : domain
-    ));
+    setDomains(
+      domains.map((domain) =>
+        domain.id === domainId
+          ? { ...domain, autoRenew: !domain.autoRenew }
+          : domain,
+      ),
+    );
   };
 
   const toggleDomainLock = (domainId: string) => {
-    setDomains(domains.map(domain =>
-      domain.id === domainId ? { ...domain, locked: !domain.locked } : domain
-    ));
+    setDomains(
+      domains.map((domain) =>
+        domain.id === domainId ? { ...domain, locked: !domain.locked } : domain,
+      ),
+    );
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Active": return "default";
-      case "Expired": return "destructive";
-      case "Pending": return "secondary";
-      case "Pending Transfer": return "secondary";
-      default: return "secondary";
+      case "Active":
+        return "default";
+      case "Expired":
+        return "destructive";
+      case "Pending":
+        return "secondary";
+      case "Pending Transfer":
+        return "secondary";
+      default:
+        return "secondary";
     }
   };
 
@@ -181,46 +212,67 @@ export default function Services() {
     return "text-gray-600";
   };
 
-  const filteredDomains = domains.filter(domain => {
-    const matchesSearch = domain.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || domain.status === statusFilter;
+  const filteredDomains = domains.filter((domain) => {
+    const matchesSearch = domain.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || domain.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const sortedDomains = [...filteredDomains].sort((a, b) => {
     switch (sortBy) {
-      case "name": return a.name.localeCompare(b.name);
-      case "expiration": return a.daysRemaining - b.daysRemaining;
-      case "status": return a.status.localeCompare(b.status);
-      default: return 0;
+      case "name":
+        return a.name.localeCompare(b.name);
+      case "expiration":
+        return a.daysRemaining - b.daysRemaining;
+      case "status":
+        return a.status.localeCompare(b.status);
+      default:
+        return 0;
     }
   });
 
   const handleAddRecord = () => {
-    const domain = domains.find(d => d.id === expandedDomain);
+    const domain = domains.find((d) => d.id === expandedDomain);
     if (domain) {
       const recordWithId = { ...newRecord, id: Date.now().toString() };
-      setDomains(domains.map(d =>
-        d.id === expandedDomain
-          ? { ...d, dnsRecords: [...d.dnsRecords, recordWithId] }
-          : d
-      ));
+      setDomains(
+        domains.map((d) =>
+          d.id === expandedDomain
+            ? { ...d, dnsRecords: [...d.dnsRecords, recordWithId] }
+            : d,
+        ),
+      );
       setNewRecord({ id: "", type: "A", name: "", value: "", ttl: "3600" });
       setShowAddRecord(false);
     }
   };
 
   const handleDeleteRecord = (domainId: string, recordId: string) => {
-    setDomains(domains.map(domain =>
-      domain.id === domainId
-        ? { ...domain, dnsRecords: domain.dnsRecords.filter(r => r.id !== recordId) }
-        : domain
-    ));
+    setDomains(
+      domains.map((domain) =>
+        domain.id === domainId
+          ? {
+              ...domain,
+              dnsRecords: domain.dnsRecords.filter((r) => r.id !== recordId),
+            }
+          : domain,
+      ),
+    );
   };
 
-  const handleNameserverChange = (domainId: string, index: number, value: string) => {
-    setEditingNameservers(prev => {
-      const current = prev[domainId] || domains.find(d => d.id === domainId)?.nameservers || [];
+  const handleNameserverChange = (
+    domainId: string,
+    index: number,
+    value: string,
+  ) => {
+    setEditingNameservers((prev) => {
+      const current =
+        prev[domainId] ||
+        domains.find((d) => d.id === domainId)?.nameservers ||
+        [];
       const updated = [...current];
       updated[index] = value;
       return { ...prev, [domainId]: updated };
@@ -230,12 +282,14 @@ export default function Services() {
   const saveNameservers = (domainId: string) => {
     const updatedNameservers = editingNameservers[domainId];
     if (updatedNameservers) {
-      setDomains(domains.map(domain =>
-        domain.id === domainId
-          ? { ...domain, nameservers: updatedNameservers }
-          : domain
-      ));
-      setEditingNameservers(prev => {
+      setDomains(
+        domains.map((domain) =>
+          domain.id === domainId
+            ? { ...domain, nameservers: updatedNameservers }
+            : domain,
+        ),
+      );
+      setEditingNameservers((prev) => {
         const updated = { ...prev };
         delete updated[domainId];
         return updated;
@@ -244,10 +298,13 @@ export default function Services() {
   };
 
   const addNameserver = (domainId: string) => {
-    const current = editingNameservers[domainId] || domains.find(d => d.id === domainId)?.nameservers || [];
-    setEditingNameservers(prev => ({
+    const current =
+      editingNameservers[domainId] ||
+      domains.find((d) => d.id === domainId)?.nameservers ||
+      [];
+    setEditingNameservers((prev) => ({
       ...prev,
-      [domainId]: [...current, ""]
+      [domainId]: [...current, ""],
     }));
   };
 
@@ -292,7 +349,10 @@ export default function Services() {
                     />
                   </div>
                   <div className="flex gap-3">
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <Select
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
+                    >
                       <SelectTrigger className="w-40">
                         <Filter className="mr-2 h-4 w-4" />
                         <SelectValue />
@@ -334,12 +394,16 @@ export default function Services() {
                             <Globe className="h-5 w-5 text-primary" />
                           </div>
                           <div className="text-left">
-                            <h3 className="text-xl font-bold text-gray-900">{domain.name}</h3>
+                            <h3 className="text-xl font-bold text-gray-900">
+                              {domain.name}
+                            </h3>
                             <div className="flex items-center space-x-4 mt-1">
                               <p className="body-sm text-gray-600">
                                 Expires: {domain.expires}
                               </p>
-                              <span className={`body-sm font-medium ${getDaysRemainingColor(domain.daysRemaining)}`}>
+                              <span
+                                className={`body-sm font-medium ${getDaysRemainingColor(domain.daysRemaining)}`}
+                              >
                                 ({domain.daysRemaining} days remaining)
                               </span>
                             </div>
@@ -358,13 +422,18 @@ export default function Services() {
                             {domain.status}
                           </Badge>
                           <div className="flex items-center space-x-2">
-                            <Label htmlFor={`auto-renew-${domain.id}`} className="body-sm text-gray-600">
+                            <Label
+                              htmlFor={`auto-renew-${domain.id}`}
+                              className="body-sm text-gray-600"
+                            >
                               Auto-renew
                             </Label>
                             <Switch
                               id={`auto-renew-${domain.id}`}
                               checked={domain.autoRenew}
-                              onCheckedChange={() => toggleAutoRenewal(domain.id)}
+                              onCheckedChange={() =>
+                                toggleAutoRenewal(domain.id)
+                              }
                             />
                           </div>
                           <Button variant="outline" size="sm">
@@ -391,15 +460,25 @@ export default function Services() {
                                 </CardHeader>
                                 <CardContent className="space-y-3">
                                   <div className="flex justify-between">
-                                    <span className="body-sm text-gray-600">Registrar:</span>
-                                    <span className="body-sm font-medium">{domain.registrar}</span>
+                                    <span className="body-sm text-gray-600">
+                                      Registrar:
+                                    </span>
+                                    <span className="body-sm font-medium">
+                                      {domain.registrar}
+                                    </span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="body-sm text-gray-600">Registration Date:</span>
-                                    <span className="body-sm font-medium">Dec 15, 2022</span>
+                                    <span className="body-sm text-gray-600">
+                                      Registration Date:
+                                    </span>
+                                    <span className="body-sm font-medium">
+                                      Dec 15, 2022
+                                    </span>
                                   </div>
                                   <div className="flex justify-between items-center">
-                                    <span className="body-sm text-gray-600">Domain Lock:</span>
+                                    <span className="body-sm text-gray-600">
+                                      Domain Lock:
+                                    </span>
                                     <div className="flex items-center space-x-2">
                                       {domain.locked ? (
                                         <Lock className="h-4 w-4 text-success" />
@@ -408,16 +487,26 @@ export default function Services() {
                                       )}
                                       <Switch
                                         checked={domain.locked}
-                                        onCheckedChange={() => toggleDomainLock(domain.id)}
+                                        onCheckedChange={() =>
+                                          toggleDomainLock(domain.id)
+                                        }
                                       />
                                     </div>
                                   </div>
                                   <div className="flex justify-between items-center">
-                                    <span className="body-sm text-gray-600">EPP/Auth Code:</span>
+                                    <span className="body-sm text-gray-600">
+                                      EPP/Auth Code:
+                                    </span>
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      onClick={() => setShowAuthCode(showAuthCode === domain.id ? null : domain.id)}
+                                      onClick={() =>
+                                        setShowAuthCode(
+                                          showAuthCode === domain.id
+                                            ? null
+                                            : domain.id,
+                                        )
+                                      }
                                     >
                                       {showAuthCode === domain.id ? (
                                         <>
@@ -434,7 +523,9 @@ export default function Services() {
                                   </div>
                                   {showAuthCode === domain.id && (
                                     <div className="bg-gray-50 p-3 rounded border">
-                                      <code className="body-sm font-mono">AUTH-CODE-12345678</code>
+                                      <code className="body-sm font-mono">
+                                        AUTH-CODE-12345678
+                                      </code>
                                     </div>
                                   )}
                                 </CardContent>
@@ -449,14 +540,23 @@ export default function Services() {
                                   </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
-                                  {(editingNameservers[domain.id] || domain.nameservers).map((ns, index) => (
+                                  {(
+                                    editingNameservers[domain.id] ||
+                                    domain.nameservers
+                                  ).map((ns, index) => (
                                     <div key={index}>
                                       <Label className="body-sm text-gray-600">
                                         Nameserver {index + 1}
                                       </Label>
                                       <Input
                                         value={ns}
-                                        onChange={(e) => handleNameserverChange(domain.id, index, e.target.value)}
+                                        onChange={(e) =>
+                                          handleNameserverChange(
+                                            domain.id,
+                                            index,
+                                            e.target.value,
+                                          )
+                                        }
                                         className="mt-1"
                                         placeholder={`ns${index + 1}.domainhost.com`}
                                       />
@@ -476,7 +576,9 @@ export default function Services() {
                                       <Button
                                         size="sm"
                                         className="bg-primary hover:bg-primary/90"
-                                        onClick={() => saveNameservers(domain.id)}
+                                        onClick={() =>
+                                          saveNameservers(domain.id)
+                                        }
                                       >
                                         <Save className="mr-2 h-4 w-4" />
                                         Save
@@ -492,34 +594,63 @@ export default function Services() {
                               <CardHeader>
                                 <div className="flex items-center justify-between">
                                   <CardTitle>DNS Records</CardTitle>
-                                  <Dialog open={showAddRecord} onOpenChange={setShowAddRecord}>
+                                  <Dialog
+                                    open={showAddRecord}
+                                    onOpenChange={setShowAddRecord}
+                                  >
                                     <DialogTrigger asChild>
-                                      <Button size="sm" className="bg-primary hover:bg-primary/90">
+                                      <Button
+                                        size="sm"
+                                        className="bg-primary hover:bg-primary/90"
+                                      >
                                         <Plus className="mr-2 h-4 w-4" />
                                         Add Record
                                       </Button>
                                     </DialogTrigger>
                                     <DialogContent>
                                       <DialogHeader>
-                                        <DialogTitle>Add DNS Record</DialogTitle>
+                                        <DialogTitle>
+                                          Add DNS Record
+                                        </DialogTitle>
                                         <DialogDescription>
-                                          Create a new DNS record for {domain.name}
+                                          Create a new DNS record for{" "}
+                                          {domain.name}
                                         </DialogDescription>
                                       </DialogHeader>
                                       <div className="space-y-4">
                                         <div>
                                           <Label>Record Type</Label>
-                                          <Select value={newRecord.type} onValueChange={(value) => setNewRecord({...newRecord, type: value})}>
+                                          <Select
+                                            value={newRecord.type}
+                                            onValueChange={(value) =>
+                                              setNewRecord({
+                                                ...newRecord,
+                                                type: value,
+                                              })
+                                            }
+                                          >
                                             <SelectTrigger>
                                               <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="A">A</SelectItem>
-                                              <SelectItem value="AAAA">AAAA</SelectItem>
-                                              <SelectItem value="CNAME">CNAME</SelectItem>
-                                              <SelectItem value="MX">MX</SelectItem>
-                                              <SelectItem value="TXT">TXT</SelectItem>
-                                              <SelectItem value="NS">NS</SelectItem>
+                                              <SelectItem value="A">
+                                                A
+                                              </SelectItem>
+                                              <SelectItem value="AAAA">
+                                                AAAA
+                                              </SelectItem>
+                                              <SelectItem value="CNAME">
+                                                CNAME
+                                              </SelectItem>
+                                              <SelectItem value="MX">
+                                                MX
+                                              </SelectItem>
+                                              <SelectItem value="TXT">
+                                                TXT
+                                              </SelectItem>
+                                              <SelectItem value="NS">
+                                                NS
+                                              </SelectItem>
                                             </SelectContent>
                                           </Select>
                                         </div>
@@ -527,7 +658,12 @@ export default function Services() {
                                           <Label>Name</Label>
                                           <Input
                                             value={newRecord.name}
-                                            onChange={(e) => setNewRecord({...newRecord, name: e.target.value})}
+                                            onChange={(e) =>
+                                              setNewRecord({
+                                                ...newRecord,
+                                                name: e.target.value,
+                                              })
+                                            }
                                             placeholder="@, www, mail, etc."
                                           />
                                         </div>
@@ -535,7 +671,12 @@ export default function Services() {
                                           <Label>Value</Label>
                                           <Input
                                             value={newRecord.value}
-                                            onChange={(e) => setNewRecord({...newRecord, value: e.target.value})}
+                                            onChange={(e) =>
+                                              setNewRecord({
+                                                ...newRecord,
+                                                value: e.target.value,
+                                              })
+                                            }
                                             placeholder="192.168.1.1, example.com, etc."
                                           />
                                         </div>
@@ -543,14 +684,28 @@ export default function Services() {
                                           <Label>TTL (seconds)</Label>
                                           <Input
                                             value={newRecord.ttl}
-                                            onChange={(e) => setNewRecord({...newRecord, ttl: e.target.value})}
+                                            onChange={(e) =>
+                                              setNewRecord({
+                                                ...newRecord,
+                                                ttl: e.target.value,
+                                              })
+                                            }
                                           />
                                         </div>
                                         <div className="flex space-x-2">
-                                          <Button onClick={handleAddRecord} className="flex-1">
+                                          <Button
+                                            onClick={handleAddRecord}
+                                            className="flex-1"
+                                          >
                                             Add Record
                                           </Button>
-                                          <Button variant="outline" onClick={() => setShowAddRecord(false)} className="flex-1">
+                                          <Button
+                                            variant="outline"
+                                            onClick={() =>
+                                              setShowAddRecord(false)
+                                            }
+                                            className="flex-1"
+                                          >
                                             Cancel
                                           </Button>
                                         </div>
@@ -567,27 +722,42 @@ export default function Services() {
                                       <TableHead>Name</TableHead>
                                       <TableHead>Value</TableHead>
                                       <TableHead>TTL</TableHead>
-                                      <TableHead className="text-right">Actions</TableHead>
+                                      <TableHead className="text-right">
+                                        Actions
+                                      </TableHead>
                                     </TableRow>
                                   </TableHeader>
                                   <TableBody>
                                     {domain.dnsRecords.map((record) => (
                                       <TableRow key={record.id}>
                                         <TableCell>
-                                          <Badge variant="outline">{record.type}</Badge>
+                                          <Badge variant="outline">
+                                            {record.type}
+                                          </Badge>
                                         </TableCell>
-                                        <TableCell className="font-mono body-sm">{record.name}</TableCell>
-                                        <TableCell className="font-mono body-sm">{record.value}</TableCell>
-                                        <TableCell className="body-sm">{record.ttl}</TableCell>
+                                        <TableCell className="font-mono body-sm">
+                                          {record.name}
+                                        </TableCell>
+                                        <TableCell className="font-mono body-sm">
+                                          {record.value}
+                                        </TableCell>
+                                        <TableCell className="body-sm">
+                                          {record.ttl}
+                                        </TableCell>
                                         <TableCell className="text-right">
                                           <div className="flex items-center justify-end space-x-2">
                                             <Button variant="ghost" size="sm">
                                               <Edit className="h-4 w-4" />
                                             </Button>
-                                            <Button 
-                                              variant="ghost" 
+                                            <Button
+                                              variant="ghost"
                                               size="sm"
-                                              onClick={() => handleDeleteRecord(domain.id, record.id)}
+                                              onClick={() =>
+                                                handleDeleteRecord(
+                                                  domain.id,
+                                                  record.id,
+                                                )
+                                              }
                                             >
                                               <Trash2 className="h-4 w-4 text-error" />
                                             </Button>
@@ -599,7 +769,10 @@ export default function Services() {
                                 </Table>
                                 {domain.dnsRecords.length === 0 && (
                                   <div className="text-center py-8 text-gray-500">
-                                    <p>No DNS records found. Add your first record above.</p>
+                                    <p>
+                                      No DNS records found. Add your first
+                                      record above.
+                                    </p>
                                   </div>
                                 )}
                               </CardContent>
@@ -619,7 +792,9 @@ export default function Services() {
             <div className="text-center py-12 text-gray-500">
               <Server className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <h3 className="h3 text-gray-700 mb-2">Hosting Services</h3>
-              <p className="body text-gray-600">Manage your web hosting and server configurations</p>
+              <p className="body text-gray-600">
+                Manage your web hosting and server configurations
+              </p>
             </div>
           </TabsContent>
 
@@ -627,7 +802,9 @@ export default function Services() {
             <div className="text-center py-12 text-gray-500">
               <Shield className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <h3 className="h3 text-gray-700 mb-2">SSL Certificates</h3>
-              <p className="body text-gray-600">Secure your websites with SSL certificates</p>
+              <p className="body text-gray-600">
+                Secure your websites with SSL certificates
+              </p>
             </div>
           </TabsContent>
 
@@ -635,7 +812,9 @@ export default function Services() {
             <div className="text-center py-12 text-gray-500">
               <Mail className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <h3 className="h3 text-gray-700 mb-2">Email Services</h3>
-              <p className="body text-gray-600">Configure email accounts and forwarding</p>
+              <p className="body text-gray-600">
+                Configure email accounts and forwarding
+              </p>
             </div>
           </TabsContent>
         </Tabs>

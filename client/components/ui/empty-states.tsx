@@ -1,17 +1,17 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { 
-  Globe, 
-  MessageCircle, 
-  FileText, 
-  Bell, 
+import {
+  Globe,
+  MessageCircle,
+  FileText,
+  Bell,
   Check,
   Plus,
   Search,
   CreditCard,
   Server,
-  Shield
+  Shield,
 } from "lucide-react";
 
 interface EmptyStateProps {
@@ -30,13 +30,13 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export function EmptyState({ 
-  icon, 
-  title, 
-  description, 
-  action, 
-  secondaryAction, 
-  className 
+export function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+  secondaryAction,
+  className,
 }: EmptyStateProps) {
   return (
     <div className={cn("text-center py-12 px-6", className)}>
@@ -49,8 +49,8 @@ export function EmptyState({
       <p className="text-gray-600 mb-6 max-w-md mx-auto">{description}</p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         {action && (
-          <Button 
-            onClick={action.onClick} 
+          <Button
+            onClick={action.onClick}
             variant={action.variant || "default"}
             className="mobile-touch-target"
           >
@@ -59,8 +59,8 @@ export function EmptyState({
           </Button>
         )}
         {secondaryAction && (
-          <Button 
-            onClick={secondaryAction.onClick} 
+          <Button
+            onClick={secondaryAction.onClick}
             variant="outline"
             className="mobile-touch-target"
           >
@@ -73,7 +73,11 @@ export function EmptyState({
 }
 
 // Specific Empty States
-export function EmptyDomains({ onRegisterDomain }: { onRegisterDomain: () => void }) {
+export function EmptyDomains({
+  onRegisterDomain,
+}: {
+  onRegisterDomain: () => void;
+}) {
   return (
     <EmptyState
       icon={<Globe className="h-8 w-8 text-gray-400" />}
@@ -91,7 +95,11 @@ export function EmptyDomains({ onRegisterDomain }: { onRegisterDomain: () => voi
   );
 }
 
-export function EmptyTickets({ onCreateTicket }: { onCreateTicket: () => void }) {
+export function EmptyTickets({
+  onCreateTicket,
+}: {
+  onCreateTicket: () => void;
+}) {
   return (
     <EmptyState
       icon={<MessageCircle className="h-8 w-8 text-gray-400" />}
@@ -109,7 +117,11 @@ export function EmptyTickets({ onCreateTicket }: { onCreateTicket: () => void })
   );
 }
 
-export function EmptyInvoices({ onAdjustDateRange }: { onAdjustDateRange: () => void }) {
+export function EmptyInvoices({
+  onAdjustDateRange,
+}: {
+  onAdjustDateRange: () => void;
+}) {
   return (
     <EmptyState
       icon={<FileText className="h-8 w-8 text-gray-400" />}
@@ -146,7 +158,13 @@ export function EmptyNotifications() {
   );
 }
 
-export function EmptySearch({ searchTerm, onClearSearch }: { searchTerm: string; onClearSearch: () => void }) {
+export function EmptySearch({
+  searchTerm,
+  onClearSearch,
+}: {
+  searchTerm: string;
+  onClearSearch: () => void;
+}) {
   return (
     <EmptyState
       icon={<Search className="h-8 w-8 text-gray-400" />}
@@ -201,11 +219,11 @@ export function EmptyActivity() {
 }
 
 // Error Empty State
-export function ErrorEmpty({ 
+export function ErrorEmpty({
   title = "Something went wrong",
   description = "We encountered an error while loading this content. Please try again.",
   onRetry,
-  onContactSupport
+  onContactSupport,
 }: {
   title?: string;
   description?: string;
@@ -216,21 +234,39 @@ export function ErrorEmpty({
     <EmptyState
       icon={
         <div className="text-error">
-          <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          <svg
+            className="h-8 w-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
           </svg>
         </div>
       }
       title={title}
       description={description}
-      action={onRetry ? {
-        label: "Try Again",
-        onClick: onRetry,
-      } : undefined}
-      secondaryAction={onContactSupport ? {
-        label: "Contact Support",
-        onClick: onContactSupport,
-      } : undefined}
+      action={
+        onRetry
+          ? {
+              label: "Try Again",
+              onClick: onRetry,
+            }
+          : undefined
+      }
+      secondaryAction={
+        onContactSupport
+          ? {
+              label: "Contact Support",
+              onClick: onContactSupport,
+            }
+          : undefined
+      }
     />
   );
 }
