@@ -177,4 +177,90 @@
   .checkbox-base {
     @apply form-checkbox text-primary border-gray-300 rounded focus:ring-primary;
   }
+
+  /* Mobile Optimizations */
+  .mobile-touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  .mobile-card-spacing {
+    @apply p-4 sm:p-6;
+  }
+
+  .mobile-button-spacing {
+    @apply px-4 py-3 sm:px-6 sm:py-2;
+  }
+
+  /* Animation Guidelines */
+  .transition-drawer {
+    @apply transition-transform duration-300 ease-out;
+  }
+
+  .transition-hover {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .transition-loading {
+    @apply transition-opacity duration-150 ease-in-out;
+  }
+
+  /* Loading Spinner */
+  .loading-spinner {
+    @apply animate-spin rounded-full border-2 border-gray-300 border-t-primary;
+  }
+
+  /* Toast Animation */
+  .toast-enter {
+    @apply transform translate-y-[-100%] opacity-0;
+  }
+
+  .toast-enter-active {
+    @apply transform translate-y-0 opacity-100 transition-all duration-300 ease-out;
+  }
+
+  /* Accordion Animation */
+  .accordion-content {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  /* Mobile-specific utilities */
+  @media (max-width: 767px) {
+    .mobile-full-width {
+      @apply w-full;
+    }
+
+    .mobile-single-column {
+      @apply grid-cols-1 !important;
+    }
+
+    .mobile-hide {
+      @apply hidden;
+    }
+
+    .mobile-show {
+      @apply block;
+    }
+  }
+
+  /* Touch-friendly form elements */
+  .mobile-input {
+    @apply h-12 text-base;
+  }
+
+  .mobile-select {
+    @apply h-12 text-base;
+  }
+
+  .mobile-textarea {
+    @apply text-base leading-relaxed;
+  }
+
+  /* Swipe indicators */
+  .swipe-indicator {
+    @apply absolute top-1/2 transform -translate-y-1/2 opacity-50 transition-opacity duration-200;
+  }
+
+  .swipe-indicator:hover {
+    @apply opacity-100;
+  }
 }
