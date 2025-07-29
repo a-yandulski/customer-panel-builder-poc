@@ -101,6 +101,7 @@ export default function Services() {
   });
   const [showAddRecord, setShowAddRecord] = useState(false);
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const [editingNameservers, setEditingNameservers] = useState<{[key: string]: string[]}>({});
 
   const [domains, setDomains] = useState<Domain[]>([
     {
@@ -215,6 +216,39 @@ export default function Services() {
         ? { ...domain, dnsRecords: domain.dnsRecords.filter(r => r.id !== recordId) }
         : domain
     ));
+  };
+
+  const handleNameserverChange = (domainId: string, index: number, value: string) => {
+    setEditingNameservers(prev => {
+      const current = prev[domainId] || domains.find(d => d.id === domainId)?.nameservers || [];
+      const updated = [...current];
+      updated[index] = value;
+      return { ...prev, [domainId]: updated };
+    });
+  };
+
+  const saveNameservers = (domainId: string) => {
+    const updatedNameservers = editingNameservers[domainId];
+    if (updatedNameservers) {
+      setDomains(domains.map(domain =>
+        domain.id === domainId
+          ? { ...domain, nameservers: updatedNameservers }
+          : domain
+      ));
+      setEditingNameservers(prev => {
+        const updated = { ...prev };
+        delete updated[domainId];
+        return updated;
+      });
+    }
+  };
+
+  const addNameserver = (domainId: string) => {
+    const current = editingNameservers[domainId] || domains.find(d => d.id === domainId)?.nameservers || [];
+    setEditingNameservers(prev => ({
+      ...prev,
+      [domainId]: [...current, ""]
+    }));
   };
 
   return (
@@ -412,18 +446,40 @@ export default function Services() {
                                   </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
-                                  {domain.nameservers.map((ns, index) => (
+                                  {(editingNameservers[domain.id] || domain.nameservers).map((ns, index) => (
                                     <div key={index}>
                                       <Label className="body-sm text-gray-600">
                                         Nameserver {index + 1}
                                       </Label>
-                                      <Input value={ns} className="mt-1" />
+                                      <Input
+                                        value={ns}
+                                        onChange={(e) => handleNameserverChange(domain.id, index, e.target.value)}
+                                        className="mt-1"
+                                        placeholder={`ns${index + 1}.domainhost.com`}
+                                      />
                                     </div>
                                   ))}
-                                  <Button variant="outline" size="sm" className="w-full">
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Add Nameserver
-                                  </Button>
+                                  <div className="flex space-x-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="flex-1"
+                                      onClick={() => addNameserver(domain.id)}
+                                    >
+                                      <Plus className="mr-2 h-4 w-4" />
+                                      Add Nameserver
+                                    </Button>
+                                    {editingNameservers[domain.id] && (
+                                      <Button
+                                        size="sm"
+                                        className="bg-primary hover:bg-primary/90"
+                                        onClick={() => saveNameservers(domain.id)}
+                                      >
+                                        <Save className="mr-2 h-4 w-4" />
+                                        Save
+                                      </Button>
+                                    )}
+                                  </div>
                                 </CardContent>
                               </Card>
                             </div>
