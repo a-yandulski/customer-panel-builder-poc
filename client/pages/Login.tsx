@@ -38,14 +38,14 @@ export default function Login() {
         {/* Logo and Header */}
         <div className="text-center">
           <div className="flex justify-center">
-            <div className="w-12 h-12 bg-brand-primary rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">D</span>
             </div>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <h2 className="mt-6 h2 text-gray-900">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 body-sm text-gray-500">
             Manage your domains, hosting, and services
           </p>
         </div>
@@ -53,8 +53,8 @@ export default function Login() {
         {/* Login Form */}
         <Card className="border-gray-200 shadow-lg">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl text-center">Welcome back</CardTitle>
-            <CardDescription className="text-center">
+            <CardTitle className="text-xl font-semibold text-center">Welcome back</CardTitle>
+            <CardDescription className="text-center body-sm">
               Enter your credentials to access your customer panel
             </CardDescription>
           </CardHeader>
