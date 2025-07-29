@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,89 +11,106 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
   :root {
+    /* Custom Design System Colors */
+    --brand-primary: 218 100% 60%; /* #035BFF */
+    --brand-secondary: 237 50% 68%; /* #6366F1 */
+
+    /* Neutral Grays */
+    --gray-900: 210 13% 9%; /* #111827 */
+    --gray-800: 213 13% 17%; /* #1F2937 */
+    --gray-700: 212 13% 25%; /* #374151 */
+    --gray-600: 214 13% 38%; /* #4B5563 */
+    --gray-500: 214 11% 51%; /* #6B7280 */
+    --gray-400: 213 13% 65%; /* #9CA3AF */
+    --gray-300: 213 27% 84%; /* #D1D5DB */
+    --gray-200: 217 33% 89%; /* #E5E7EB */
+    --gray-100: 220 43% 95%; /* #F3F4F6 */
+    --gray-50: 210 40% 98%; /* #F9FAFB */
+
+    /* Semantic Colors */
+    --success: 158 64% 52%; /* #10B981 */
+    --error: 4 90% 58%; /* #EF4444 */
+    --warning: 38 92% 50%; /* #F59E0B */
+
+    /* Design System Mapping */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: var(--gray-900);
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: var(--gray-900);
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: var(--gray-900);
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: var(--brand-primary);
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: var(--gray-100);
+    --secondary-foreground: var(--gray-900);
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: var(--gray-100);
+    --muted-foreground: var(--gray-600);
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: var(--brand-secondary);
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: var(--error);
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: var(--gray-300);
+    --input: var(--gray-300);
+    --ring: var(--brand-primary);
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: var(--gray-50);
+    --sidebar-foreground: var(--gray-700);
+    --sidebar-primary: var(--brand-primary);
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: var(--gray-100);
+    --sidebar-accent-foreground: var(--gray-700);
+    --sidebar-border: var(--gray-300);
+    --sidebar-ring: var(--brand-primary);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark mode mappings */
+    --background: var(--gray-900);
+    --foreground: var(--gray-100);
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: var(--gray-800);
+    --card-foreground: var(--gray-100);
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: var(--gray-800);
+    --popover-foreground: var(--gray-100);
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: var(--brand-primary);
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: var(--gray-800);
+    --secondary-foreground: var(--gray-100);
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: var(--gray-800);
+    --muted-foreground: var(--gray-400);
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: var(--brand-secondary);
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: var(--error);
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: var(--gray-700);
+    --input: var(--gray-700);
+    --ring: var(--brand-primary);
+
+    --sidebar-background: var(--gray-800);
+    --sidebar-foreground: var(--gray-200);
+    --sidebar-primary: var(--brand-primary);
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: var(--gray-700);
+    --sidebar-accent-foreground: var(--gray-200);
+    --sidebar-border: var(--gray-700);
+    --sidebar-ring: var(--brand-primary);
   }
 }
 
@@ -102,5 +121,35 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Typography Scale */
+  .h1 {
+    @apply text-4xl font-bold leading-tight; /* 2.25rem / 700 */
+  }
+
+  .h2 {
+    @apply text-3xl font-semibold leading-tight;
+  }
+
+  .h3 {
+    @apply text-2xl font-semibold leading-snug;
+  }
+
+  .h4 {
+    @apply text-xl font-medium leading-snug;
+  }
+
+  .body {
+    @apply text-base font-normal leading-relaxed; /* 1rem / 400 */
+  }
+
+  .body-sm {
+    @apply text-sm font-normal leading-relaxed;
+  }
+
+  .caption {
+    @apply text-xs font-medium leading-tight;
   }
 }
