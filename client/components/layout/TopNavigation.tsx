@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Bell, Menu, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -21,6 +22,7 @@ const navigationItems = [
 
 export default function TopNavigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-white border-b border-gray-200 shadow-sm">
@@ -41,13 +43,15 @@ export default function TopNavigation() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navigationItems.map((item) => (
-              <a
+              <Link
                 key={item.href}
-                href={item.href}
-                className="text-gray-700 hover:text-primary transition-colors duration-200 font-semibold"
+                to={item.href}
+                className={`text-gray-700 hover:text-primary transition-colors duration-200 font-semibold ${
+                  location.pathname === item.href ? 'text-primary' : ''
+                }`}
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -132,14 +136,16 @@ function MobileNavigation({ onItemClick }: MobileNavigationProps) {
       <nav className="flex-1 p-4">
         <div className="space-y-2">
           {navigationItems.map((item) => (
-            <a
+            <Link
               key={item.href}
-              href={item.href}
+              to={item.href}
               onClick={onItemClick}
-              className="block px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary rounded-md transition-colors duration-200 font-semibold"
+              className={`block px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary rounded-md transition-colors duration-200 font-semibold ${
+                location.pathname === item.href ? 'bg-gray-100 text-primary' : ''
+              }`}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </div>
       </nav>
