@@ -324,53 +324,56 @@ export default function Services() {
               {sortedDomains.map((domain) => (
                 <Card key={domain.id} className="shadow-md">
                   <Collapsible>
-                    <CollapsibleTrigger className="w-full" onClick={() => toggleDomainExpansion(domain.id)}>
-                      <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-2 bg-primary/10 rounded-lg">
-                              <Globe className="h-5 w-5 text-primary" />
-                            </div>
-                            <div className="text-left">
-                              <h3 className="text-xl font-bold text-gray-900">{domain.name}</h3>
-                              <div className="flex items-center space-x-4 mt-1">
-                                <p className="body-sm text-gray-600">
-                                  Expires: {domain.expires}
-                                </p>
-                                <span className={`body-sm font-medium ${getDaysRemainingColor(domain.daysRemaining)}`}>
-                                  ({domain.daysRemaining} days remaining)
-                                </span>
-                              </div>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <CollapsibleTrigger
+                          className="flex items-center space-x-4 flex-1 text-left"
+                          onClick={() => toggleDomainExpansion(domain.id)}
+                        >
+                          <div className="p-2 bg-primary/10 rounded-lg">
+                            <Globe className="h-5 w-5 text-primary" />
+                          </div>
+                          <div className="text-left">
+                            <h3 className="text-xl font-bold text-gray-900">{domain.name}</h3>
+                            <div className="flex items-center space-x-4 mt-1">
+                              <p className="body-sm text-gray-600">
+                                Expires: {domain.expires}
+                              </p>
+                              <span className={`body-sm font-medium ${getDaysRemainingColor(domain.daysRemaining)}`}>
+                                ({domain.daysRemaining} days remaining)
+                              </span>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-3">
-                            <Badge variant={getStatusColor(domain.status)}>
-                              {domain.status}
-                            </Badge>
-                            <div className="flex items-center space-x-2">
-                              <Label htmlFor={`auto-renew-${domain.id}`} className="body-sm text-gray-600">
-                                Auto-renew
-                              </Label>
-                              <Switch
-                                id={`auto-renew-${domain.id}`}
-                                checked={domain.autoRenew}
-                                onCheckedChange={() => toggleAutoRenewal(domain.id)}
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                            </div>
-                            <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
-                              <Settings className="mr-2 h-4 w-4" />
-                              Manage
-                            </Button>
+                          <div className="ml-auto">
                             {expandedDomain === domain.id ? (
                               <ChevronUp className="h-4 w-4" />
                             ) : (
                               <ChevronDown className="h-4 w-4" />
                             )}
                           </div>
+                        </CollapsibleTrigger>
+
+                        <div className="flex items-center space-x-3 ml-4">
+                          <Badge variant={getStatusColor(domain.status)}>
+                            {domain.status}
+                          </Badge>
+                          <div className="flex items-center space-x-2">
+                            <Label htmlFor={`auto-renew-${domain.id}`} className="body-sm text-gray-600">
+                              Auto-renew
+                            </Label>
+                            <Switch
+                              id={`auto-renew-${domain.id}`}
+                              checked={domain.autoRenew}
+                              onCheckedChange={() => toggleAutoRenewal(domain.id)}
+                            />
+                          </div>
+                          <Button variant="outline" size="sm">
+                            <Settings className="mr-2 h-4 w-4" />
+                            Manage
+                          </Button>
                         </div>
-                      </CardContent>
-                    </CollapsibleTrigger>
+                      </div>
+                    </CardContent>
 
                     {/* Expanded Domain Details */}
                     <CollapsibleContent>
