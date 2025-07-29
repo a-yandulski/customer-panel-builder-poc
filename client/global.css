@@ -11,106 +11,103 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
   :root {
-    /* Custom Design System Colors */
-    --brand-primary: 218 100% 60%; /* #035BFF */
-    --brand-secondary: 237 50% 68%; /* #6366F1 */
+    /* Primary & Secondary Colors */
+    --color-primary: 218 100% 60%; /* #035BFF - Blue 600 */
+    --color-primary-light: 218 100% 92%; /* #E8F0FF - Blue 100 */
+    --color-secondary: 237 50% 68%; /* #6366F1 - Indigo 500 */
 
-    /* Neutral Grays */
-    --gray-900: 210 13% 9%; /* #111827 */
-    --gray-800: 213 13% 17%; /* #1F2937 */
-    --gray-700: 212 13% 25%; /* #374151 */
-    --gray-600: 214 13% 38%; /* #4B5563 */
-    --gray-500: 214 11% 51%; /* #6B7280 */
-    --gray-400: 213 13% 65%; /* #9CA3AF */
-    --gray-300: 213 27% 84%; /* #D1D5DB */
-    --gray-200: 217 33% 89%; /* #E5E7EB */
-    --gray-100: 220 43% 95%; /* #F3F4F6 */
-    --gray-50: 210 40% 98%; /* #F9FAFB */
+    /* Neutral Grayscale */
+    --color-gray-900: 210 13% 9%; /* #111827 */
+    --color-gray-700: 212 13% 25%; /* #374151 */
+    --color-gray-500: 214 11% 51%; /* #6B7280 */
+    --color-gray-300: 213 27% 84%; /* #D1D5DB */
+    --color-gray-100: 220 43% 95%; /* #F3F4F6 */
 
     /* Semantic Colors */
-    --success: 158 64% 52%; /* #10B981 */
-    --error: 4 90% 58%; /* #EF4444 */
-    --warning: 38 92% 50%; /* #F59E0B */
+    --color-success: 158 64% 52%; /* #10B981 - Green 600 */
+    --color-error: 4 90% 58%; /* #EF4444 - Red 600 */
+    --color-warning: 38 92% 50%; /* #F59E0B - Yellow 500 */
+    --color-info: 213 93% 68%; /* #60A5FA - Blue 400 */
 
     /* Design System Mapping */
     --background: 0 0% 100%;
-    --foreground: var(--gray-900);
+    --foreground: var(--color-gray-900);
 
     --card: 0 0% 100%;
-    --card-foreground: var(--gray-900);
+    --card-foreground: var(--color-gray-900);
 
     --popover: 0 0% 100%;
-    --popover-foreground: var(--gray-900);
+    --popover-foreground: var(--color-gray-900);
 
-    --primary: var(--brand-primary);
+    --primary: var(--color-primary);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: var(--gray-100);
-    --secondary-foreground: var(--gray-900);
+    --secondary: var(--color-gray-100);
+    --secondary-foreground: var(--color-gray-900);
 
-    --muted: var(--gray-100);
-    --muted-foreground: var(--gray-600);
+    --muted: var(--color-gray-100);
+    --muted-foreground: var(--color-gray-500);
 
-    --accent: var(--brand-secondary);
+    --accent: var(--color-secondary);
     --accent-foreground: 0 0% 100%;
 
-    --destructive: var(--error);
+    --destructive: var(--color-error);
     --destructive-foreground: 0 0% 100%;
 
-    --border: var(--gray-300);
-    --input: var(--gray-300);
-    --ring: var(--brand-primary);
+    --border: var(--color-gray-300);
+    --input: var(--color-gray-300);
+    --ring: var(--color-primary);
 
     --radius: 0.5rem;
 
-    --sidebar-background: var(--gray-50);
-    --sidebar-foreground: var(--gray-700);
-    --sidebar-primary: var(--brand-primary);
+    --sidebar-background: var(--color-gray-100);
+    --sidebar-foreground: var(--color-gray-700);
+    --sidebar-primary: var(--color-primary);
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: var(--gray-100);
-    --sidebar-accent-foreground: var(--gray-700);
-    --sidebar-border: var(--gray-300);
-    --sidebar-ring: var(--brand-primary);
+    --sidebar-accent: var(--color-gray-100);
+    --sidebar-accent-foreground: var(--color-gray-700);
+    --sidebar-border: var(--color-gray-300);
+    --sidebar-ring: var(--color-primary);
   }
 
   .dark {
     /* Dark mode mappings */
-    --background: var(--gray-900);
-    --foreground: var(--gray-100);
+    --background: var(--color-gray-900);
+    --foreground: var(--color-gray-100);
 
-    --card: var(--gray-800);
-    --card-foreground: var(--gray-100);
+    --card: 213 13% 17%; /* #1F2937 - Gray 800 */
+    --card-foreground: var(--color-gray-100);
 
-    --popover: var(--gray-800);
-    --popover-foreground: var(--gray-100);
+    --popover: 213 13% 17%; /* #1F2937 - Gray 800 */
+    --popover-foreground: var(--color-gray-100);
 
-    --primary: var(--brand-primary);
+    --primary: var(--color-primary);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: var(--gray-800);
-    --secondary-foreground: var(--gray-100);
+    --secondary: 213 13% 17%; /* #1F2937 - Gray 800 */
+    --secondary-foreground: var(--color-gray-100);
 
-    --muted: var(--gray-800);
-    --muted-foreground: var(--gray-400);
+    --muted: 213 13% 17%; /* #1F2937 - Gray 800 */
+    --muted-foreground: 213 13% 65%; /* #9CA3AF - Gray 400 */
 
-    --accent: var(--brand-secondary);
+    --accent: var(--color-secondary);
     --accent-foreground: 0 0% 100%;
 
-    --destructive: var(--error);
+    --destructive: var(--color-error);
     --destructive-foreground: 0 0% 100%;
 
-    --border: var(--gray-700);
-    --input: var(--gray-700);
-    --ring: var(--brand-primary);
+    --border: var(--color-gray-700);
+    --input: var(--color-gray-700);
+    --ring: var(--color-primary);
 
-    --sidebar-background: var(--gray-800);
-    --sidebar-foreground: var(--gray-200);
-    --sidebar-primary: var(--brand-primary);
+    --sidebar-background: 213 13% 17%; /* #1F2937 - Gray 800 */
+    --sidebar-foreground: 217 33% 89%; /* #E5E7EB - Gray 200 */
+    --sidebar-primary: var(--color-primary);
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: var(--gray-700);
-    --sidebar-accent-foreground: var(--gray-200);
-    --sidebar-border: var(--gray-700);
-    --sidebar-ring: var(--brand-primary);
+    --sidebar-accent: var(--color-gray-700);
+    --sidebar-accent-foreground: 217 33% 89%; /* #E5E7EB - Gray 200 */
+    --sidebar-border: var(--color-gray-700);
+    --sidebar-ring: var(--color-primary);
   }
 }
 
@@ -130,32 +127,54 @@
       sans-serif;
   }
 
-  /* Typography Scale */
+  /* Typography Scale - Following Design System */
   .h1 {
-    @apply text-4xl font-bold leading-tight; /* 2.25rem / 700 */
+    @apply text-4xl font-bold leading-10; /* 2.25rem / 2.5rem / 700 */
   }
 
   .h2 {
-    @apply text-3xl font-semibold leading-tight;
+    @apply text-3xl font-semibold leading-9; /* 1.875rem / 2.25rem / 600 */
   }
 
   .h3 {
-    @apply text-2xl font-semibold leading-snug;
+    @apply text-2xl font-semibold leading-8; /* 1.5rem / 2rem / 600 */
   }
 
-  .h4 {
-    @apply text-xl font-medium leading-snug;
+  .body-large {
+    @apply text-lg font-normal leading-7; /* 1.125rem / 1.75rem / 400 */
   }
 
   .body {
-    @apply text-base font-normal leading-relaxed; /* 1rem / 400 */
+    @apply text-base font-normal leading-6; /* 1rem / 1.5rem / 400 */
   }
 
   .body-sm {
-    @apply text-sm font-normal leading-relaxed;
+    @apply text-sm font-normal leading-5; /* 0.875rem / 1.25rem / 400 */
   }
 
-  .caption {
-    @apply text-xs font-medium leading-tight;
+  /* Button Styles */
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-primary text-white font-semibold rounded-md px-4 py-2 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center bg-gray-100 text-gray-800 font-semibold rounded-md px-4 py-2 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50;
+  }
+
+  .btn-tertiary {
+    @apply inline-flex items-center justify-center text-primary font-semibold px-2 py-1 hover:text-primary-dark focus:outline-none disabled:opacity-50;
+  }
+
+  /* Form Input Styles */
+  .input-base {
+    @apply border border-gray-300 rounded-md px-3 py-2 bg-white text-base focus:border-primary focus:ring-1 focus:ring-primary;
+  }
+
+  .select-base {
+    @apply appearance-none border border-gray-300 rounded-md px-3 py-2 bg-white text-base focus:border-primary focus:ring-1 focus:ring-primary;
+  }
+
+  .checkbox-base {
+    @apply form-checkbox text-primary border-gray-300 rounded focus:ring-primary;
   }
 }
