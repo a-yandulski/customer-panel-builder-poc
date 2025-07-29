@@ -1,5 +1,6 @@
 import { useState } from "react";
 import AppShell from "@/components/layout/AppShell";
+import MobileOptimizedCard from "@/components/MobileOptimizedCard";
 import {
   Card,
   CardContent,
@@ -44,9 +45,11 @@ export default function Dashboard() {
     <AppShell>
       <div className="space-y-6">
         {/* Personalized Welcome Section */}
-        <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg p-6 border border-gray-200">
-          <h1 className="h1 text-gray-900 mb-2">Welcome back, John!</h1>
-          <p className="body-large text-gray-700">
+        <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg mobile-card-spacing border border-gray-200">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+            Welcome back, John!
+          </h1>
+          <p className="body sm:body-large text-gray-700">
             Great to see you again. Here's what's happening with your services today.
           </p>
         </div>
@@ -82,7 +85,7 @@ export default function Dashboard() {
         )}
 
         {/* Service Summary Cards - 4-card grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           <Card className="shadow-md">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="body-sm font-semibold text-gray-700">
@@ -143,87 +146,79 @@ export default function Dashboard() {
         </div>
 
         {/* 2-Column Layout: Main Content (70%) + Sidebar (30%) */}
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:gap-6">
           {/* Main Content - 70% */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-4 lg:space-y-6">
             {/* Upcoming Renewals Widget */}
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Calendar className="mr-2 h-5 w-5 text-primary" />
-                  Upcoming Renewals
-                </CardTitle>
-                <CardDescription className="body-sm">
-                  Services requiring renewal in the next 30 days
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[
-                    {
-                      domain: "example.com",
-                      type: "Domain Registration",
-                      expires: "Dec 15, 2024",
-                      urgent: true,
-                      price: "$12.99",
-                    },
-                    {
-                      domain: "mysite.org",
-                      type: "Web Hosting",
-                      expires: "Dec 22, 2024",
-                      urgent: false,
-                      price: "$89.99",
-                    },
-                    {
-                      domain: "business.net",
-                      type: "SSL Certificate",
-                      expires: "Jan 5, 2025",
-                      urgent: false,
-                      price: "$49.99",
-                    },
-                  ].map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold text-gray-900">{item.domain}</h4>
-                          <Badge
-                            variant={item.urgent ? "destructive" : "secondary"}
-                            className="body-sm"
-                          >
-                            {item.urgent ? "⚠️ Urgent" : "📅 Upcoming"}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center justify-between body-sm text-gray-600">
-                          <span>{item.type}</span>
-                          <span>Expires: {item.expires}</span>
-                        </div>
-                        <div className="flex items-center justify-between mt-3">
-                          <div className="flex items-center space-x-3">
-                            <span className="body-sm text-gray-700">Auto-renew:</span>
-                            <Switch
-                              checked={renewalToggles[item.domain as keyof typeof renewalToggles]}
-                              onCheckedChange={() => handleRenewalToggle(item.domain)}
-                            />
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <span className="font-semibold text-gray-900">{item.price}</span>
-                            <Button size="sm" className="bg-primary hover:bg-primary/90">
-                              Renew Now
-                            </Button>
-                          </div>
-                        </div>
+            <MobileOptimizedCard
+              title="Upcoming Renewals"
+              description="Services requiring renewal in the next 30 days"
+              collapsible={true}
+              defaultCollapsed={false}
+            >
+              <div className="space-y-4">
+                {[
+                  {
+                    domain: "example.com",
+                    type: "Domain Registration",
+                    expires: "Dec 15, 2024",
+                    urgent: true,
+                    price: "$12.99",
+                  },
+                  {
+                    domain: "mysite.org",
+                    type: "Web Hosting",
+                    expires: "Dec 22, 2024",
+                    urgent: false,
+                    price: "$89.99",
+                  },
+                  {
+                    domain: "business.net",
+                    type: "SSL Certificate",
+                    expires: "Jan 5, 2025",
+                    urgent: false,
+                    price: "$49.99",
+                  },
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    className="p-4 bg-gray-50 rounded-lg border space-y-3"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                      <h4 className="font-semibold text-gray-900 text-lg">{item.domain}</h4>
+                      <Badge
+                        variant={item.urgent ? "destructive" : "secondary"}
+                        className="body-sm w-fit"
+                      >
+                        {item.urgent ? "⚠️ Urgent" : "📅 Upcoming"}
+                      </Badge>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-1 sm:space-y-0 body-sm text-gray-600">
+                      <span>{item.type}</span>
+                      <span>Expires: {item.expires}</span>
+                    </div>
+                    <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span className="body-sm text-gray-700">Auto-renew:</span>
+                        <Switch
+                          checked={renewalToggles[item.domain as keyof typeof renewalToggles]}
+                          onCheckedChange={() => handleRenewalToggle(item.domain)}
+                        />
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <span className="font-semibold text-gray-900 text-lg">{item.price}</span>
+                        <Button size="sm" className="bg-primary hover:bg-primary/90 mobile-touch-target">
+                          Renew Now
+                        </Button>
                       </div>
                     </div>
-                  ))}
-                </div>
-                <Button variant="outline" className="w-full mt-4">
-                  View All Renewals
-                </Button>
-              </CardContent>
-            </Card>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" className="w-full mt-4 mobile-touch-target">
+                View All Renewals
+              </Button>
+            </MobileOptimizedCard>
 
             {/* Recent Activity Feed */}
             <Card className="shadow-md">
@@ -289,34 +284,31 @@ export default function Dashboard() {
           </div>
 
           {/* Sidebar - 30% */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-4 lg:space-y-6">
             {/* Quick Actions Section */}
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription className="body-sm">
-                  Common tasks and shortcuts
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button className="w-full justify-start bg-primary hover:bg-primary/90">
+            <MobileOptimizedCard
+              title="Quick Actions"
+              description="Common tasks and shortcuts"
+            >
+              <div className="space-y-3">
+                <Button className="w-full justify-start bg-primary hover:bg-primary/90 mobile-touch-target">
                   <Globe className="mr-2 h-4 w-4" />
                   Register New Domain
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start mobile-touch-target">
                   <LifeBuoy className="mr-2 h-4 w-4" />
                   Contact Support
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start mobile-touch-target">
                   <FileText className="mr-2 h-4 w-4" />
                   View Invoices
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start mobile-touch-target">
                   <Settings className="mr-2 h-4 w-4" />
                   Manage DNS
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </MobileOptimizedCard>
 
             {/* System Status Widget */}
             <Card className="shadow-md">
