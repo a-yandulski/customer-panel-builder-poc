@@ -1,8 +1,21 @@
 import AppShell from "@/components/layout/AppShell";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Globe, Server, CreditCard, AlertTriangle, TrendingUp } from "lucide-react";
+import {
+  Calendar,
+  Globe,
+  Server,
+  CreditCard,
+  AlertTriangle,
+  TrendingUp,
+} from "lucide-react";
 
 export default function Dashboard() {
   return (
@@ -33,9 +46,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">12</div>
-              <p className="text-xs text-gray-500 mt-1">
-                +2 from last month
-              </p>
+              <p className="text-xs text-gray-500 mt-1">+2 from last month</p>
             </CardContent>
           </Card>
 
@@ -48,9 +59,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">8</div>
-              <p className="text-xs text-gray-500 mt-1">
-                All services running
-              </p>
+              <p className="text-xs text-gray-500 mt-1">All services running</p>
             </CardContent>
           </Card>
 
@@ -63,9 +72,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">$247</div>
-              <p className="text-xs text-gray-500 mt-1">
-                -12% from last month
-              </p>
+              <p className="text-xs text-gray-500 mt-1">-12% from last month</p>
             </CardContent>
           </Card>
 
@@ -78,9 +85,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">2</div>
-              <p className="text-xs text-gray-500 mt-1">
-                1 open, 1 pending
-              </p>
+              <p className="text-xs text-gray-500 mt-1">1 open, 1 pending</p>
             </CardContent>
           </Card>
         </div>
@@ -101,18 +106,43 @@ export default function Dashboard() {
             <CardContent>
               <div className="space-y-4">
                 {[
-                  { domain: "example.com", type: "Domain", expires: "Dec 15, 2024", urgent: true },
-                  { domain: "mysite.org", type: "Hosting", expires: "Dec 22, 2024", urgent: false },
-                  { domain: "business.net", type: "SSL Certificate", expires: "Jan 5, 2025", urgent: false },
+                  {
+                    domain: "example.com",
+                    type: "Domain",
+                    expires: "Dec 15, 2024",
+                    urgent: true,
+                  },
+                  {
+                    domain: "mysite.org",
+                    type: "Hosting",
+                    expires: "Dec 22, 2024",
+                    urgent: false,
+                  },
+                  {
+                    domain: "business.net",
+                    type: "SSL Certificate",
+                    expires: "Jan 5, 2025",
+                    urgent: false,
+                  },
                 ].map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
                     <div>
-                      <div className="font-medium text-gray-900">{item.domain}</div>
+                      <div className="font-medium text-gray-900">
+                        {item.domain}
+                      </div>
                       <div className="text-sm text-gray-500">{item.type}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-gray-900">{item.expires}</div>
-                      <Badge variant={item.urgent ? "destructive" : "secondary"} className="text-xs">
+                      <div className="text-sm text-gray-900">
+                        {item.expires}
+                      </div>
+                      <Badge
+                        variant={item.urgent ? "destructive" : "secondary"}
+                        className="text-xs"
+                      >
                         {item.urgent ? "Urgent" : "Upcoming"}
                       </Badge>
                     </div>
@@ -129,9 +159,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>
-                Common tasks and shortcuts
-              </CardDescription>
+              <CardDescription>Common tasks and shortcuts</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button variant="outline" className="w-full justify-start">
@@ -165,18 +193,49 @@ export default function Dashboard() {
           <CardContent>
             <div className="space-y-4">
               {[
-                { action: "Domain renewed", target: "example.com", time: "2 hours ago", type: "success" },
-                { action: "SSL certificate installed", target: "mysite.org", time: "1 day ago", type: "success" },
-                { action: "Support ticket created", target: "#12345", time: "3 days ago", type: "info" },
-                { action: "DNS settings updated", target: "business.net", time: "1 week ago", type: "info" },
+                {
+                  action: "Domain renewed",
+                  target: "example.com",
+                  time: "2 hours ago",
+                  type: "success",
+                },
+                {
+                  action: "SSL certificate installed",
+                  target: "mysite.org",
+                  time: "1 day ago",
+                  type: "success",
+                },
+                {
+                  action: "Support ticket created",
+                  target: "#12345",
+                  time: "3 days ago",
+                  type: "info",
+                },
+                {
+                  action: "DNS settings updated",
+                  target: "business.net",
+                  time: "1 week ago",
+                  type: "info",
+                },
               ].map((activity, index) => (
-                <div key={index} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
-                  <div className={`w-2 h-2 rounded-full ${
-                    activity.type === 'success' ? 'bg-success' : 'bg-brand-primary'
-                  }`} />
+                <div
+                  key={index}
+                  className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg"
+                >
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      activity.type === "success"
+                        ? "bg-success"
+                        : "bg-brand-primary"
+                    }`}
+                  />
                   <div className="flex-1">
-                    <div className="font-medium text-gray-900">{activity.action}</div>
-                    <div className="text-sm text-gray-500">{activity.target}</div>
+                    <div className="font-medium text-gray-900">
+                      {activity.action}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {activity.target}
+                    </div>
                   </div>
                   <div className="text-sm text-gray-500">{activity.time}</div>
                 </div>

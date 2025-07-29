@@ -1,9 +1,21 @@
 import AppShell from "@/components/layout/AppShell";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CreditCard, Download, DollarSign, Calendar, Receipt } from "lucide-react";
+import {
+  CreditCard,
+  Download,
+  DollarSign,
+  Calendar,
+  Receipt,
+} from "lucide-react";
 
 export default function Billing() {
   return (
@@ -49,9 +61,7 @@ export default function Billing() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">$47.00</div>
-              <p className="text-xs text-gray-500 mt-1">
-                Due Dec 15, 2024
-              </p>
+              <p className="text-xs text-gray-500 mt-1">Due Dec 15, 2024</p>
             </CardContent>
           </Card>
 
@@ -64,9 +74,7 @@ export default function Billing() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">$247.00</div>
-              <p className="text-xs text-gray-500 mt-1">
-                5 transactions
-              </p>
+              <p className="text-xs text-gray-500 mt-1">5 transactions</p>
             </CardContent>
           </Card>
         </div>
@@ -82,26 +90,26 @@ export default function Billing() {
           <TabsContent value="invoices" className="space-y-4">
             <div className="grid gap-4">
               {[
-                { 
-                  id: "INV-2024-001", 
-                  amount: "$47.00", 
-                  date: "Dec 1, 2024", 
+                {
+                  id: "INV-2024-001",
+                  amount: "$47.00",
+                  date: "Dec 1, 2024",
                   status: "Paid",
-                  description: "Domain renewal - example.com"
+                  description: "Domain renewal - example.com",
                 },
-                { 
-                  id: "INV-2024-002", 
-                  amount: "$120.00", 
-                  date: "Nov 15, 2024", 
+                {
+                  id: "INV-2024-002",
+                  amount: "$120.00",
+                  date: "Nov 15, 2024",
                   status: "Paid",
-                  description: "Hosting plan upgrade"
+                  description: "Hosting plan upgrade",
                 },
-                { 
-                  id: "INV-2024-003", 
-                  amount: "$80.00", 
-                  date: "Nov 1, 2024", 
+                {
+                  id: "INV-2024-003",
+                  amount: "$80.00",
+                  date: "Nov 1, 2024",
                   status: "Paid",
-                  description: "SSL certificates (2x)"
+                  description: "SSL certificates (2x)",
                 },
               ].map((invoice, index) => (
                 <Card key={index}>
@@ -112,14 +120,22 @@ export default function Billing() {
                           <Receipt className="h-5 w-5 text-brand-primary" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{invoice.id}</h3>
-                          <p className="text-sm text-gray-500">{invoice.description}</p>
+                          <h3 className="font-semibold text-gray-900">
+                            {invoice.id}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {invoice.description}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
                         <div className="text-right">
-                          <div className="font-semibold text-gray-900">{invoice.amount}</div>
-                          <div className="text-sm text-gray-500">{invoice.date}</div>
+                          <div className="font-semibold text-gray-900">
+                            {invoice.amount}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {invoice.date}
+                          </div>
                         </div>
                         <Badge variant="default">{invoice.status}</Badge>
                         <Button variant="outline" size="sm">
@@ -137,17 +153,17 @@ export default function Billing() {
           <TabsContent value="payments" className="space-y-4">
             <div className="grid gap-4">
               {[
-                { 
-                  type: "Visa", 
-                  last4: "4242", 
-                  expires: "12/26", 
-                  isDefault: true 
+                {
+                  type: "Visa",
+                  last4: "4242",
+                  expires: "12/26",
+                  isDefault: true,
                 },
-                { 
-                  type: "Mastercard", 
-                  last4: "8888", 
-                  expires: "08/27", 
-                  isDefault: false 
+                {
+                  type: "Mastercard",
+                  last4: "8888",
+                  expires: "08/27",
+                  isDefault: false,
                 },
               ].map((card, index) => (
                 <Card key={index}>
@@ -161,7 +177,9 @@ export default function Billing() {
                           <h3 className="font-semibold text-gray-900">
                             {card.type} ending in {card.last4}
                           </h3>
-                          <p className="text-sm text-gray-500">Expires {card.expires}</p>
+                          <p className="text-sm text-gray-500">
+                            Expires {card.expires}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
@@ -182,26 +200,26 @@ export default function Billing() {
           <TabsContent value="history" className="space-y-4">
             <div className="grid gap-4">
               {[
-                { 
-                  date: "Dec 1, 2024", 
-                  amount: "$47.00", 
-                  method: "Visa •••• 4242", 
+                {
+                  date: "Dec 1, 2024",
+                  amount: "$47.00",
+                  method: "Visa •••• 4242",
                   status: "Completed",
-                  description: "Domain renewal payment"
+                  description: "Domain renewal payment",
                 },
-                { 
-                  date: "Nov 15, 2024", 
-                  amount: "$120.00", 
-                  method: "Visa •••• 4242", 
+                {
+                  date: "Nov 15, 2024",
+                  amount: "$120.00",
+                  method: "Visa •••• 4242",
                   status: "Completed",
-                  description: "Hosting upgrade payment"
+                  description: "Hosting upgrade payment",
                 },
-                { 
-                  date: "Nov 1, 2024", 
-                  amount: "$80.00", 
-                  method: "Mastercard •••• 8888", 
+                {
+                  date: "Nov 1, 2024",
+                  amount: "$80.00",
+                  method: "Mastercard •••• 8888",
                   status: "Completed",
-                  description: "SSL certificate payment"
+                  description: "SSL certificate payment",
                 },
               ].map((payment, index) => (
                 <Card key={index}>
@@ -212,14 +230,24 @@ export default function Billing() {
                           <DollarSign className="h-5 w-5 text-success" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{payment.amount}</h3>
-                          <p className="text-sm text-gray-500">{payment.description}</p>
+                          <h3 className="font-semibold text-gray-900">
+                            {payment.amount}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {payment.description}
+                          </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium text-gray-900">{payment.date}</div>
-                        <div className="text-sm text-gray-500">{payment.method}</div>
-                        <Badge variant="default" className="mt-1">{payment.status}</Badge>
+                        <div className="font-medium text-gray-900">
+                          {payment.date}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {payment.method}
+                        </div>
+                        <Badge variant="default" className="mt-1">
+                          {payment.status}
+                        </Badge>
                       </div>
                     </div>
                   </CardContent>

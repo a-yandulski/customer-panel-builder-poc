@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Bell, Menu, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -56,8 +56,8 @@ export default function TopNavigation() {
             {/* Notifications */}
             <Button variant="ghost" size="sm" className="relative">
               <Bell className="h-5 w-5 text-gray-600" />
-              <Badge 
-                variant="destructive" 
+              <Badge
+                variant="destructive"
                 className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs"
               >
                 3
@@ -81,9 +81,7 @@ export default function TopNavigation() {
                   <User className="mr-2 h-4 w-4" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Account Settings
-                </DropdownMenuItem>
+                <DropdownMenuItem>Account Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-red-600">
                   Sign Out
@@ -99,7 +97,9 @@ export default function TopNavigation() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[260px] p-0">
-                <MobileNavigation onItemClick={() => setIsMobileMenuOpen(false)} />
+                <MobileNavigation
+                  onItemClick={() => setIsMobileMenuOpen(false)}
+                />
               </SheetContent>
             </Sheet>
           </div>
@@ -155,8 +155,8 @@ function MobileNavigation({ onItemClick }: MobileNavigationProps) {
             <div className="text-sm text-gray-500">john@example.com</div>
           </div>
         </div>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"
           onClick={onItemClick}
         >

@@ -26,9 +26,7 @@ export default function Index() {
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-primary"></div>
           Loading DomainHost...
         </h1>
-        <p className="mt-2 text-gray-600">
-          Redirecting to your customer panel
-        </p>
+        <p className="mt-2 text-gray-600">Redirecting to your customer panel</p>
       </div>
     </div>
   );

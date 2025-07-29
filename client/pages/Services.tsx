@@ -1,5 +1,11 @@
 import AppShell from "@/components/layout/AppShell";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,26 +40,26 @@ export default function Services() {
           <TabsContent value="domains" className="space-y-4">
             <div className="grid gap-4">
               {[
-                { 
-                  domain: "example.com", 
-                  status: "Active", 
-                  expires: "Dec 15, 2024", 
+                {
+                  domain: "example.com",
+                  status: "Active",
+                  expires: "Dec 15, 2024",
                   autoRenew: true,
-                  registrar: "DomainHost"
+                  registrar: "DomainHost",
                 },
-                { 
-                  domain: "mysite.org", 
-                  status: "Active", 
-                  expires: "Mar 22, 2025", 
+                {
+                  domain: "mysite.org",
+                  status: "Active",
+                  expires: "Mar 22, 2025",
                   autoRenew: false,
-                  registrar: "DomainHost"
+                  registrar: "DomainHost",
                 },
-                { 
-                  domain: "business.net", 
-                  status: "Pending Transfer", 
-                  expires: "Jan 5, 2025", 
+                {
+                  domain: "business.net",
+                  status: "Pending Transfer",
+                  expires: "Jan 5, 2025",
                   autoRenew: true,
-                  registrar: "External"
+                  registrar: "External",
                 },
               ].map((domain, index) => (
                 <Card key={index}>
@@ -64,12 +70,20 @@ export default function Services() {
                           <Globe className="h-5 w-5 text-brand-primary" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{domain.domain}</h3>
-                          <p className="text-sm text-gray-500">Expires: {domain.expires}</p>
+                          <h3 className="font-semibold text-gray-900">
+                            {domain.domain}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            Expires: {domain.expires}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <Badge variant={domain.status === "Active" ? "default" : "secondary"}>
+                        <Badge
+                          variant={
+                            domain.status === "Active" ? "default" : "secondary"
+                          }
+                        >
                           {domain.status}
                         </Badge>
                         <Button variant="outline" size="sm">
@@ -79,7 +93,9 @@ export default function Services() {
                       </div>
                     </div>
                     <div className="mt-4 flex items-center space-x-6 text-sm text-gray-500">
-                      <span>Auto-renew: {domain.autoRenew ? "Enabled" : "Disabled"}</span>
+                      <span>
+                        Auto-renew: {domain.autoRenew ? "Enabled" : "Disabled"}
+                      </span>
                       <span>Registrar: {domain.registrar}</span>
                     </div>
                   </CardContent>
@@ -91,19 +107,19 @@ export default function Services() {
           <TabsContent value="hosting" className="space-y-4">
             <div className="grid gap-4">
               {[
-                { 
-                  name: "Web Hosting Pro", 
-                  domain: "example.com", 
-                  plan: "Professional", 
+                {
+                  name: "Web Hosting Pro",
+                  domain: "example.com",
+                  plan: "Professional",
                   status: "Active",
-                  usage: "2.1 GB / 10 GB"
+                  usage: "2.1 GB / 10 GB",
                 },
-                { 
-                  name: "WordPress Hosting", 
-                  domain: "mysite.org", 
-                  plan: "Business", 
+                {
+                  name: "WordPress Hosting",
+                  domain: "mysite.org",
+                  plan: "Business",
                   status: "Active",
-                  usage: "8.7 GB / 25 GB"
+                  usage: "8.7 GB / 25 GB",
                 },
               ].map((hosting, index) => (
                 <Card key={index}>
@@ -114,8 +130,12 @@ export default function Services() {
                           <Server className="h-5 w-5 text-brand-primary" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{hosting.name}</h3>
-                          <p className="text-sm text-gray-500">{hosting.domain} • {hosting.plan}</p>
+                          <h3 className="font-semibold text-gray-900">
+                            {hosting.name}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {hosting.domain} • {hosting.plan}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
@@ -132,9 +152,14 @@ export default function Services() {
                         <span>{hosting.usage}</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-brand-primary h-2 rounded-full" 
-                          style={{ width: hosting.name === "Web Hosting Pro" ? "21%" : "35%" }}
+                        <div
+                          className="bg-brand-primary h-2 rounded-full"
+                          style={{
+                            width:
+                              hosting.name === "Web Hosting Pro"
+                                ? "21%"
+                                : "35%",
+                          }}
                         ></div>
                       </div>
                     </div>
@@ -147,19 +172,19 @@ export default function Services() {
           <TabsContent value="security" className="space-y-4">
             <div className="grid gap-4">
               {[
-                { 
-                  name: "SSL Certificate", 
-                  domain: "example.com", 
-                  type: "Extended Validation", 
+                {
+                  name: "SSL Certificate",
+                  domain: "example.com",
+                  type: "Extended Validation",
                   status: "Active",
-                  expires: "Dec 15, 2024"
+                  expires: "Dec 15, 2024",
                 },
-                { 
-                  name: "SSL Certificate", 
-                  domain: "mysite.org", 
-                  type: "Domain Validation", 
+                {
+                  name: "SSL Certificate",
+                  domain: "mysite.org",
+                  type: "Domain Validation",
                   status: "Active",
-                  expires: "Mar 22, 2025"
+                  expires: "Mar 22, 2025",
                 },
               ].map((security, index) => (
                 <Card key={index}>
@@ -170,8 +195,12 @@ export default function Services() {
                           <Shield className="h-5 w-5 text-success" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{security.name}</h3>
-                          <p className="text-sm text-gray-500">{security.domain} • {security.type}</p>
+                          <h3 className="font-semibold text-gray-900">
+                            {security.name}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {security.domain} • {security.type}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">

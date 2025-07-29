@@ -1,13 +1,32 @@
 import AppShell from "@/components/layout/AppShell";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MessageCircle, Plus, Search, FileText, Clock, AlertCircle } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  MessageCircle,
+  Plus,
+  Search,
+  FileText,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
 
 export default function Support() {
   return (
@@ -40,10 +59,7 @@ export default function Support() {
             <div className="flex items-center space-x-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input 
-                  placeholder="Search tickets..." 
-                  className="pl-10"
-                />
+                <Input placeholder="Search tickets..." className="pl-10" />
               </div>
               <Select defaultValue="all">
                 <SelectTrigger className="w-32">
@@ -61,32 +77,32 @@ export default function Support() {
             {/* Tickets List */}
             <div className="grid gap-4">
               {[
-                { 
-                  id: "#12345", 
-                  subject: "Domain transfer issue", 
-                  status: "Open", 
+                {
+                  id: "#12345",
+                  subject: "Domain transfer issue",
+                  status: "Open",
                   priority: "High",
                   created: "Dec 10, 2024",
                   updated: "Dec 11, 2024",
-                  category: "Domains"
+                  category: "Domains",
                 },
-                { 
-                  id: "#12344", 
-                  subject: "Email not working after server migration", 
-                  status: "Pending", 
+                {
+                  id: "#12344",
+                  subject: "Email not working after server migration",
+                  status: "Pending",
                   priority: "Medium",
                   created: "Dec 8, 2024",
                   updated: "Dec 9, 2024",
-                  category: "Email"
+                  category: "Email",
                 },
-                { 
-                  id: "#12343", 
-                  subject: "SSL certificate installation", 
-                  status: "Closed", 
+                {
+                  id: "#12343",
+                  subject: "SSL certificate installation",
+                  status: "Closed",
                   priority: "Low",
                   created: "Dec 5, 2024",
                   updated: "Dec 6, 2024",
-                  category: "Security"
+                  category: "Security",
                 },
               ].map((ticket, index) => (
                 <Card key={index}>
@@ -97,20 +113,31 @@ export default function Support() {
                           <MessageCircle className="h-5 w-5 text-brand-primary" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{ticket.subject}</h3>
-                          <p className="text-sm text-gray-500">{ticket.id} • {ticket.category}</p>
+                          <h3 className="font-semibold text-gray-900">
+                            {ticket.subject}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {ticket.id} • {ticket.category}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
                         <div className="text-right text-sm">
-                          <div className="text-gray-900">Created: {ticket.created}</div>
-                          <div className="text-gray-500">Updated: {ticket.updated}</div>
+                          <div className="text-gray-900">
+                            Created: {ticket.created}
+                          </div>
+                          <div className="text-gray-500">
+                            Updated: {ticket.updated}
+                          </div>
                         </div>
                         <div className="flex flex-col space-y-2">
-                          <Badge 
+                          <Badge
                             variant={
-                              ticket.status === "Open" ? "destructive" : 
-                              ticket.status === "Pending" ? "secondary" : "default"
+                              ticket.status === "Open"
+                                ? "destructive"
+                                : ticket.status === "Pending"
+                                  ? "secondary"
+                                  : "default"
                             }
                           >
                             {ticket.status}
@@ -135,7 +162,8 @@ export default function Support() {
               <CardHeader>
                 <CardTitle>Create Support Ticket</CardTitle>
                 <CardDescription>
-                  Describe your issue and we'll help you resolve it as quickly as possible
+                  Describe your issue and we'll help you resolve it as quickly
+                  as possible
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -152,11 +180,13 @@ export default function Support() {
                         <SelectItem value="email">Email</SelectItem>
                         <SelectItem value="security">Security</SelectItem>
                         <SelectItem value="billing">Billing</SelectItem>
-                        <SelectItem value="technical">Technical Support</SelectItem>
+                        <SelectItem value="technical">
+                          Technical Support
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="priority">Priority</Label>
                     <Select>
@@ -175,7 +205,7 @@ export default function Support() {
 
                 <div className="space-y-2">
                   <Label htmlFor="subject">Subject</Label>
-                  <Input 
+                  <Input
                     id="subject"
                     placeholder="Brief description of your issue"
                   />
@@ -183,7 +213,7 @@ export default function Support() {
 
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
-                  <Textarea 
+                  <Textarea
                     id="description"
                     placeholder="Please provide detailed information about your issue, including any error messages and steps you've already tried."
                     rows={6}
@@ -191,7 +221,9 @@ export default function Support() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="domain">Related Domain/Service (Optional)</Label>
+                  <Label htmlFor="domain">
+                    Related Domain/Service (Optional)
+                  </Label>
                   <Select>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a service" />
@@ -215,48 +247,48 @@ export default function Support() {
             {/* Search Bar */}
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input 
-                placeholder="Search knowledge base..." 
-                className="pl-10"
-              />
+              <Input placeholder="Search knowledge base..." className="pl-10" />
             </div>
 
             {/* Popular Articles */}
             <div className="grid gap-4">
               <h3 className="h3 text-gray-900">Popular Articles</h3>
               {[
-                { 
-                  title: "How to point your domain to our servers", 
+                {
+                  title: "How to point your domain to our servers",
                   category: "Domains",
                   readTime: "3 min read",
-                  helpful: 45
+                  helpful: 45,
                 },
-                { 
-                  title: "Setting up email accounts and forwarding", 
+                {
+                  title: "Setting up email accounts and forwarding",
                   category: "Email",
                   readTime: "5 min read",
-                  helpful: 38
+                  helpful: 38,
                 },
-                { 
-                  title: "Installing WordPress on your hosting account", 
+                {
+                  title: "Installing WordPress on your hosting account",
                   category: "Hosting",
                   readTime: "7 min read",
-                  helpful: 52
+                  helpful: 52,
                 },
-                { 
-                  title: "Understanding SSL certificates and HTTPS", 
+                {
+                  title: "Understanding SSL certificates and HTTPS",
                   category: "Security",
                   readTime: "4 min read",
-                  helpful: 29
+                  helpful: 29,
                 },
-                { 
-                  title: "Managing DNS records and subdomains", 
+                {
+                  title: "Managing DNS records and subdomains",
                   category: "Domains",
                   readTime: "6 min read",
-                  helpful: 41
+                  helpful: 41,
                 },
               ].map((article, index) => (
-                <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer">
+                <Card
+                  key={index}
+                  className="hover:shadow-md transition-shadow cursor-pointer"
+                >
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
@@ -264,7 +296,9 @@ export default function Support() {
                           <FileText className="h-5 w-5 text-brand-primary" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-900">{article.title}</h4>
+                          <h4 className="font-semibold text-gray-900">
+                            {article.title}
+                          </h4>
                           <div className="flex items-center space-x-3 mt-1 text-sm text-gray-500">
                             <span>{article.category}</span>
                             <span>•</span>
