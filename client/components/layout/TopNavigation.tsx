@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Bell, Menu, User, X } from "lucide-react";
+import { Menu, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import NotificationCenter from "@/components/NotificationCenter";
 
 const navigationItems = [
   { label: "Dashboard", href: "/dashboard" },
@@ -59,15 +60,7 @@ export default function TopNavigation() {
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
             {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative">
-              <Bell className="h-5 w-5 text-gray-600" />
-              <Badge
-                variant="destructive"
-                className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs"
-              >
-                3
-              </Badge>
-            </Button>
+            <NotificationCenter />
 
             {/* User Profile */}
             <DropdownMenu>
@@ -119,52 +112,73 @@ interface MobileNavigationProps {
 }
 
 function MobileNavigation({ onItemClick }: MobileNavigationProps) {
+  const location = useLocation();
+
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Mobile Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-            <span className="text-white font-bold text-sm">D</span>
+          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-lg">D</span>
           </div>
-          <span className="font-semibold text-gray-900 text-lg">
+          <span className="font-semibold text-gray-900 text-xl">
             DomainHost
           </span>
         </div>
       </div>
 
       {/* Mobile Navigation Items */}
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 p-6">
         <div className="space-y-2">
           {navigationItems.map((item) => (
             <Link
               key={item.href}
               to={item.href}
               onClick={onItemClick}
-              className={`block px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary rounded-md transition-colors duration-200 font-semibold ${
-                location.pathname === item.href ? 'bg-gray-100 text-primary' : ''
+              className={`flex items-center px-4 py-4 text-gray-700 hover:bg-gray-100 hover:text-primary rounded-lg transition-all duration-200 font-semibold min-h-[44px] ${
+                location.pathname === item.href ? 'bg-primary/10 text-primary border-l-4 border-primary' : ''
               }`}
             >
               {item.label}
             </Link>
           ))}
         </div>
+
+        {/* Mobile Quick Actions */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <div className="space-y-2">
+            <button
+              className="flex items-center w-full px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors min-h-[44px]"
+              onClick={onItemClick}
+            >
+              Register Domain
+            </button>
+            <button
+              className="flex items-center w-full px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors min-h-[44px]"
+              onClick={onItemClick}
+            >
+              Create Ticket
+            </button>
+          </div>
+        </div>
       </nav>
 
       {/* Mobile Footer */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center space-x-3 mb-3">
-          <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-            <User className="h-5 w-5 text-gray-600" />
+      <div className="p-6 border-t border-gray-200">
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+            <User className="h-6 w-6 text-gray-600" />
           </div>
           <div>
-            <div className="font-medium text-gray-900">John Doe</div>
+            <div className="font-semibold text-gray-900">John Doe</div>
             <div className="text-sm text-gray-500">john@example.com</div>
           </div>
         </div>
         <Button
           variant="outline"
-          className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"
+          className="w-full justify-center h-12 text-red-600 border-red-200 hover:bg-red-50 font-semibold"
           onClick={onItemClick}
         >
           Sign Out
