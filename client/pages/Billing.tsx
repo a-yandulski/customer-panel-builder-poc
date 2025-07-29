@@ -1,5 +1,6 @@
 import { useState } from "react";
 import AppShell from "@/components/layout/AppShell";
+import MobileTable, { TableBadge, TableActions, MobileActionButton } from "@/components/MobileTable";
 import {
   Card,
   CardContent,
@@ -490,53 +491,78 @@ export default function Billing() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Invoice #</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedInvoices.map((invoice) => (
-                      <TableRow key={invoice.id} className="hover:bg-gray-50">
-                        <TableCell className="font-mono font-medium">
-                          {invoice.number}
-                        </TableCell>
-                        <TableCell className="body-sm">{invoice.date}</TableCell>
-                        <TableCell className="body-sm">{invoice.description}</TableCell>
-                        <TableCell className="font-semibold">{invoice.amount}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(invoice.status)}>
-                            {invoice.status}
-                          </Badge>
-                          {invoice.dueDate && invoice.status !== "Paid" && (
+                <MobileTable
+                  columns={[
+                    {
+                      key: "number",
+                      header: "Invoice #",
+                      mobileLabel: "Invoice",
+                      render: (value) => (
+                        <span className="font-mono font-medium">{value}</span>
+                      ),
+                    },
+                    {
+                      key: "date",
+                      header: "Date",
+                      render: (value) => <span className="body-sm">{value}</span>,
+                    },
+                    {
+                      key: "description",
+                      header: "Description",
+                      render: (value) => <span className="body-sm">{value}</span>,
+                      hideOnMobile: true,
+                    },
+                    {
+                      key: "amount",
+                      header: "Amount",
+                      render: (value) => <span className="font-semibold">{value}</span>,
+                    },
+                    {
+                      key: "status",
+                      header: "Status",
+                      render: (value, row) => (
+                        <div>
+                          <TableBadge className={getStatusColor(value)}>
+                            {value}
+                          </TableBadge>
+                          {row.dueDate && value !== "Paid" && (
                             <p className="body-sm text-gray-500 mt-1">
-                              Due: {invoice.dueDate}
+                              Due: {row.dueDate}
                             </p>
                           )}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end space-x-2">
-                            <Button variant="outline" size="sm">
-                              <Download className="mr-2 h-4 w-4" />
-                              Download
-                            </Button>
-                            {invoice.status === "Pending" && (
-                              <Button size="sm" className="bg-primary hover:bg-primary/90">
-                                Pay Now
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                        </div>
+                      ),
+                    },
+                    {
+                      key: "actions",
+                      header: "Actions",
+                      mobileLabel: "Actions",
+                      render: (_, row) => (
+                        <TableActions className="justify-end">
+                          <MobileActionButton
+                            onClick={() => console.log("Download", row.id)}
+                            variant="outline"
+                          >
+                            <Download className="mr-2 h-4 w-4" />
+                            Download
+                          </MobileActionButton>
+                          {row.status === "Pending" && (
+                            <MobileActionButton
+                              onClick={() => console.log("Pay", row.id)}
+                              variant="default"
+                              className="bg-primary hover:bg-primary/90"
+                            >
+                              Pay Now
+                            </MobileActionButton>
+                          )}
+                        </TableActions>
+                      ),
+                    },
+                  ]}
+                  data={paginatedInvoices}
+                  primaryColumn="number"
+                  className="table-auto"
+                />
 
                 {/* Pagination */}
                 <div className="flex items-center justify-between mt-4">
