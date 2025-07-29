@@ -1,5 +1,10 @@
 import { useState } from "react";
 import AppShell from "@/components/layout/AppShell";
+import { useToast } from "@/components/ui/toast";
+import { FormFieldError, ValidationErrorSummary } from "@/components/ui/error-states";
+import { SettingsSaved, InlineSuccess } from "@/components/ui/success-states";
+import { LoadingOverlay } from "@/components/ui/loading-states";
+import { Button } from "@/components/ui/interactive-states";
 import {
   Card,
   CardContent,
@@ -90,6 +95,11 @@ export default function Account() {
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [sameAsBilling, setSameAsBilling] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({});
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [settingSaved, setSettingSaved] = useState("");
+  const toast = useToast();
 
   const [profileData, setProfileData] = useState({
     name: "John Doe",
@@ -229,11 +239,72 @@ export default function Account() {
   };
 
   const handleSaveProfile = async () => {
+    // Reset errors
+    setValidationErrors([]);
+    setFieldErrors({});
+
+    // Validate form
+    const errors: string[] = [];
+    const fieldErrs: {[key: string]: string} = {};
+
+    if (!profileData.name.trim()) {
+      errors.push("Full name is required");
+      fieldErrs.name = "Please enter your full name";
+    }
+
+    if (!profileData.email.trim()) {
+      errors.push("Email address is required");
+      fieldErrs.email = "Please enter a valid email address";
+    } else if (!/\S+@\S+\.\S+/.test(profileData.email)) {
+      errors.push("Email address is invalid");
+      fieldErrs.email = "Please enter a valid email address";
+    }
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      setFieldErrors(fieldErrs);
+      toast.error("Please fix the errors before saving", {
+        title: "Validation Error"
+      });
+      return;
+    }
+
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    setIsEditing(false);
+
+    try {
+      // Simulate API call
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // Simulate random success/failure for demo
+          if (Math.random() > 0.8) {
+            reject(new Error("Network error: Unable to save profile"));
+          } else {
+            resolve(true);
+          }
+        }, 2000);
+      });
+
+      setIsLoading(false);
+      setIsEditing(false);
+      setShowSuccessMessage(true);
+
+      toast.success("Profile updated successfully!", {
+        title: "Changes Saved"
+      });
+
+      // Hide success message after 3 seconds
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+
+    } catch (error) {
+      setIsLoading(false);
+      toast.error(error instanceof Error ? error.message : "Failed to save profile", {
+        title: "Save Failed",
+        action: {
+          label: "Try Again",
+          onClick: handleSaveProfile
+        }
+      });
+    }
   };
 
   const handleNotificationChange = (id: string, type: 'email' | 'sms' | 'push', value: boolean) => {
@@ -301,6 +372,22 @@ export default function Account() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Validation Errors */}
+                {validationErrors.length > 0 && (
+                  <ValidationErrorSummary
+                    errors={validationErrors}
+                    onDismiss={() => setValidationErrors([])}
+                  />
+                )}
+
+                {/* Success Message */}
+                {showSuccessMessage && (
+                  <InlineSuccess
+                    message="Profile updated successfully!"
+                    onDismiss={() => setShowSuccessMessage(false)}
+                  />
+                )}
+
                 {/* Avatar Section */}
                 <div className="flex items-center space-x-6">
                   <div className="relative">
@@ -332,9 +419,17 @@ export default function Account() {
                     </Label>
                     <Input
                       value={profileData.name}
-                      onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                      onChange={(e) => {
+                        setProfileData({...profileData, name: e.target.value});
+                        // Clear field error when user starts typing
+                        if (fieldErrors.name) {
+                          setFieldErrors(prev => ({...prev, name: ""}));
+                        }
+                      }}
                       disabled={!isEditing}
+                      className={fieldErrors.name ? "form-field-error" : "form-field-focus"}
                     />
+                    <FormFieldError error={fieldErrors.name} />
                   </div>
 
                   <div className="space-y-2">
@@ -344,9 +439,17 @@ export default function Account() {
                     </Label>
                     <Input
                       value={profileData.email}
-                      onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                      onChange={(e) => {
+                        setProfileData({...profileData, email: e.target.value});
+                        // Clear field error when user starts typing
+                        if (fieldErrors.email) {
+                          setFieldErrors(prev => ({...prev, email: ""}));
+                        }
+                      }}
                       disabled={!isEditing}
+                      className={fieldErrors.email ? "form-field-error" : "form-field-focus"}
                     />
+                    <FormFieldError error={fieldErrors.email} />
                   </div>
 
                   <div className="space-y-2">
@@ -375,23 +478,22 @@ export default function Account() {
                 </div>
 
                 {isEditing && (
-                  <div className="flex space-x-3">
-                    <Button 
-                      className="bg-primary hover:bg-primary/90"
-                      onClick={handleSaveProfile}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      ) : (
+                  <LoadingOverlay isLoading={isLoading}>
+                    <div className="flex space-x-3">
+                      <Button
+                        className="bg-primary hover:bg-primary/90"
+                        onClick={handleSaveProfile}
+                        loading={isLoading}
+                        loadingText="Saving..."
+                      >
                         <Save className="mr-2 h-4 w-4" />
-                      )}
-                      Save Changes
-                    </Button>
-                    <Button variant="outline" onClick={() => setIsEditing(false)}>
-                      Cancel
-                    </Button>
-                  </div>
+                        Save Changes
+                      </Button>
+                      <Button variant="outline" onClick={() => setIsEditing(false)} disabled={isLoading}>
+                        Cancel
+                      </Button>
+                    </div>
+                  </LoadingOverlay>
                 )}
               </CardContent>
             </Card>
@@ -741,7 +843,7 @@ export default function Account() {
                   </div>
                   <Switch
                     checked={twoFactorEnabled}
-                    onCheckedChange={setTwoFactorEnabled}
+                    onCheckedChange={handleTwoFactorToggle}
                   />
                 </div>
 
@@ -1038,6 +1140,13 @@ export default function Account() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Settings Saved Notification */}
+      <SettingsSaved
+        setting={settingSaved}
+        visible={!!settingSaved}
+        onHide={() => setSettingSaved("")}
+      />
     </AppShell>
   );
 }
