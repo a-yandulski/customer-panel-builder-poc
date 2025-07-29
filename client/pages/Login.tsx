@@ -42,9 +42,7 @@ export default function Login() {
               <span className="text-white font-bold text-xl">D</span>
             </div>
           </div>
-          <h2 className="mt-6 h2 text-gray-900">
-            Sign in to your account
-          </h2>
+          <h2 className="mt-6 h2 text-gray-900">Sign in to your account</h2>
           <p className="mt-2 body-sm text-gray-500">
             Manage your domains, hosting, and services
           </p>
@@ -53,7 +51,9 @@ export default function Login() {
         {/* Login Form */}
         <Card className="border-gray-200 shadow-lg">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl font-semibold text-center">Welcome back</CardTitle>
+            <CardTitle className="text-xl font-semibold text-center">
+              Welcome back
+            </CardTitle>
             <CardDescription className="text-center body-sm">
               Enter your credentials to access your customer panel
             </CardDescription>
