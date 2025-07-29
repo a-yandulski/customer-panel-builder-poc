@@ -29,7 +29,7 @@ export default function TopNavigation() {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-brand-primary rounded-md flex items-center justify-center">
+              <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
                 <span className="text-white font-bold text-sm">D</span>
               </div>
               <span className="font-semibold text-gray-900 text-lg hidden sm:block">
@@ -44,7 +44,7 @@ export default function TopNavigation() {
               <a
                 key={item.href}
                 href={item.href}
-                className="text-gray-600 hover:text-brand-primary transition-colors duration-200 font-medium"
+                className="text-gray-700 hover:text-primary transition-colors duration-200 font-semibold"
               >
                 {item.label}
               </a>
@@ -119,7 +119,7 @@ function MobileNavigation({ onItemClick }: MobileNavigationProps) {
       {/* Mobile Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-brand-primary rounded-md flex items-center justify-center">
+          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
             <span className="text-white font-bold text-sm">D</span>
           </div>
           <span className="font-semibold text-gray-900 text-lg">
@@ -136,7 +136,7 @@ function MobileNavigation({ onItemClick }: MobileNavigationProps) {
               key={item.href}
               href={item.href}
               onClick={onItemClick}
-              className="block px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-brand-primary rounded-md transition-colors duration-200 font-medium"
+              className="block px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary rounded-md transition-colors duration-200 font-semibold"
             >
               {item.label}
             </a>
