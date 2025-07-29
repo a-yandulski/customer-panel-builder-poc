@@ -63,7 +63,7 @@ export default function Login() {
               <div className="space-y-2">
                 <Label
                   htmlFor="email"
-                  className="text-sm font-medium text-gray-700"
+                  className="body-sm font-semibold text-gray-700"
                 >
                   Email address
                 </Label>
@@ -81,7 +81,7 @@ export default function Login() {
               <div className="space-y-2">
                 <Label
                   htmlFor="password"
-                  className="text-sm font-medium text-gray-700"
+                  className="body-sm font-semibold text-gray-700"
                 >
                   Password
                 </Label>
@@ -120,14 +120,14 @@ export default function Login() {
                   />
                   <Label
                     htmlFor="remember"
-                    className="text-sm text-gray-600 cursor-pointer"
+                    className="body-sm text-gray-500 cursor-pointer"
                   >
                     Remember me
                   </Label>
                 </div>
                 <a
                   href="/forgot-password"
-                  className="text-sm text-brand-primary hover:text-brand-secondary font-medium transition-colors"
+                  className="body-sm text-primary hover:text-secondary font-semibold transition-colors"
                 >
                   Forgot password?
                 </a>
@@ -135,7 +135,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-brand-primary hover:bg-brand-primary/90 text-white font-medium"
+                className="w-full h-11 btn-primary"
                 disabled={isLoading}
               >
                 {isLoading ? (
