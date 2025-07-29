@@ -17,28 +17,27 @@ export default {
         sans: ["Inter", "system-ui", "sans-serif"],
       },
       colors: {
-        // Custom Brand Colors
-        brand: {
-          primary: "hsl(var(--brand-primary))",
-          secondary: "hsl(var(--brand-secondary))",
+        // Design System Colors
+        primary: {
+          DEFAULT: "hsl(var(--color-primary))", // #035BFF
+          light: "hsl(var(--color-primary-light))", // #E8F0FF
         },
-        // Custom Gray Scale
+        secondary: "hsl(var(--color-secondary))", // #6366F1
+
+        // Neutral Colors (Design System)
         gray: {
-          50: "hsl(var(--gray-50))",
-          100: "hsl(var(--gray-100))",
-          200: "hsl(var(--gray-200))",
-          300: "hsl(var(--gray-300))",
-          400: "hsl(var(--gray-400))",
-          500: "hsl(var(--gray-500))",
-          600: "hsl(var(--gray-600))",
-          700: "hsl(var(--gray-700))",
-          800: "hsl(var(--gray-800))",
-          900: "hsl(var(--gray-900))",
+          900: "hsl(var(--color-gray-900))", // #111827
+          700: "hsl(var(--color-gray-700))", // #374151
+          500: "hsl(var(--color-gray-500))", // #6B7280
+          300: "hsl(var(--color-gray-300))", // #D1D5DB
+          100: "hsl(var(--color-gray-100))", // #F3F4F6
         },
+
         // Semantic Colors
-        success: "hsl(var(--success))",
-        error: "hsl(var(--error))",
-        warning: "hsl(var(--warning))",
+        success: "hsl(var(--color-success))", // #10B981
+        error: "hsl(var(--color-error))", // #EF4444
+        warning: "hsl(var(--color-warning))", // #F59E0B
+        info: "hsl(var(--color-info))", // #60A5FA
         // Standard shadcn/ui colors
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
