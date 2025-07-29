@@ -412,16 +412,34 @@ export default function Account() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label className="body-sm font-semibold">Street Address</Label>
-                    <Input value={profileData.billingAddress.street} />
+                    <Input
+                      value={profileData.billingAddress.street}
+                      onChange={(e) => setProfileData({
+                        ...profileData,
+                        billingAddress: { ...profileData.billingAddress, street: e.target.value }
+                      })}
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label className="body-sm font-semibold">City</Label>
-                      <Input value={profileData.billingAddress.city} />
+                      <Input
+                        value={profileData.billingAddress.city}
+                        onChange={(e) => setProfileData({
+                          ...profileData,
+                          billingAddress: { ...profileData.billingAddress, city: e.target.value }
+                        })}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label className="body-sm font-semibold">State</Label>
-                      <Select value={profileData.billingAddress.state}>
+                      <Select
+                        value={profileData.billingAddress.state}
+                        onValueChange={(value) => setProfileData({
+                          ...profileData,
+                          billingAddress: { ...profileData.billingAddress, state: value }
+                        })}
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -436,11 +454,23 @@ export default function Account() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label className="body-sm font-semibold">ZIP Code</Label>
-                      <Input value={profileData.billingAddress.zipCode} />
+                      <Input
+                        value={profileData.billingAddress.zipCode}
+                        onChange={(e) => setProfileData({
+                          ...profileData,
+                          billingAddress: { ...profileData.billingAddress, zipCode: e.target.value }
+                        })}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label className="body-sm font-semibold">Country</Label>
-                      <Select value={profileData.billingAddress.country}>
+                      <Select
+                        value={profileData.billingAddress.country}
+                        onValueChange={(value) => setProfileData({
+                          ...profileData,
+                          billingAddress: { ...profileData.billingAddress, country: value }
+                        })}
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -486,16 +516,34 @@ export default function Account() {
                     <>
                       <div className="space-y-2">
                         <Label className="body-sm font-semibold">Street Address</Label>
-                        <Input value={profileData.legalAddress.street} />
+                        <Input
+                          value={profileData.legalAddress.street}
+                          onChange={(e) => setProfileData({
+                            ...profileData,
+                            legalAddress: { ...profileData.legalAddress, street: e.target.value }
+                          })}
+                        />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-2">
                           <Label className="body-sm font-semibold">City</Label>
-                          <Input value={profileData.legalAddress.city} />
+                          <Input
+                            value={profileData.legalAddress.city}
+                            onChange={(e) => setProfileData({
+                              ...profileData,
+                              legalAddress: { ...profileData.legalAddress, city: e.target.value }
+                            })}
+                          />
                         </div>
                         <div className="space-y-2">
                           <Label className="body-sm font-semibold">State</Label>
-                          <Select value={profileData.legalAddress.state}>
+                          <Select
+                            value={profileData.legalAddress.state}
+                            onValueChange={(value) => setProfileData({
+                              ...profileData,
+                              legalAddress: { ...profileData.legalAddress, state: value }
+                            })}
+                          >
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
@@ -510,11 +558,23 @@ export default function Account() {
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-2">
                           <Label className="body-sm font-semibold">ZIP Code</Label>
-                          <Input value={profileData.legalAddress.zipCode} />
+                          <Input
+                            value={profileData.legalAddress.zipCode}
+                            onChange={(e) => setProfileData({
+                              ...profileData,
+                              legalAddress: { ...profileData.legalAddress, zipCode: e.target.value }
+                            })}
+                          />
                         </div>
                         <div className="space-y-2">
                           <Label className="body-sm font-semibold">Country</Label>
-                          <Select value={profileData.legalAddress.country}>
+                          <Select
+                            value={profileData.legalAddress.country}
+                            onValueChange={(value) => setProfileData({
+                              ...profileData,
+                              legalAddress: { ...profileData.legalAddress, country: value }
+                            })}
+                          >
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
