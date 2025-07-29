@@ -161,19 +161,19 @@ export default function Login() {
 
             {/* Help Links */}
             <div className="text-center space-y-2">
-              <p className="text-sm text-gray-600">
+              <p className="body-sm text-gray-500">
                 Don't have an account?{" "}
                 <a
                   href="/register"
-                  className="text-brand-primary hover:text-brand-secondary font-medium transition-colors"
+                  className="text-primary hover:text-secondary font-semibold transition-colors"
                 >
                   Create one here
                 </a>
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="body-sm text-gray-500">
                 <a
                   href="/support"
-                  className="text-brand-primary hover:text-brand-secondary font-medium transition-colors"
+                  className="text-primary hover:text-secondary font-semibold transition-colors"
                 >
                   Contact Support
                 </a>
@@ -186,11 +186,11 @@ export default function Login() {
         <div className="text-center">
           <p className="text-xs text-gray-500">
             By signing in, you agree to our{" "}
-            <a href="/terms" className="text-brand-primary hover:underline">
+            <a href="/terms" className="text-primary hover:underline">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="/privacy" className="text-brand-primary hover:underline">
+            <a href="/privacy" className="text-primary hover:underline">
               Privacy Policy
             </a>
           </p>
