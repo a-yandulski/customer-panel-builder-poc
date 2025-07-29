@@ -315,6 +315,18 @@ export default function Account() {
     );
   };
 
+  const handleTwoFactorToggle = (enabled: boolean) => {
+    setTwoFactorEnabled(enabled);
+    setSettingSaved(enabled ? "Two-factor authentication enabled" : "Two-factor authentication disabled");
+
+    toast.success(
+      enabled ? "Two-factor authentication has been enabled" : "Two-factor authentication has been disabled",
+      {
+        title: "Security Setting Updated"
+      }
+    );
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
   };
