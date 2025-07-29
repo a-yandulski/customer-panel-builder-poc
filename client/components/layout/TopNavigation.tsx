@@ -18,6 +18,7 @@ const navigationItems = [
   { label: "Services", href: "/services" },
   { label: "Billing", href: "/billing" },
   { label: "Support", href: "/support" },
+  { label: "Account", href: "/account" },
 ];
 
 export default function TopNavigation() {
