@@ -258,7 +258,7 @@ export function useInvoiceDetails(invoiceId: string | null) {
     if (invoiceId) {
       fetchInvoice();
     }
-  }, [invoiceId, fetchInvoice]);
+  }, [invoiceId]);
 
   return {
     invoice,
