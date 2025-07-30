@@ -1,0 +1,445 @@
+# Customer Panel API Specification v1.0
+
+This document defines a single, authoritative REST API for the Customer Panel front-end to perform all CRUD and integration flows against mock and live back-end services. All endpoints adhere to JSON over HTTPS, versioned under `/v1`.
+
+**Pattern:** This API serves as a Backend-for-Frontend (BFF) layer. The Customer Panel SPA communicates solely with this unified API; it does not call third-party services directly.
+
++**Pattern:** This API serves as a Backend-for-Frontend (BFF) layer. The Customer Panel SPA communicates solely with this unified API; it does not call third-party services directly.
+
+### 1.1 Conventions
+
+- All requests and responses use `application/json`.
+- Timestamps are RFC 3339 (e.g., `2025-07-29T14:23:00Z`).
+- Resource identifiers use UUIDv4 or Provider-specific IDs (e.g., `dom_1234`).
+- All endpoints require a valid JWT Bearer token (see section 2).
+
+### 1.2 Third-Party Integrations
+
+The Customer Panel backend orchestrates calls to the following external systems. All credentials and API keys are stored securely in environment variables.
+
+| Service        | Base URL                              | Auth Method                 | Description                                            |
+|----------------|---------------------------------------|-----------------------------|--------------------------------------------------------|
+| HubSpot CRM    | `https://api.hubapi.com`             | OAuth2 / API Key            | Source of truth for user profile and address data.     |
+| Auth0          | `https://{tenant}.auth0.com`         | OAuth2 Authorization Code   | Identity Provider for user authentication and security.|
+| Domain Registry| (varies by registrar)                | API Key / OAuth2            | Domain metadata, DNS records, nameserver updates.      |
+| ChargeBee      | `https://{site}.chargebee.com/api/v2` | API Key                     | Billing plans, subscriptions, invoices, payment methods.|
+| Zendesk        | `https://{subdomain}.zendesk.com/api/v2` | OAuth2 / API Token        | Support ticket creation, retrieval, and notifications. |
+| Commercetools  | `https://api.{region}.commercetools.com/{projectKey}` | OAuth2 Client Credentials | Product ownership, order history (REST & GraphQL). |
+| Jahia          | `https://{instance}.jahia.org/rest`  | API Key / OAuth2            | Content and marketing-driven promotional banners.      |
+
+### 1.3 Integration Details
+
+Below are key API paths for each external system that our backend will orchestrate under the hood:
+
+- **HubSpot CRM**:  
+  • Contact retrieval: `GET https://api.hubapi.com/crm/v3/objects/contacts/{contactId}`  
+  • Update contact: `PATCH https://api.hubapi.com/crm/v3/objects/contacts/{contactId}`  
+  • Required scopes: `crm.objects.contacts.read`, `crm.objects.contacts.write`
+
+- **Auth0**:  
+  • Token issuance: `POST https://{tenant}.auth0.com/oauth/token` (Auth Code + PKCE)  
+  • Token revocation: `POST https://{tenant}.auth0.com/oauth/revoke`  
+  • User logout: `GET https://{tenant}.auth0.com/v2/logout`
+
+- **ChargeBee**:  
+  • List invoices: `GET https://{site}.chargebee.com/api/v2/invoices`  
+  • Download PDF: `GET https://{site}.chargebee.com/api/v2/invoices/{invoiceId}/download?format=pdf`  
+  • Payment methods: `GET https://{site}.chargebee.com/api/v2/payment_sources`
+
+- **Zendesk**:  
+  • Upload attachments: `POST https://{subdomain}.zendesk.com/api/v2/uploads.json?filename={fileName}`  
+  • Create ticket: `POST https://{subdomain}.zendesk.com/api/v2/tickets.json` (include `upload_token` array)  
+  • List tickets: `GET https://{subdomain}.zendesk.com/api/v2/tickets.json`
+
+- **Commercetools**:  
+  • List products: `GET https://api.europe-west1.gcp.commercetools.com/{projectKey}/products`  
+  • List orders: `GET https://api.europe-west1.gcp.commercetools.com/{projectKey}/orders`
+  • GraphQL endpoint: `POST https://api.europe-west1.gcp.commercetools.com/{projectKey}/graphql`
+
+- **Jahia**:  
+  • Content query: `GET https://{instance}.jahia.org/rest/query?workspace=default&query=...`  
+  • Banners & pages: `GET https://{instance}.jahia.org/rest/content/{siteKey}/pages/{pageKey}`
+
+## 2. Authentication & Authorization
+
+### 2.1 Auth0 Integration
+
+- **Flow:** OAuth 2.0 Authorization Code Grant with PKCE.  
+- **Token Endpoint:** Hosted by Auth0; front-end obtains access token.  
+- **Audience:** `https://api.customerpanel.example.com`  
+- **Token Usage:** Include header `Authorization: Bearer <access_token>` on every request.
+
+### 2.2 Scopes & Permissions
+
+| Scope          | Description                          | Required For                       |
+|----------------|--------------------------------------|------------------------------------|
+| `profile:read` | Read user profile                    | GET `/user/profile`               |
+| `profile:write`| Update user profile                  | PUT `/user/profile`               |
+| `domains:read` | List and view domains                | GET `/domains` and `/domains/:id` |
+| `domains:write`| Update domain settings               | PATCH `/domains/:id`              |
+| `invoices:read`| List and download invoices           | GET `/invoices` and `/invoices/:id/pdf` |
+| `tickets:read` | List and view support tickets        | GET `/tickets` and `/tickets/:id` |
+| `tickets:write`| Create tickets and replies           | POST `/tickets` and `/tickets/:id/reply` |
+| `notifications:read` | Read notification counts and list | GET `/notifications` and `/notifications/unreadCount` |
+
+## 3. Error Handling
+
+All error responses use the following JSON schema:
+
+```json
+{
+  "error": {
+    "code": "string",       // machine-readable error code
+    "message": "string",    // human-readable summary
+    "details": [             // optional, field-level errors
+      {
+        "field": "string",
+        "issue": "string"
+      }
+    ]
+  }
+}
+```
+Common HTTP status codes:
+
+- `400 Bad Request` — validation errors or malformed JSON.
+- `401 Unauthorized` — missing/invalid token.
+- `403 Forbidden` — insufficient scope.
+- `404 Not Found` — resource does not exist.
+- `429 Too Many Requests` — rate limit exceeded.
+- `500 Internal Server Error` — unexpected errors.
+
+## 4. Rate Limiting & Timeouts
+
+- **Rate Limit:** 60 requests per minute per user.  
+- **429 Response:** Retry-After header in seconds.  
+- **Timeout:** All requests must respond within 30 seconds; client may retry idempotent GETs once.
+
+## 5. API Endpoints
+
+### 5.1 User & Profile Management
+
+#### 5.1.1 GET /user/profile
+
+- **Description:** Fetch the authenticated user’s profile.
+- **Auth Scopes:** `profile:read`
+- **Request:** None.
+- **Response (200):**
+
+  ```json
+  {
+    "id": "user_abc123",
+    "name": "Alice Yandulski",
+    "email": "alice@example.com",
+    "phone": "+15551234567",
+    "twoFactorEnabled": false
+  }
+  ```
+
+#### 5.1.2 PUT /user/profile
+
+- **Description:** Update user profile fields.
+- **Auth Scopes:** `profile:write`
+- **Request Body:**
+
+  ```json
+  {
+    "name": "string",        // required, 1–100 chars
+    "phone": "string|null"   // optional, E.164 format
+  }
+  ```
+
+- **Response (200):** Updated profile as in GET.
+
+#### 5.1.3 GET /user/address
+
+- **Description:** Fetch the authenticated user’s billing and legal addresses.
+- **Auth Scopes:** `profile:read`
+- **Response (200):**
+
+  ```json
+  {
+    "billing": {
+      "street": "string",
+      "city": "string",
+      "state": "string",
+      "postalCode": "string",
+      "country": "string"
+    },
+    "legal": {
+      "street": "string",
+      "city": "string",
+      "state": "string",
+      "postalCode": "string",
+      "country": "string"
+    } | null
+  }
+  ```
+
+- **Orchestration:**
+  - HubSpot CRM: `GET /crm/v3/objects/contacts/{contactId}?properties=address,city,region,postal_code,country`  
+  - ChargeBee: `GET /api/v2/customers/{customer_id}` (billing address fields)
+
+#### 5.1.4 PUT /user/address
+
+- **Description:** Update billing and optional legal addresses.
+- **Auth Scopes:** `profile:write`
+- **Request Body:**
+
+  ```json
+  {
+    "billing": { /* same schema as GET */ },
+    "legal": { /* same schema as GET */ } | null
+  }
+  ```
+
+- **Response (200):** `{ "updated": true }`
+- **Orchestration:**
+  - HubSpot CRM: `PATCH /crm/v3/objects/contacts/{contactId}` with address properties  
+  - ChargeBee: `POST /api/v2/customers/{customer_id}` or `PATCH` new endpoint
+
+### 5.2 Domain Management
+
+#### 5.2.1 GET /domains
+
+- **Description:** List all domains for user.
+- **Auth Scopes:** `domains:read`
+- **Response (200):** Array of domain objects:
+
+  ```json
+  [
+    {
+      "id": "dom_123",
+      "name": "example.com",
+      "expires": "2026-02-14",
+      "autoRenew": true,
+      "status": "active"
+    }
+  ]
+  ```
+
+#### 5.2.2 PATCH /domains/{domainId}
+
+- **Description:** Update domain settings (auto-renew only).
+- **Auth Scopes:** `domains:write`
+- **Request Body:**
+
+  ```json
+  {
+    "autoRenew": true
+  }
+  ```
+
+- **Response (200):** Updated domain object.
+
+#### 5.2.3 GET /domains/{domainId}/dns
+
+- **Description:** Retrieve DNS records for a domain.
+- **Auth Scopes:** `domains:read`
+- **Response (200):** Array of DNS record objects:
+
+  ```json
+  [
+    {
+      "id": "rec_456",
+      "type": "A",
+      "name": "www",
+      "value": "192.0.2.1",
+      "ttl": 3600
+    }
+  ]
+  ```
+
+#### 5.2.4 PATCH /domains/{domainId}/nameservers
+
+- **Description:** Update up to 5 nameserver hostnames.
+- **Auth Scopes:** `domains:write`
+- **Request Body:**
+
+  ```json
+  {
+    "nameservers": ["ns1.example.net", "ns2.example.net"] // 2–5 items
+  }
+  ```
+
+- **Response (200):** `{ "updated": true }`
+
+### 5.3 Billing & Invoices
+
+#### 5.3.1 GET /invoices
+
+- **Description:** List all user invoices.
+- **Auth Scopes:** `invoices:read`
+- **Response (200):**
+
+  ```json
+  [
+    {
+      "id": "inv_001",
+      "date": "2025-07-01",
+      "total": 49.00,
+      "status": "paid"
+    }
+  ]
+  ```
+
+#### 5.3.2 GET /invoices/{invoiceId}/pdf
+
+- **Description:** Download invoice PDF.
+- **Auth Scopes:** `invoices:read`
+- **Response (302 Redirect):** Redirect to PDF URL.
+
+#### 5.3.3 GET /subscriptions
+
+- **Description:** List all active subscriptions for the user.
+- **Auth Scopes:** `invoices:read`
+- **Response (200):**
+
+  ```json
+  [ { "id": "sub_001", "status": "active", "plan": "Pro" } ]
+  ```
+
+- **Orchestration:**
+  - ChargeBee: `GET /api/v2/subscriptions?customer_id={custId}`
+
+#### 5.3.4 DELETE /payment_sources/{sourceId}
+
+- **Description:** Remove a payment method.
+- **Auth Scopes:** `invoices:write`
+- **Response (200):** `{ "deleted": true }`
+- **Orchestration:**
+  - ChargeBee: `POST /api/v2/payment_sources/{sourceId}/delete`
+
+#### 5.3.5 POST /payment_sources/{sourceId}/default
+
+- **Description:** Set a payment method as default.
+- **Auth Scopes:** `invoices:write`
+- **Response (200):** `{ "default": true }`
+- **Orchestration:**
+  - ChargeBee: `POST /api/v2/payment_sources/{sourceId}/update_default`
+
+### 5.4 Support Tickets
+
+#### 5.4.1 GET /tickets
+
+- **Description:** List all support tickets.
+- **Auth Scopes:** `tickets:read`
+- **Response:** Array of ticket summaries.
+
+#### 5.4.2 POST /tickets
+
+- **Description:** Create a new support ticket.
+- **Auth Scopes:** `tickets:write`
+- **Request:** `multipart/form-data`
+  - `category` (string, required)
+  - `subject` (string, required, max 100)
+  - `body` (string, required, max 1000)
+  - `attachments` (file array, max 5)
+- **Response (201):** Created ticket object.
+
+#### 5.4.3 GET /tickets/{ticketId}
+
+- **Description:** Fetch conversation thread.
+- **Auth Scopes:** `tickets:read`
+- **Response:**
+
+  ```json
+  {
+    "id": "tick_456",
+    "category": "Billing",
+    "subject": "Wrong charge",
+    "status": "open",
+    "thread": [ { "author":"agent","message":"…" } ]
+  }
+  ```
+
+#### 5.4.4 POST /tickets/{ticketId}/reply
+
+- **Description:** Post a reply to a ticket.
+- **Auth Scopes:** `tickets:write`
+- **Request Body:**
+
+  ```json
+  { "body": "string" }
+  ```
+
+- **Response (201):** New message object.
+
+#### 5.4.5 GET /tickets/{ticketId}/audits
+
+- **Description:** Fetch audit trail for a ticket.
+- **Auth Scopes:** `tickets:read`
+- **Response (200):** Array of audit entries with timestamps, author IDs, and actions.
+- **Orchestration:**
+  - Zendesk: `GET /api/v2/tickets/{ticketId}/audits.json`
+
+### 5.5 Notifications
+
+#### 5.5.1 GET /notifications/unreadCount
+
+- **Description:** Fetch unread notification count.
+- **Auth Scopes:** `notifications:read`
+- **Response:** `{ "count": 5 }`
+
+#### 5.5.2 GET /notifications
+
+- **Description:** List recent notifications.
+- **Auth Scopes:** `notifications:read`
+- **Response:** Array of notification objects.
+
+### 5.6 Auth Service Extensions
+
+#### 5.6.1 GET /auth/userinfo
+
+- **Description:** Retrieve user profile claims from Auth0.
+- **Auth Scopes:** `openid profile email`
+- **Request:** None.
+- **Response (200):**
+
+  ```json
+  {
+    "sub": "auth0|123456",
+    "email": "alice@example.com",
+    "name": "Alice Yandulski",
+    "multifactor": false
+  }
+  ```
+
+#### 5.6.2 POST /auth/logout
+
+- **Description:** Invalidate session and clear cookies.
+- **Request Body:**
+
+  ```json
+  { "returnTo": "https://app.customerpanel.example.com" }
+  ```
+
+- **Response (302):** Redirect to Auth0 logout endpoint.
+
+#### 5.6.3 GET /user/search
+
+- **Description:** Resolve HubSpot contact ID by email.
+- **Query Params:** `email=string`
+- **Auth Scopes:** `profile:read`
+- **Response (200):**
+
+  ```json
+  { "contactId": "abcd-ef01-2345" }
+  ```
+
+- **Orchestration:**
+  - HubSpot CRM: `POST https://api.hubapi.com/crm/v3/objects/contacts/search`
+
+## 6. Data Models
+
+```jsonschema
+{
+  "User": { /* see section 5.1 schemas */ },
+  "Domain": { /* see section 5.2 schemas */ },
+  "DNSRecord": { /* see section 5.2.3 */ },
+  "Invoice": { /* see section 5.3.1 */ },
+  "Ticket": { /* see section 5.4.3 */ },
+  "Notification": { /* see section 5.5 */ }
+}
+```
+
