@@ -32,7 +32,7 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleLogin = async () => {
+  const handleAuth0Login = async () => {
     try {
       setIsRedirecting(true);
       await loginWithRedirect();
@@ -40,6 +40,35 @@ export default function Login() {
       setIsRedirecting(false);
       console.error("Login error:", err);
     }
+  };
+
+  const handleFakeLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoggingIn(true);
+
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Simple fake authentication - just store user data in localStorage
+    const fakeUser = {
+      sub: "fake|123456789",
+      name: email === "john.doe@example.com" ? "John Doe" : "Demo User",
+      given_name: email === "john.doe@example.com" ? "John" : "Demo",
+      family_name: email === "john.doe@example.com" ? "Doe" : "User",
+      email: email,
+      email_verified: true,
+      picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=035BFF&color=fff`,
+      updated_at: new Date().toISOString(),
+    };
+
+    // Store fake auth state
+    localStorage.setItem('fake_auth_user', JSON.stringify(fakeUser));
+    localStorage.setItem('fake_auth_token', 'fake_jwt_token_' + Date.now());
+
+    setIsLoggingIn(false);
+
+    // Trigger a page reload to reinitialize auth state
+    window.location.href = '/dashboard';
   };
 
   // Show loading state while Auth0 is initializing
