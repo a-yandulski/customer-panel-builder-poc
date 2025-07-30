@@ -1,5 +1,6 @@
 import { worker } from './browser';
 import { shouldEnableMSW } from './config';
+import './test-utils'; // Import test utilities for global access
 
 // Initialize MSW
 export const setupMSW = async (): Promise<void> => {
