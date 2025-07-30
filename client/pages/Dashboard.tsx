@@ -152,15 +152,6 @@ export default function Dashboard() {
             <Button
               variant="outline"
               size="sm"
-              onClick={isPolling ? stopPolling : startPolling}
-              className="hidden sm:flex"
-            >
-              <Clock className="h-4 w-4 mr-2" />
-              {isPolling ? "Stop Auto-Refresh" : "Auto-Refresh"}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
               onClick={handleRefresh}
               disabled={isRefreshing}
             >
