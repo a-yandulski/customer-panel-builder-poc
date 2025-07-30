@@ -666,81 +666,667 @@ export const handlers = [
   }),
 
   // =======================
-  // BILLING ENDPOINTS
+  // BILLING SYSTEM
   // =======================
 
-  // Get invoices with pagination and errors
-  http.get("/api/billing/invoices", async ({ request }) => {
-    await delay(randomDelay());
+  // Invoice listing with error scenarios
+  http.get("/api/invoices", async ({ request }) => {
+    await delay(randomDelay(300, 1200));
 
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+    const search = url.searchParams.get("search")?.toLowerCase() || "";
+    const status = url.searchParams.get("status");
+    const sortBy = url.searchParams.get("sortBy") || "date";
+    const sortOrder = url.searchParams.get("sortOrder") || "desc";
 
-    // Simulate intermittent failures
-    if (shouldFail(7)) {
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate server errors (8% chance)
+    if (shouldFail(8)) {
       return HttpResponse.json(
         { error: "Billing service temporarily unavailable" },
+        { status: 500 },
+      );
+    }
+
+    // Simulate rate limiting (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 },
+        { headers: { "Retry-After": "60" } },
+      );
+    }
+
+    const invoicesData = [
+      {
+        id: "inv_001",
+        number: "INV-2024-001",
+        date: "2024-12-01T10:30:00Z",
+        dueDate: "2024-12-15T23:59:59Z",
+        amount: 47.00,
+        currency: "USD",
+        status: "paid",
+        description: "Domain renewal - example.com",
+        lineItems: [
+          { description: "Domain renewal", quantity: 1, unitPrice: 15.99 },
+          { description: "Privacy protection", quantity: 1, unitPrice: 9.99 },
+          { description: "Tax", quantity: 1, unitPrice: 21.02 },
+        ],
+        paymentMethod: "Visa ending in 4242",
+        paymentDate: "2024-12-01T10:45:00Z",
+        downloadUrl: "/api/invoices/inv_001/pdf",
+      },
+      {
+        id: "inv_002",
+        number: "INV-2024-002",
+        date: "2024-11-15T14:22:00Z",
+        dueDate: "2024-12-15T23:59:59Z",
+        amount: 120.00,
+        currency: "USD",
+        status: "pending",
+        description: "Hosting plan upgrade",
+        lineItems: [
+          { description: "Professional Hosting (12 months)", quantity: 1, unitPrice: 99.99 },
+          { description: "Setup fee", quantity: 1, unitPrice: 20.01 },
+        ],
+        paymentMethod: null,
+        paymentDate: null,
+        downloadUrl: "/api/invoices/inv_002/pdf",
+      },
+      {
+        id: "inv_003",
+        number: "INV-2024-003",
+        date: "2024-10-20T09:15:00Z",
+        dueDate: "2024-11-20T23:59:59Z",
+        amount: 89.99,
+        currency: "USD",
+        status: "overdue",
+        description: "SSL certificate renewal",
+        lineItems: [
+          { description: "Extended Validation SSL", quantity: 1, unitPrice: 79.99 },
+          { description: "Installation service", quantity: 1, unitPrice: 10.00 },
+        ],
+        paymentMethod: null,
+        paymentDate: null,
+        downloadUrl: "/api/invoices/inv_003/pdf",
+      },
+      {
+        id: "inv_004",
+        number: "INV-2024-004",
+        date: "2024-10-01T16:45:00Z",
+        dueDate: "2024-10-15T23:59:59Z",
+        amount: 15.99,
+        currency: "USD",
+        status: "paid",
+        description: "Domain registration - newsite.com",
+        lineItems: [
+          { description: "Domain registration (.com)", quantity: 1, unitPrice: 15.99 },
+        ],
+        paymentMethod: "Mastercard ending in 8888",
+        paymentDate: "2024-10-01T17:00:00Z",
+        downloadUrl: "/api/invoices/inv_004/pdf",
+      },
+      {
+        id: "inv_005",
+        number: "INV-2024-005",
+        date: "2024-09-12T11:30:00Z",
+        dueDate: "2024-09-27T23:59:59Z",
+        amount: 299.99,
+        currency: "USD",
+        status: "paid",
+        description: "Annual hosting package",
+        lineItems: [
+          { description: "Business Hosting (12 months)", quantity: 1, unitPrice: 249.99 },
+          { description: "Premium support", quantity: 1, unitPrice: 50.00 },
+        ],
+        paymentMethod: "Visa ending in 4242",
+        paymentDate: "2024-09-12T11:45:00Z",
+        downloadUrl: "/api/invoices/inv_005/pdf",
+      },
+    ];
+
+    // Filter invoices
+    let filteredInvoices = invoicesData;
+
+    if (search) {
+      filteredInvoices = filteredInvoices.filter(
+        (invoice) =>
+          invoice.number.toLowerCase().includes(search) ||
+          invoice.description.toLowerCase().includes(search),
+      );
+    }
+
+    if (status && status !== "all") {
+      filteredInvoices = filteredInvoices.filter(
+        (invoice) => invoice.status === status,
+      );
+    }
+
+    // Sort invoices
+    filteredInvoices.sort((a, b) => {
+      let aValue, bValue;
+
+      switch (sortBy) {
+        case "date":
+          aValue = new Date(a.date).getTime();
+          bValue = new Date(b.date).getTime();
+          break;
+        case "amount":
+          aValue = a.amount;
+          bValue = b.amount;
+          break;
+        case "number":
+          aValue = a.number;
+          bValue = b.number;
+          break;
+        default:
+          aValue = a.date;
+          bValue = b.date;
+      }
+
+      if (sortOrder === "desc") {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    });
+
+    // Paginate results
+    const totalCount = filteredInvoices.length;
+    const totalPages = Math.ceil(totalCount / limit);
+    const startIndex = (page - 1) * limit;
+    const paginatedInvoices = filteredInvoices.slice(startIndex, startIndex + limit);
+
+    return HttpResponse.json({
+      invoices: paginatedInvoices,
+      pagination: {
+        page,
+        limit,
+        totalPages,
+        totalCount,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+      filters: { search, status, sortBy, sortOrder, page, limit },
+    });
+  }),
+
+  // Individual invoice details
+  http.get("/api/invoices/:invoiceId", async ({ params, request }) => {
+    await delay(randomDelay(200, 800));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate not found (invoice doesn't exist)
+    if (params.invoiceId === "inv_999") {
+      return HttpResponse.json(
+        { error: "Invoice not found" },
+        { status: 404 },
+      );
+    }
+
+    // Simulate server error (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Failed to retrieve invoice details" },
+        { status: 500 },
+      );
+    }
+
+    // Return mock invoice details
+    return HttpResponse.json({
+      invoice: {
+        id: params.invoiceId,
+        number: `INV-2024-${params.invoiceId?.slice(-3)}`,
+        date: "2024-12-01T10:30:00Z",
+        dueDate: "2024-12-15T23:59:59Z",
+        amount: 47.00,
+        currency: "USD",
+        status: "paid",
+        description: "Domain renewal - example.com",
+        lineItems: [
+          { description: "Domain renewal", quantity: 1, unitPrice: 15.99 },
+          { description: "Privacy protection", quantity: 1, unitPrice: 9.99 },
+          { description: "Tax", quantity: 1, unitPrice: 21.02 },
+        ],
+        paymentMethod: "Visa ending in 4242",
+        paymentDate: "2024-12-01T10:45:00Z",
+        billingAddress: {
+          name: "John Doe",
+          company: "Acme Corp",
+          street: "123 Main St",
+          city: "New York",
+          state: "NY",
+          postalCode: "10001",
+          country: "US",
+        },
+      },
+    });
+  }),
+
+  // PDF download with error scenarios
+  http.get("/api/invoices/:invoiceId/pdf", async ({ params, request }) => {
+    await delay(randomDelay(500, 2000));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate invoice not found (10% chance or specific IDs)
+    if (params.invoiceId === "inv_999" || shouldFail(10)) {
+      return HttpResponse.json(
+        { error: "Invoice not found or PDF not available" },
+        { status: 404 },
+      );
+    }
+
+    // Simulate service unavailable (PDF generation service down) (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "PDF generation service temporarily unavailable" },
+        { status: 503 },
+        { headers: { "Retry-After": "120" } },
+      );
+    }
+
+    // Simulate rate limiting for PDF downloads (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Too many PDF download requests. Please wait before trying again." },
+        { status: 429 },
+        { headers: { "Retry-After": "30" } },
+      );
+    }
+
+    // Redirect to mock PDF URL (successful case)
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: `https://mockpdfs.example.com/invoice-${params.invoiceId}.pdf`,
+      },
+    });
+  }),
+
+  // Subscriptions listing with errors
+  http.get("/api/subscriptions", async ({ request }) => {
+    await delay(randomDelay(400, 1500));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate network timeout (longer delay + error) (4% chance)
+    if (shouldFail(4)) {
+      await delay(8000);
+      return HttpResponse.json(
+        { error: "Request timeout. Please try again." },
+        { status: 408 },
+      );
+    }
+
+    // Simulate subscription sync issues (6% chance)
+    if (shouldFail(6)) {
+      return HttpResponse.json(
+        { error: "Subscription data synchronization in progress. Please try again in a few minutes." },
+        { status: 503 },
+        { headers: { "Retry-After": "180" } },
+      );
+    }
+
+    const subscriptionsData = [
+      {
+        id: "sub_001",
+        service: "Web Hosting Pro",
+        plan: "Professional Plan",
+        amount: 29.99,
+        currency: "USD",
+        billingCycle: "monthly",
+        nextPayment: "2024-12-15T00:00:00Z",
+        paymentMethod: "Visa ending in 4242",
+        autoRenewal: true,
+        status: "active",
+        startDate: "2023-12-15T00:00:00Z",
+        features: ["50GB Storage", "Unlimited Bandwidth", "Email Accounts", "SSL Certificate"],
+        cancellationPolicy: "Cancel anytime with 30 days notice",
+      },
+      {
+        id: "sub_002",
+        service: "Domain Registration",
+        plan: "example.com",
+        amount: 12.99,
+        currency: "USD",
+        billingCycle: "yearly",
+        nextPayment: "2025-12-15T00:00:00Z",
+        paymentMethod: "Visa ending in 4242",
+        autoRenewal: true,
+        status: "active",
+        startDate: "2022-12-15T00:00:00Z",
+        features: ["Domain Name", "DNS Management", "Privacy Protection"],
+        cancellationPolicy: "Non-refundable domain registration",
+      },
+      {
+        id: "sub_003",
+        service: "SSL Certificate",
+        plan: "Extended Validation",
+        amount: 49.99,
+        currency: "USD",
+        billingCycle: "yearly",
+        nextPayment: "2025-01-05T00:00:00Z",
+        paymentMethod: "Mastercard ending in 8888",
+        autoRenewal: false,
+        status: "active",
+        startDate: "2024-01-05T00:00:00Z",
+        features: ["EV SSL Certificate", "Green Address Bar", "Warranty Protection"],
+        cancellationPolicy: "Prorated refund available",
+      },
+    ];
+
+    return HttpResponse.json({
+      subscriptions: subscriptionsData,
+      totalCount: subscriptionsData.length,
+    });
+  }),
+
+  // Update subscription auto-renewal
+  http.patch("/api/subscriptions/:subscriptionId", async ({ params, request }) => {
+    await delay(randomDelay(300, 1000));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+
+    // Simulate forbidden action (subscription can't be modified) (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "This subscription cannot be modified at this time" },
+        { status: 403 },
+      );
+    }
+
+    // Simulate server error (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Failed to update subscription" },
+        { status: 500 },
+      );
+    }
+
+    return HttpResponse.json({
+      subscription: {
+        id: params.subscriptionId,
+        autoRenewal: body.autoRenewal,
+        updatedAt: new Date().toISOString(),
+      },
+    });
+  }),
+
+  // Payment methods listing with security errors
+  http.get("/api/payment_sources", async ({ request }) => {
+    await delay(randomDelay(200, 800));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate forbidden access (user not authorized for payment info) (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Insufficient permissions to access payment methods" },
+        { status: 403 },
+      );
+    }
+
+    // Simulate PCI compliance service unavailable (2% chance)
+    if (shouldFail(2)) {
+      return HttpResponse.json(
+        { error: "Payment processing service temporarily unavailable for security maintenance" },
+        { status: 503 },
+        { headers: { "Retry-After": "300" } },
+      );
+    }
+
+    const paymentMethodsData = [
+      {
+        id: "pm_001",
+        type: "visa",
+        last4: "4242",
+        expiryMonth: 12,
+        expiryYear: 2026,
+        isDefault: true,
+        holderName: "John Doe",
+        brand: "Visa",
+        country: "US",
+        addedDate: "2023-01-15T10:30:00Z",
+        fingerprint: "Xt5EWLLDS7FJjR1c",
+      },
+      {
+        id: "pm_002",
+        type: "mastercard",
+        last4: "8888",
+        expiryMonth: 8,
+        expiryYear: 2027,
+        isDefault: false,
+        holderName: "John Doe",
+        brand: "Mastercard",
+        country: "US",
+        addedDate: "2023-06-20T14:22:00Z",
+        fingerprint: "Xt5EWLLDS7FJjR1d",
+      },
+      {
+        id: "pm_003",
+        type: "paypal",
+        last4: "john@example.com",
+        expiryMonth: null,
+        expiryYear: null,
+        isDefault: false,
+        holderName: "john@example.com",
+        brand: "PayPal",
+        country: "US",
+        addedDate: "2023-08-10T09:45:00Z",
+        fingerprint: null,
+      },
+    ];
+
+    return HttpResponse.json({
+      paymentSources: paymentMethodsData,
+      totalCount: paymentMethodsData.length,
+    });
+  }),
+
+  // Add payment method with validation errors
+  http.post("/api/payment_sources", async ({ request }) => {
+    await delay(randomDelay(800, 2000));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+
+    // Simulate validation errors (15% chance)
+    if (shouldFail(15)) {
+      return HttpResponse.json(
+        {
+          error: "Payment method validation failed",
+          details: [
+            { field: "cardNumber", issue: "Invalid card number" },
+            { field: "expiryDate", issue: "Card has expired" },
+          ],
+        },
+        { status: 422 },
+      );
+    }
+
+    // Simulate payment processing errors (8% chance)
+    if (shouldFail(8)) {
+      return HttpResponse.json(
+        { error: "Payment processor temporarily unavailable" },
+        { status: 503 },
+      );
+    }
+
+    // Simulate fraud detection (2% chance)
+    if (shouldFail(2)) {
+      return HttpResponse.json(
+        { error: "Payment method rejected for security reasons" },
+        { status: 403 },
+      );
+    }
+
+    return HttpResponse.json({
+      paymentSource: {
+        id: `pm_${Date.now()}`,
+        type: body.type || "visa",
+        last4: body.cardNumber?.slice(-4) || "0000",
+        isDefault: body.setAsDefault || false,
+        addedDate: new Date().toISOString(),
+      },
+    }, { status: 201 });
+  }),
+
+  // Delete payment method
+  http.delete("/api/payment_sources/:paymentSourceId", async ({ params, request }) => {
+    await delay(randomDelay(300, 800));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate cannot delete default payment method
+    if (params.paymentSourceId === "pm_001") {
+      return HttpResponse.json(
+        { error: "Cannot delete default payment method. Please set another method as default first." },
+        { status: 409 },
+      );
+    }
+
+    // Simulate server error (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Failed to delete payment method" },
+        { status: 500 },
+      );
+    }
+
+    return HttpResponse.json({ deleted: true });
+  }),
+
+  // Set default payment method
+  http.post("/api/payment_sources/:paymentSourceId/default", async ({ params, request }) => {
+    await delay(randomDelay(200, 600));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate server error (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Failed to update default payment method" },
+        { status: 500 },
+      );
+    }
+
+    return HttpResponse.json({
+      paymentSource: {
+        id: params.paymentSourceId,
+        isDefault: true,
+        updatedAt: new Date().toISOString(),
+      },
+    });
+  }),
+
+  // Billing summary/dashboard
+  http.get("/api/billing/summary", async ({ request }) => {
+    await delay(randomDelay(300, 1000));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate service error (4% chance)
+    if (shouldFail(4)) {
+      return HttpResponse.json(
+        { error: "Billing summary temporarily unavailable" },
         { status: 503 },
       );
     }
 
     return HttpResponse.json({
-      invoices: mockInvoices,
-      pagination: { page, totalPages: 1, totalItems: mockInvoices.length },
-    });
-  }),
-
-  // Payment processing with various scenarios
-  http.post("/api/billing/payments", async ({ request }) => {
-    await delay(randomDelay(500, 1500)); // Longer delay for payment processing
-
-    const body = (await request.json()) as any;
-
-    // Simulate payment validation errors (400)
-    if (!body.amount || body.amount <= 0) {
-      return HttpResponse.json(
+      currentBalance: 0.00,
+      accountCredit: 127.50,
+      nextPayment: {
+        amount: 47.00,
+        dueDate: "2024-12-15T00:00:00Z",
+        description: "Web Hosting Pro renewal",
+      },
+      monthlySpend: {
+        amount: 247.00,
+        transactionCount: 5,
+        period: "2024-12",
+      },
+      upcomingCharges: [
         {
-          error: "Validation failed",
-          details: {
-            amount: ["Amount must be greater than 0"],
-          },
+          id: "upcoming_001",
+          service: "Web Hosting Pro",
+          amount: 29.99,
+          dueDate: "2024-12-15T00:00:00Z",
         },
-        { status: 400 },
-      );
-    }
-
-    if (!body.paymentMethod) {
-      return HttpResponse.json(
         {
-          error: "Validation failed",
-          details: {
-            paymentMethod: ["Payment method is required"],
-          },
+          id: "upcoming_002",
+          service: "Domain Renewal",
+          amount: 15.99,
+          dueDate: "2024-12-20T00:00:00Z",
         },
-        { status: 400 },
-      );
-    }
-
-    // Simulate payment declined (402 Payment Required)
-    if (body.paymentMethod === "declined-card") {
-      return HttpResponse.json(
-        { error: "Payment declined by bank" },
-        { status: 402 },
-      );
-    }
-
-    // Simulate payment gateway error (502 Bad Gateway)
-    if (shouldFail(5)) {
-      return HttpResponse.json(
-        { error: "Payment gateway error" },
-        { status: 502 },
-      );
-    }
-
-    return HttpResponse.json({
-      paymentId: "pay_" + Math.random().toString(36).substr(2, 9),
-      status: "succeeded",
-      amount: body.amount,
+      ],
     });
   }),
 
