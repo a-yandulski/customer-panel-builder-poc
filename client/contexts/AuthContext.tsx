@@ -93,14 +93,14 @@ function AuthProvider({ children }: AuthProviderProps) {
   const isUsingFakeAuth = !!fakeUser;
 
   const contextValue: AuthContextType = {
-    user: auth0.user,
-    isAuthenticated: auth0.isAuthenticated,
-    isLoading: auth0.isLoading || !isInitialized,
+    user: isUsingFakeAuth ? fakeUser : auth0.user,
+    isAuthenticated: isUsingFakeAuth ? !!fakeUser : auth0.isAuthenticated,
+    isLoading: (auth0.isLoading || fakeAuthLoading) && !isInitialized,
     error: auth0.error,
     loginWithRedirect: auth0.loginWithRedirect,
-    logout: auth0.logout,
-    getAccessTokenSilently: auth0.getAccessTokenSilently,
-    getIdTokenClaims: auth0.getIdTokenClaims,
+    logout: isUsingFakeAuth ? fakeLogout : auth0.logout,
+    getAccessTokenSilently: isUsingFakeAuth ? fakeGetAccessToken : auth0.getAccessTokenSilently,
+    getIdTokenClaims: isUsingFakeAuth ? fakeGetIdTokenClaims : auth0.getIdTokenClaims,
   };
 
   return (
