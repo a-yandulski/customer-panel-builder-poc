@@ -5,8 +5,8 @@ interface ServiceSummary {
   domains: { total: number; active: number; expiring: number };
   subscriptions: { total: number; active: number; suspended: number };
   tickets: { total: number; open: number; pending: number; closed: number };
-  billing: { 
-    balance: number; 
+  billing: {
+    balance: number;
     currency: string;
     nextPayment: string;
     overdue: number;
@@ -57,7 +57,11 @@ interface UseDashboardReturn {
   };
   refetch: {
     summary: () => Promise<void>;
-    renewals: (options?: { window?: number; sortBy?: string; type?: string }) => Promise<void>;
+    renewals: (options?: {
+      window?: number;
+      sortBy?: string;
+      type?: string;
+    }) => Promise<void>;
     activities: (options?: { limit?: number }) => Promise<void>;
     all: () => Promise<void>;
   };
@@ -66,103 +70,117 @@ interface UseDashboardReturn {
 
 export function useDashboard(): UseDashboardReturn {
   const { api } = useApi();
-  
+
   // Data state
   const [data, setData] = useState<DashboardData>({
     summary: null,
     renewals: [],
-    activities: []
+    activities: [],
   });
 
   // Loading state
   const [loading, setLoading] = useState({
     summary: true,
     renewals: true,
-    activities: true
+    activities: true,
   });
 
   // Error state
   const [error, setError] = useState({
     summary: null as string | null,
     renewals: null as string | null,
-    activities: null as string | null
+    activities: null as string | null,
   });
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch service summary
   const fetchSummary = useCallback(async () => {
-    setLoading(prev => ({ ...prev, summary: true }));
-    setError(prev => ({ ...prev, summary: null }));
-    
+    setLoading((prev) => ({ ...prev, summary: true }));
+    setError((prev) => ({ ...prev, summary: null }));
+
     try {
-      const response = await api.get<{ summary: ServiceSummary; lastUpdated: string }>('/services/summary');
-      setData(prev => ({ ...prev, summary: response.summary }));
+      const response = await api.get<{
+        summary: ServiceSummary;
+        lastUpdated: string;
+      }>("/services/summary");
+      setData((prev) => ({ ...prev, summary: response.summary }));
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch service summary';
-      setError(prev => ({ ...prev, summary: errorMessage }));
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch service summary";
+      setError((prev) => ({ ...prev, summary: errorMessage }));
     } finally {
-      setLoading(prev => ({ ...prev, summary: false }));
+      setLoading((prev) => ({ ...prev, summary: false }));
     }
   }, [api]);
 
   // Fetch renewals
-  const fetchRenewals = useCallback(async (options?: { window?: number; sortBy?: string; type?: string }) => {
-    setLoading(prev => ({ ...prev, renewals: true }));
-    setError(prev => ({ ...prev, renewals: null }));
-    
-    try {
-      const params = new URLSearchParams();
-      if (options?.window) params.append('window', options.window.toString());
-      if (options?.sortBy) params.append('sortBy', options.sortBy);
-      if (options?.type) params.append('type', options.type);
-      
-      const queryString = params.toString();
-      const endpoint = queryString ? `/renewals?${queryString}` : '/renewals';
-      
-      const response = await api.get<{
-        renewals: Renewal[];
-        totalAmount: number;
-        currency: string;
-        window: number;
-        count: number;
-      }>(endpoint);
-      
-      setData(prev => ({ ...prev, renewals: response.renewals }));
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch renewals';
-      setError(prev => ({ ...prev, renewals: errorMessage }));
-    } finally {
-      setLoading(prev => ({ ...prev, renewals: false }));
-    }
-  }, [api]);
+  const fetchRenewals = useCallback(
+    async (options?: { window?: number; sortBy?: string; type?: string }) => {
+      setLoading((prev) => ({ ...prev, renewals: true }));
+      setError((prev) => ({ ...prev, renewals: null }));
+
+      try {
+        const params = new URLSearchParams();
+        if (options?.window) params.append("window", options.window.toString());
+        if (options?.sortBy) params.append("sortBy", options.sortBy);
+        if (options?.type) params.append("type", options.type);
+
+        const queryString = params.toString();
+        const endpoint = queryString ? `/renewals?${queryString}` : "/renewals";
+
+        const response = await api.get<{
+          renewals: Renewal[];
+          totalAmount: number;
+          currency: string;
+          window: number;
+          count: number;
+        }>(endpoint);
+
+        setData((prev) => ({ ...prev, renewals: response.renewals }));
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to fetch renewals";
+        setError((prev) => ({ ...prev, renewals: errorMessage }));
+      } finally {
+        setLoading((prev) => ({ ...prev, renewals: false }));
+      }
+    },
+    [api],
+  );
 
   // Fetch activities
-  const fetchActivities = useCallback(async (options?: { limit?: number }) => {
-    setLoading(prev => ({ ...prev, activities: true }));
-    setError(prev => ({ ...prev, activities: null }));
-    
-    try {
-      const params = new URLSearchParams();
-      if (options?.limit) params.append('limit', options.limit.toString());
-      
-      const queryString = params.toString();
-      const endpoint = queryString ? `/dashboard/activity?${queryString}` : '/dashboard/activity';
-      
-      const response = await api.get<{
-        activities: Activity[];
-        hasMore: boolean;
-        total: number;
-      }>(endpoint);
-      
-      setData(prev => ({ ...prev, activities: response.activities }));
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch activities';
-      setError(prev => ({ ...prev, activities: errorMessage }));
-    } finally {
-      setLoading(prev => ({ ...prev, activities: false }));
-    }
-  }, [api]);
+  const fetchActivities = useCallback(
+    async (options?: { limit?: number }) => {
+      setLoading((prev) => ({ ...prev, activities: true }));
+      setError((prev) => ({ ...prev, activities: null }));
+
+      try {
+        const params = new URLSearchParams();
+        if (options?.limit) params.append("limit", options.limit.toString());
+
+        const queryString = params.toString();
+        const endpoint = queryString
+          ? `/dashboard/activity?${queryString}`
+          : "/dashboard/activity";
+
+        const response = await api.get<{
+          activities: Activity[];
+          hasMore: boolean;
+          total: number;
+        }>(endpoint);
+
+        setData((prev) => ({ ...prev, activities: response.activities }));
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to fetch activities";
+        setError((prev) => ({ ...prev, activities: errorMessage }));
+      } finally {
+        setLoading((prev) => ({ ...prev, activities: false }));
+      }
+    },
+    [api],
+  );
 
   // Refetch all data
   const refetchAll = useCallback(async () => {
@@ -171,31 +189,55 @@ export function useDashboard(): UseDashboardReturn {
     setError({ summary: null, renewals: null, activities: null });
 
     try {
-      const [summaryRes, renewalsRes, activitiesRes] = await Promise.allSettled([
-        api.get<{ summary: ServiceSummary; lastUpdated: string }>('/services/summary'),
-        api.get<{renewals: Renewal[]; totalAmount: number; currency: string; window: number; count: number;}>('/renewals?window=30'),
-        api.get<{activities: Activity[]; hasMore: boolean; total: number;}>('/dashboard/activity?limit=5')
-      ]);
+      const [summaryRes, renewalsRes, activitiesRes] = await Promise.allSettled(
+        [
+          api.get<{ summary: ServiceSummary; lastUpdated: string }>(
+            "/services/summary",
+          ),
+          api.get<{
+            renewals: Renewal[];
+            totalAmount: number;
+            currency: string;
+            window: number;
+            count: number;
+          }>("/renewals?window=30"),
+          api.get<{ activities: Activity[]; hasMore: boolean; total: number }>(
+            "/dashboard/activity?limit=5",
+          ),
+        ],
+      );
 
-      if (summaryRes.status === 'fulfilled') {
-        setData(prev => ({ ...prev, summary: summaryRes.value.summary }));
+      if (summaryRes.status === "fulfilled") {
+        setData((prev) => ({ ...prev, summary: summaryRes.value.summary }));
       } else {
-        const errorMessage = summaryRes.reason instanceof Error ? summaryRes.reason.message : 'Failed to fetch service summary';
-        setError(prev => ({ ...prev, summary: errorMessage }));
+        const errorMessage =
+          summaryRes.reason instanceof Error
+            ? summaryRes.reason.message
+            : "Failed to fetch service summary";
+        setError((prev) => ({ ...prev, summary: errorMessage }));
       }
 
-      if (renewalsRes.status === 'fulfilled') {
-        setData(prev => ({ ...prev, renewals: renewalsRes.value.renewals }));
+      if (renewalsRes.status === "fulfilled") {
+        setData((prev) => ({ ...prev, renewals: renewalsRes.value.renewals }));
       } else {
-        const errorMessage = renewalsRes.reason instanceof Error ? renewalsRes.reason.message : 'Failed to fetch renewals';
-        setError(prev => ({ ...prev, renewals: errorMessage }));
+        const errorMessage =
+          renewalsRes.reason instanceof Error
+            ? renewalsRes.reason.message
+            : "Failed to fetch renewals";
+        setError((prev) => ({ ...prev, renewals: errorMessage }));
       }
 
-      if (activitiesRes.status === 'fulfilled') {
-        setData(prev => ({ ...prev, activities: activitiesRes.value.activities }));
+      if (activitiesRes.status === "fulfilled") {
+        setData((prev) => ({
+          ...prev,
+          activities: activitiesRes.value.activities,
+        }));
       } else {
-        const errorMessage = activitiesRes.reason instanceof Error ? activitiesRes.reason.message : 'Failed to fetch activities';
-        setError(prev => ({ ...prev, activities: errorMessage }));
+        const errorMessage =
+          activitiesRes.reason instanceof Error
+            ? activitiesRes.reason.message
+            : "Failed to fetch activities";
+        setError((prev) => ({ ...prev, activities: errorMessage }));
       }
     } finally {
       setLoading({ summary: false, renewals: false, activities: false });
@@ -211,7 +253,7 @@ export function useDashboard(): UseDashboardReturn {
         await Promise.all([
           fetchSummary(),
           fetchRenewals({ window: 30 }),
-          fetchActivities({ limit: 5 })
+          fetchActivities({ limit: 5 }),
         ]);
       } finally {
         setIsRefreshing(false);
@@ -229,16 +271,16 @@ export function useDashboard(): UseDashboardReturn {
       summary: fetchSummary,
       renewals: fetchRenewals,
       activities: fetchActivities,
-      all: refetchAll
+      all: refetchAll,
     },
-    isRefreshing
+    isRefreshing,
   };
 }
 
 // Hook for real-time updates simulation
 export function useDashboardPolling(
   onPoll: () => void,
-  intervalMs: number = 30000
+  intervalMs: number = 30000,
 ) {
   const [isPolling, setIsPolling] = useState(false);
 

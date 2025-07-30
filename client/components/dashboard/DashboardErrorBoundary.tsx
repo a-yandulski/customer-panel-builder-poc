@@ -1,7 +1,13 @@
 import React from "react";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -31,11 +37,15 @@ export class DashboardErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("Dashboard Error Boundary caught an error:", error, errorInfo);
-    
+    console.error(
+      "Dashboard Error Boundary caught an error:",
+      error,
+      errorInfo,
+    );
+
     // In a real app, you might want to log this to an error reporting service
     // logErrorToService(error, errorInfo);
-    
+
     this.setState({
       error,
       errorInfo,
@@ -53,12 +63,17 @@ export class DashboardErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       const { fallback: Fallback } = this.props;
-      
+
       if (Fallback && this.state.error) {
         return <Fallback error={this.state.error} retry={this.handleRetry} />;
       }
 
-      return <DefaultErrorFallback onRetry={this.handleRetry} onGoHome={this.handleGoHome} />;
+      return (
+        <DefaultErrorFallback
+          onRetry={this.handleRetry}
+          onGoHome={this.handleGoHome}
+        />
+      );
     }
 
     return this.props.children;
@@ -70,7 +85,10 @@ interface DefaultErrorFallbackProps {
   onGoHome: () => void;
 }
 
-function DefaultErrorFallback({ onRetry, onGoHome }: DefaultErrorFallbackProps) {
+function DefaultErrorFallback({
+  onRetry,
+  onGoHome,
+}: DefaultErrorFallbackProps) {
   return (
     <div className="min-h-[400px] flex items-center justify-center p-6">
       <Card className="w-full max-w-lg border-red-200">
@@ -82,38 +100,36 @@ function DefaultErrorFallback({ onRetry, onGoHome }: DefaultErrorFallbackProps) 
             Dashboard Error
           </CardTitle>
           <CardDescription className="text-gray-600">
-            Something went wrong while loading your dashboard. This error has been logged and we're working to fix it.
+            Something went wrong while loading your dashboard. This error has
+            been logged and we're working to fix it.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
-              onClick={onRetry} 
-              className="flex-1"
-              variant="default"
-            >
+            <Button onClick={onRetry} className="flex-1" variant="default">
               <RefreshCw className="h-4 w-4 mr-2" />
               Try Again
             </Button>
-            <Button 
-              onClick={onGoHome} 
-              variant="outline"
-              className="flex-1"
-            >
+            <Button onClick={onGoHome} variant="outline" className="flex-1">
               <Home className="h-4 w-4 mr-2" />
               Go Home
             </Button>
           </div>
-          
+
           <details className="mt-4">
             <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
               Technical Details
             </summary>
             <div className="mt-2 p-3 bg-gray-50 rounded border text-xs font-mono text-gray-600 max-h-32 overflow-auto">
-              <p>If you continue to experience issues, please contact support with this information:</p>
+              <p>
+                If you continue to experience issues, please contact support
+                with this information:
+              </p>
               <p className="mt-2">
-                Timestamp: {new Date().toISOString()}<br />
-                User Agent: {navigator.userAgent}<br />
+                Timestamp: {new Date().toISOString()}
+                <br />
+                User Agent: {navigator.userAgent}
+                <br />
                 URL: {window.location.href}
               </p>
             </div>

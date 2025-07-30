@@ -29,7 +29,9 @@ export default function Index() {
           Loading DomainHost...
         </h1>
         <p className="mt-2 text-gray-600">
-          {isLoading ? "Checking authentication..." : "Redirecting to your customer panel"}
+          {isLoading
+            ? "Checking authentication..."
+            : "Redirecting to your customer panel"}
         </p>
       </div>
     </div>

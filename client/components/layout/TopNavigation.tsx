@@ -34,47 +34,53 @@ export default function TopNavigation() {
   // Handle logout
   const handleLogout = () => {
     logout({
-      returnTo: window.location.origin
+      returnTo: window.location.origin,
     });
   };
 
   // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node)
+      ) {
         setIsMobileMenuOpen(false);
       }
     };
 
     if (isMobileMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isMobileMenuOpen]);
 
   // Handle keyboard navigation
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isMobileMenuOpen) {
+      if (event.key === "Escape" && isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [isMobileMenuOpen]);
 
   // Focus trap for mobile menu
   useEffect(() => {
     if (isMobileMenuOpen && mobileMenuRef.current) {
       const focusableElements = mobileMenuRef.current.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
       const firstElement = focusableElements[0] as HTMLElement;
-      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+      const lastElement = focusableElements[
+        focusableElements.length - 1
+      ] as HTMLElement;
 
       const handleTabKey = (e: KeyboardEvent) => {
-        if (e.key === 'Tab') {
+        if (e.key === "Tab") {
           if (e.shiftKey) {
             if (document.activeElement === firstElement) {
               e.preventDefault();
@@ -89,10 +95,10 @@ export default function TopNavigation() {
         }
       };
 
-      document.addEventListener('keydown', handleTabKey);
+      document.addEventListener("keydown", handleTabKey);
       firstElement?.focus();
 
-      return () => document.removeEventListener('keydown', handleTabKey);
+      return () => document.removeEventListener("keydown", handleTabKey);
     }
   }, [isMobileMenuOpen]);
 
@@ -155,11 +161,19 @@ export default function TopNavigation() {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2 h-10">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center space-x-2 h-10"
+                  >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.picture} alt={user?.name || "User"} />
+                      <AvatarImage
+                        src={user?.picture}
+                        alt={user?.name || "User"}
+                      />
                       <AvatarFallback className="bg-primary text-primary-foreground">
-                        {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
+                        {user?.name?.[0]?.toUpperCase() ||
+                          user?.email?.[0]?.toUpperCase() ||
+                          "U"}
                       </AvatarFallback>
                     </Avatar>
                     <span className="hidden sm:block text-gray-700 font-medium">
@@ -247,7 +261,11 @@ interface MobileNavigationProps {
   onLogout: () => void;
 }
 
-function MobileNavigation({ user, onItemClick, onLogout }: MobileNavigationProps) {
+function MobileNavigation({
+  user,
+  onItemClick,
+  onLogout,
+}: MobileNavigationProps) {
   const location = useLocation();
 
   return (
@@ -309,16 +327,16 @@ function MobileNavigation({ user, onItemClick, onLogout }: MobileNavigationProps
           <Avatar className="h-12 w-12">
             <AvatarImage src={user?.picture} alt={user?.name || "User"} />
             <AvatarFallback className="bg-primary text-primary-foreground">
-              {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
+              {user?.name?.[0]?.toUpperCase() ||
+                user?.email?.[0]?.toUpperCase() ||
+                "U"}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-gray-900 truncate">
               {user?.name || "User"}
             </div>
-            <div className="text-sm text-gray-500 truncate">
-              {user?.email}
-            </div>
+            <div className="text-sm text-gray-500 truncate">{user?.email}</div>
           </div>
         </div>
         <Button

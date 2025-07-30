@@ -1,6 +1,12 @@
 import { AlertTriangle, RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface ErrorStateProps {
   title: string;
@@ -10,12 +16,12 @@ interface ErrorStateProps {
   type?: "network" | "server" | "permission" | "generic";
 }
 
-export function ErrorState({ 
-  title, 
-  message, 
-  onRetry, 
+export function ErrorState({
+  title,
+  message,
+  onRetry,
   retryLabel = "Try Again",
-  type = "generic" 
+  type = "generic",
 }: ErrorStateProps) {
   const getIcon = () => {
     switch (type) {
@@ -46,9 +52,7 @@ export function ErrorState({
   return (
     <div className={`p-6 rounded-lg border ${getBackgroundColor()}`}>
       <div className="text-center space-y-4">
-        <div className="flex justify-center">
-          {getIcon()}
-        </div>
+        <div className="flex justify-center">{getIcon()}</div>
         <div>
           <h3 className="font-semibold text-gray-900 mb-1">{title}</h3>
           <p className="text-sm text-gray-600">{message}</p>
@@ -101,13 +105,13 @@ export function ActivityError({ onRetry }: { onRetry: () => void }) {
   );
 }
 
-export function EmptyState({ 
-  title, 
-  message, 
-  action 
-}: { 
-  title: string; 
-  message: string; 
+export function EmptyState({
+  title,
+  message,
+  action,
+}: {
+  title: string;
+  message: string;
   action?: React.ReactNode;
 }) {
   return (
@@ -131,7 +135,8 @@ export function NetworkError({ onRetry }: { onRetry: () => void }) {
           Connection Error
         </CardTitle>
         <CardDescription>
-          Unable to connect to our servers. Please check your internet connection.
+          Unable to connect to our servers. Please check your internet
+          connection.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -153,7 +158,8 @@ export function MaintenanceMode() {
           Maintenance Mode
         </CardTitle>
         <CardDescription>
-          We're currently performing scheduled maintenance. Some features may be temporarily unavailable.
+          We're currently performing scheduled maintenance. Some features may be
+          temporarily unavailable.
         </CardDescription>
       </CardHeader>
       <CardContent>

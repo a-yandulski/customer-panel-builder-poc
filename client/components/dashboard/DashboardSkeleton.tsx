@@ -19,10 +19,7 @@ export function RenewalTableSkeleton() {
   return (
     <div className="space-y-4">
       {[...Array(3)].map((_, index) => (
-        <div
-          key={index}
-          className="p-4 bg-gray-50 rounded-lg border space-y-3"
-        >
+        <div key={index} className="p-4 bg-gray-50 rounded-lg border space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
             <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
             <div className="h-6 bg-gray-200 rounded w-20 animate-pulse"></div>

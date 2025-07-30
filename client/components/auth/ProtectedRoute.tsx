@@ -52,7 +52,7 @@ export default function ProtectedRoute({
     // For now, we'll assume all authenticated users have all scopes
     // In a real implementation, you'd check the user's permissions/roles
     const hasRequiredScopes = requiredScopes.every(() => true);
-    
+
     if (!hasRequiredScopes) {
       return (
         <div className="min-h-screen bg-background flex items-center justify-center">
@@ -60,7 +60,9 @@ export default function ProtectedRoute({
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
               <span className="text-red-600 text-2xl">⚠️</span>
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900">Access Denied</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Access Denied
+            </h2>
             <p className="text-gray-600">
               You don't have the required permissions to access this page.
             </p>

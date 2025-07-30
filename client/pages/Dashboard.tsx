@@ -3,14 +3,19 @@ import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDashboard } from "@/hooks/useDashboard";
-import { DashboardSkeleton, ServiceCardSkeleton, RenewalTableSkeleton, ActivitySkeleton } from "@/components/dashboard/DashboardSkeleton";
-import { 
-  ErrorState, 
-  ServiceCardError, 
-  RenewalTableError, 
-  ActivityError, 
+import {
+  DashboardSkeleton,
+  ServiceCardSkeleton,
+  RenewalTableSkeleton,
+  ActivitySkeleton,
+} from "@/components/dashboard/DashboardSkeleton";
+import {
+  ErrorState,
+  ServiceCardError,
+  RenewalTableError,
+  ActivityError,
   EmptyState,
-  NetworkError
+  NetworkError,
 } from "@/components/dashboard/DashboardError";
 import MobileOptimizedCard from "@/components/MobileOptimizedCard";
 import {
@@ -46,20 +51,19 @@ import {
   RefreshCw,
   Filter,
   SortAsc,
-
   CheckCircle,
   ExternalLink,
   ArrowUpRight,
   Activity as ActivityIcon,
   Users,
-  Shield
+  Shield,
 } from "lucide-react";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data, loading, error, refetch, isRefreshing } = useDashboard();
-  
+
   // Local state
   const [showPromoBanner, setShowPromoBanner] = useState(true);
   const [renewalSort, setRenewalSort] = useState("expiry");
@@ -79,23 +83,29 @@ export default function Dashboard() {
   }, [refetch]);
 
   // Handle renewal sorting
-  const handleRenewalSort = useCallback((sortBy: string) => {
-    setRenewalSort(sortBy);
-    refetch.renewals({ sortBy, window: 30 });
-  }, [refetch]);
+  const handleRenewalSort = useCallback(
+    (sortBy: string) => {
+      setRenewalSort(sortBy);
+      refetch.renewals({ sortBy, window: 30 });
+    },
+    [refetch],
+  );
 
-  // Handle renewal filtering  
-  const handleRenewalFilter = useCallback((type: string) => {
-    setRenewalFilter(type);
-    const filterType = type === "all" ? undefined : type;
-    refetch.renewals({ type: filterType, window: 30 });
-  }, [refetch]);
+  // Handle renewal filtering
+  const handleRenewalFilter = useCallback(
+    (type: string) => {
+      setRenewalFilter(type);
+      const filterType = type === "all" ? undefined : type;
+      refetch.renewals({ type: filterType, window: 30 });
+    },
+    [refetch],
+  );
 
   // Format currency
   const formatCurrency = (amount: number, currency: string = "USD") => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency,
     }).format(amount);
   };
 
@@ -116,13 +126,20 @@ export default function Dashboard() {
   // Get activity icon
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case "domain_renewal": return Globe;
-      case "ssl_install": return Shield;
-      case "ticket_created": return MessageCircle;
-      case "dns_update": return Settings;
-      case "payment_received": return CreditCard;
-      case "security_alert": return Shield;
-      default: return ActivityIcon;
+      case "domain_renewal":
+        return Globe;
+      case "ssl_install":
+        return Shield;
+      case "ticket_created":
+        return MessageCircle;
+      case "dns_update":
+        return Settings;
+      case "payment_received":
+        return CreditCard;
+      case "security_alert":
+        return Shield;
+      default:
+        return ActivityIcon;
     }
   };
 
@@ -142,10 +159,12 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-              Welcome back, {user?.given_name || user?.name?.split(' ')[0] || 'there'}!
+              Welcome back,{" "}
+              {user?.given_name || user?.name?.split(" ")[0] || "there"}!
             </h1>
             <p className="body sm:body-large text-gray-700 mt-1">
-              Great to see you again. Here's what's happening with your services today.
+              Great to see you again. Here's what's happening with your services
+              today.
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -155,7 +174,9 @@ export default function Dashboard() {
               onClick={handleRefresh}
               disabled={isRefreshing}
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+              />
               Refresh
             </Button>
           </div>
@@ -209,7 +230,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <>
-              <Card 
+              <Card
                 className="shadow-md cursor-pointer hover:shadow-lg transition-shadow"
                 onClick={() => navigate("/services")}
               >
@@ -236,7 +257,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card 
+              <Card
                 className="shadow-md cursor-pointer hover:shadow-lg transition-shadow"
                 onClick={() => navigate("/services")}
               >
@@ -251,15 +272,14 @@ export default function Dashboard() {
                     {data.summary?.subscriptions.active || 0}
                   </div>
                   <p className="body-sm text-gray-500 mt-1">
-                    {data.summary?.subscriptions.suspended ? 
-                      `${data.summary.subscriptions.suspended} suspended` : 
-                      "All services running"
-                    }
+                    {data.summary?.subscriptions.suspended
+                      ? `${data.summary.subscriptions.suspended} suspended`
+                      : "All services running"}
                   </p>
                 </CardContent>
               </Card>
 
-              <Card 
+              <Card
                 className="shadow-md cursor-pointer hover:shadow-lg transition-shadow"
                 onClick={() => navigate("/support")}
               >
@@ -293,7 +313,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card 
+              <Card
                 className="shadow-md cursor-pointer hover:shadow-lg transition-shadow"
                 onClick={() => navigate("/billing")}
               >
@@ -305,7 +325,9 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-gray-900">
-                    {data.summary ? formatCurrency(data.summary.billing.balance) : "$0.00"}
+                    {data.summary
+                      ? formatCurrency(data.summary.billing.balance)
+                      : "$0.00"}
                   </div>
                   <p className="body-sm text-success mt-1">Available balance</p>
                 </CardContent>
@@ -326,7 +348,10 @@ export default function Dashboard() {
               defaultCollapsed={false}
               actions={
                 <div className="flex items-center space-x-2">
-                  <Select value={renewalFilter} onValueChange={handleRenewalFilter}>
+                  <Select
+                    value={renewalFilter}
+                    onValueChange={handleRenewalFilter}
+                  >
                     <SelectTrigger className="w-32">
                       <Filter className="h-4 w-4 mr-2" />
                       <SelectValue />
@@ -361,7 +386,10 @@ export default function Dashboard() {
                   title="No Upcoming Renewals"
                   message="Great! You don't have any services expiring in the next 30 days."
                   action={
-                    <Button variant="outline" onClick={() => navigate("/services")}>
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate("/services")}
+                    >
                       View All Services
                     </Button>
                   }
@@ -375,9 +403,13 @@ export default function Dashboard() {
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                         <button
-                          onClick={() => setExpandedRenewal(
-                            expandedRenewal === renewal.id ? null : renewal.id
-                          )}
+                          onClick={() =>
+                            setExpandedRenewal(
+                              expandedRenewal === renewal.id
+                                ? null
+                                : renewal.id,
+                            )
+                          }
                           className="text-left"
                         >
                           <h4 className="font-semibold text-gray-900 text-lg flex items-center">
@@ -394,14 +426,21 @@ export default function Dashboard() {
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-1 sm:space-y-0 body-sm text-gray-600">
                         <span>{renewal.displayType}</span>
-                        <span>Expires: {new Date(renewal.expiryDate).toLocaleDateString()}</span>
+                        <span>
+                          Expires:{" "}
+                          {new Date(renewal.expiryDate).toLocaleDateString()}
+                        </span>
                       </div>
                       <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center space-x-3">
-                          <span className="body-sm text-gray-700">Auto-renew:</span>
+                          <span className="body-sm text-gray-700">
+                            Auto-renew:
+                          </span>
                           <Switch
                             checked={renewal.autoRenew}
-                            onCheckedChange={() => handleRenewalToggle(renewal.id)}
+                            onCheckedChange={() =>
+                              handleRenewalToggle(renewal.id)
+                            }
                           />
                         </div>
                         <div className="flex items-center space-x-3">
@@ -416,13 +455,14 @@ export default function Dashboard() {
                           </Button>
                         </div>
                       </div>
-                      
+
                       {/* Expanded details */}
                       {expandedRenewal === renewal.id && (
                         <div className="mt-4 p-3 bg-white rounded border text-sm text-gray-600">
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <strong>Days until expiry:</strong> {renewal.daysUntilExpiry}
+                              <strong>Days until expiry:</strong>{" "}
+                              {renewal.daysUntilExpiry}
                             </div>
                             <div>
                               <strong>Status:</strong> {renewal.status}
@@ -452,8 +492,8 @@ export default function Dashboard() {
                       Latest updates and changes to your services
                     </CardDescription>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => refetch.activities()}
                   >
@@ -485,10 +525,10 @@ export default function Dashboard() {
                               activity.status === "success"
                                 ? "bg-success/10 text-success"
                                 : activity.status === "warning"
-                                ? "bg-warning/10 text-warning"
-                                : activity.status === "error"
-                                ? "bg-error/10 text-error"
-                                : "bg-primary/10 text-primary"
+                                  ? "bg-warning/10 text-warning"
+                                  : activity.status === "error"
+                                    ? "bg-error/10 text-error"
+                                    : "bg-primary/10 text-primary"
                             }`}
                           >
                             <Icon className="h-4 w-4" />
@@ -521,7 +561,7 @@ export default function Dashboard() {
               description="Common tasks and shortcuts"
             >
               <div className="space-y-3">
-                <Button 
+                <Button
                   className="w-full justify-start bg-primary hover:bg-primary/90 mobile-touch-target"
                   onClick={() => navigate("/services")}
                 >
@@ -616,10 +656,11 @@ export default function Dashboard() {
                   <div className="flex justify-between items-center">
                     <span className="body-sm text-gray-700">Next invoice</span>
                     <span className="body-sm font-medium">
-                      {data.summary?.billing.nextPayment ? 
-                        new Date(data.summary.billing.nextPayment).toLocaleDateString() : 
-                        "N/A"
-                      }
+                      {data.summary?.billing.nextPayment
+                        ? new Date(
+                            data.summary.billing.nextPayment,
+                          ).toLocaleDateString()
+                        : "N/A"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -629,9 +670,9 @@ export default function Dashboard() {
                     </Badge>
                   </div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="w-full mt-3"
                   onClick={() => navigate("/account")}
                 >

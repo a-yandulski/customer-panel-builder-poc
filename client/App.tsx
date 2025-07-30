@@ -60,7 +60,9 @@ const App = () => (
               <Route
                 path="/support"
                 element={
-                  <ProtectedRoute requiredScopes={["tickets:read", "tickets:write"]}>
+                  <ProtectedRoute
+                    requiredScopes={["tickets:read", "tickets:write"]}
+                  >
                     <Support />
                   </ProtectedRoute>
                 }
@@ -68,7 +70,9 @@ const App = () => (
               <Route
                 path="/account"
                 element={
-                  <ProtectedRoute requiredScopes={["profile:read", "profile:write"]}>
+                  <ProtectedRoute
+                    requiredScopes={["profile:read", "profile:write"]}
+                  >
                     <Account />
                   </ProtectedRoute>
                 }

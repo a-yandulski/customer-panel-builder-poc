@@ -5,6 +5,7 @@ This document provides a comprehensive guide for the Auth0 integration implement
 ## Overview
 
 The application now includes complete Auth0 integration with:
+
 - **Secure Authentication**: Enterprise-grade Auth0 Universal Login
 - **Protected Routes**: Role-based access control for different sections
 - **Responsive Navigation**: Mobile-first design with accessible drawer navigation
@@ -14,18 +15,21 @@ The application now includes complete Auth0 integration with:
 ## Features Implemented
 
 ### 🔐 Authentication System
+
 - Auth0 Universal Login integration
 - JWT token management with automatic refresh
 - Secure logout with session cleanup
 - Protected route wrapper with role-based access
 
 ### 🎨 User Interface
+
 - Responsive navigation bar with user profile dropdown
 - Mobile drawer with slide-out navigation (300ms ease-out animations)
 - User avatar display with fallback initials
 - Loading states for authentication checks
 
 ### ♿ Accessibility Features
+
 - Full keyboard navigation support
 - ARIA roles and labels for screen readers
 - Focus trap in mobile drawer
@@ -33,6 +37,7 @@ The application now includes complete Auth0 integration with:
 - Tab navigation between elements
 
 ### 🛡️ Security Features
+
 - Token storage in Auth0's secure cache
 - Automatic token refresh before expiration
 - API request interceptors with token injection
@@ -78,6 +83,7 @@ VITE_APP_MODE=development  # Use 'production' for live Auth0
 ### Auth0 Dashboard Setup
 
 1. **Create Auth0 Application**:
+
    - Application Type: Single Page Application
    - Allowed Callback URLs: `http://localhost:8080`
    - Allowed Logout URLs: `http://localhost:8080`
@@ -97,7 +103,7 @@ VITE_APP_MODE=development  # Use 'production' for live Auth0
 ### Using the Auth Hook
 
 ```tsx
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from "@/contexts/AuthContext";
 
 function MyComponent() {
   const { user, isAuthenticated, loginWithRedirect, logout } = useAuth();
@@ -120,17 +126,17 @@ function MyComponent() {
 ### Making Authenticated API Calls
 
 ```tsx
-import { useApi } from '@/lib/api';
+import { useApi } from "@/lib/api";
 
 function DataComponent() {
   const { api } = useApi();
 
   const fetchUserData = async () => {
     try {
-      const userData = await api.get('/user/profile');
+      const userData = await api.get("/user/profile");
       console.log(userData);
     } catch (error) {
-      console.error('API Error:', error);
+      console.error("API Error:", error);
     }
   };
 
@@ -144,13 +150,13 @@ function DataComponent() {
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 // Protect entire route
-<Route 
-  path="/billing" 
+<Route
+  path="/billing"
   element={
     <ProtectedRoute requiredScopes={["invoices:read"]}>
       <BillingPage />
     </ProtectedRoute>
-  } 
+  }
 />
 
 // Protect component with custom scopes
@@ -162,12 +168,14 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 ## Development vs Production
 
 ### Development Mode (Default)
+
 - Uses MSW (Mock Service Worker) for Auth0 API responses
 - Mock user data for testing
 - No actual Auth0 authentication required
 - Perfect for local development and testing
 
 ### Production Mode
+
 - Set `VITE_APP_MODE=production` in environment
 - Uses real Auth0 authentication
 - Requires valid Auth0 configuration
@@ -176,12 +184,14 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 ## Navigation Features
 
 ### Desktop Navigation
+
 - Horizontal navigation bar with hover effects
 - User profile dropdown with avatar
 - Active route highlighting
 - Notification center integration
 
 ### Mobile Navigation
+
 - Hamburger menu with slide-out drawer
 - Touch-friendly 44px minimum touch targets
 - User profile section in drawer footer
@@ -189,6 +199,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 - Backdrop overlay with fade transition
 
 ### Accessibility
+
 - **Keyboard Navigation**: Full tab support through all interactive elements
 - **Screen Readers**: ARIA labels and roles for all navigation elements
 - **Focus Management**: Focus trap in mobile drawer, restore focus on close
@@ -198,6 +209,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 ## Testing
 
 ### Manual Testing Checklist
+
 - [ ] Login redirects to Auth0 Universal Login
 - [ ] Successful login redirects to dashboard
 - [ ] Protected routes require authentication
@@ -208,6 +220,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 - [ ] API calls include authentication headers
 
 ### Mock Data Testing
+
 - Default mock user: John Doe (john.doe@example.com)
 - Mock authentication flows
 - Simulated token refresh scenarios
@@ -216,16 +229,19 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 ## Security Considerations
 
 ### Token Storage
+
 - Tokens stored in Auth0's secure cache (not localStorage)
 - Automatic token refresh before expiration
 - Secure transmission over HTTPS only
 
 ### API Security
+
 - All API requests include Bearer token
 - Automatic retry with token refresh on 401 errors
 - Request timeout and error handling
 
 ### Route Protection
+
 - Client-side route protection for UX
 - Server-side validation required for security
 - Role-based access control support
@@ -235,16 +251,19 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 ### Common Issues
 
 1. **"Authentication Error" on Login**
+
    - Check Auth0 domain and client ID in environment variables
    - Verify callback URLs in Auth0 dashboard
    - Ensure HTTPS in production
 
 2. **Token Refresh Failures**
+
    - Check Auth0 API configuration
    - Verify audience parameter matches API identifier
    - Review browser console for detailed errors
 
 3. **Mobile Drawer Not Working**
+
    - Check for JavaScript errors in console
    - Verify touch event handlers are working
    - Test keyboard accessibility (Tab/Escape keys)
@@ -255,11 +274,13 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
    - Ensure API endpoints match expected format
 
 ### Debug Mode
+
 Enable debug logging by setting `VITE_DEBUG=true` in environment variables.
 
 ## Next Steps
 
 ### Recommended Enhancements
+
 1. **Multi-Factor Authentication**: Enable MFA in Auth0 dashboard
 2. **Social Logins**: Add Google, Microsoft, or other social providers
 3. **Role-Based UI**: Show/hide features based on user roles
@@ -267,6 +288,7 @@ Enable debug logging by setting `VITE_DEBUG=true` in environment variables.
 5. **Analytics**: Track authentication events and user flows
 
 ### Performance Optimizations
+
 1. **Code Splitting**: Lazy load authentication components
 2. **Caching**: Implement user data caching strategies
 3. **Preloading**: Preload protected routes after authentication

@@ -1,5 +1,15 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { useAuth0, Auth0Provider as Auth0ProviderBase, Auth0ProviderOptions } from "@auth0/auth0-react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import {
+  useAuth0,
+  Auth0Provider as Auth0ProviderBase,
+  Auth0ProviderOptions,
+} from "@auth0/auth0-react";
 import { User } from "@auth0/auth0-spa-js";
 
 interface AuthContextType {
@@ -21,8 +31,11 @@ const auth0Config: Auth0ProviderOptions = {
   clientId: import.meta.env.VITE_AUTH0_CLIENT_ID || "your_client_id_here",
   authorizationParams: {
     redirect_uri: window.location.origin,
-    audience: import.meta.env.VITE_AUTH0_AUDIENCE || "https://api.customerpanel.example.com",
-    scope: "openid profile email profile:read profile:write domains:read domains:write invoices:read tickets:read tickets:write notifications:read"
+    audience:
+      import.meta.env.VITE_AUTH0_AUDIENCE ||
+      "https://api.customerpanel.example.com",
+    scope:
+      "openid profile email profile:read profile:write domains:read domains:write invoices:read tickets:read tickets:write notifications:read",
   },
   cacheLocation: "localstorage" as const,
   useRefreshTokens: true,
@@ -49,15 +62,15 @@ function AuthProvider({ children }: AuthProviderProps) {
   // Check for fake authentication on mount
   useEffect(() => {
     const checkFakeAuth = () => {
-      const storedUser = localStorage.getItem('fake_auth_user');
-      const storedToken = localStorage.getItem('fake_auth_token');
+      const storedUser = localStorage.getItem("fake_auth_user");
+      const storedToken = localStorage.getItem("fake_auth_token");
 
       if (storedUser && storedToken) {
         try {
           setFakeUser(JSON.parse(storedUser));
         } catch (error) {
-          localStorage.removeItem('fake_auth_user');
-          localStorage.removeItem('fake_auth_token');
+          localStorage.removeItem("fake_auth_user");
+          localStorage.removeItem("fake_auth_token");
         }
       }
       setFakeAuthLoading(false);
@@ -73,15 +86,15 @@ function AuthProvider({ children }: AuthProviderProps) {
   }, [auth0.isLoading, fakeAuthLoading]);
 
   const fakeLogout = () => {
-    localStorage.removeItem('fake_auth_user');
-    localStorage.removeItem('fake_auth_token');
+    localStorage.removeItem("fake_auth_user");
+    localStorage.removeItem("fake_auth_token");
     setFakeUser(null);
-    window.location.href = '/login';
+    window.location.href = "/login";
   };
 
   const fakeGetAccessToken = async () => {
-    const token = localStorage.getItem('fake_auth_token');
-    if (!token) throw new Error('No fake token available');
+    const token = localStorage.getItem("fake_auth_token");
+    if (!token) throw new Error("No fake token available");
     return token;
   };
 
@@ -99,14 +112,16 @@ function AuthProvider({ children }: AuthProviderProps) {
     error: auth0.error,
     loginWithRedirect: auth0.loginWithRedirect,
     logout: isUsingFakeAuth ? fakeLogout : auth0.logout,
-    getAccessTokenSilently: isUsingFakeAuth ? fakeGetAccessToken : auth0.getAccessTokenSilently,
-    getIdTokenClaims: isUsingFakeAuth ? fakeGetIdTokenClaims : auth0.getIdTokenClaims,
+    getAccessTokenSilently: isUsingFakeAuth
+      ? fakeGetAccessToken
+      : auth0.getAccessTokenSilently,
+    getIdTokenClaims: isUsingFakeAuth
+      ? fakeGetIdTokenClaims
+      : auth0.getIdTokenClaims,
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 }
 

@@ -19,7 +19,9 @@ class ApiClient {
     this.defaultTimeout = defaultTimeout;
   }
 
-  private async createAuthHeaders(getAccessTokenSilently?: () => Promise<string>): Promise<HeadersInit> {
+  private async createAuthHeaders(
+    getAccessTokenSilently?: () => Promise<string>,
+  ): Promise<HeadersInit> {
     const headers: HeadersInit = {
       "Content-Type": "application/json",
     };
@@ -30,7 +32,7 @@ class ApiClient {
         headers.Authorization = `Bearer ${token}`;
       } catch (error) {
         // Try to get fake token as fallback
-        const fakeToken = localStorage.getItem('fake_auth_token');
+        const fakeToken = localStorage.getItem("fake_auth_token");
         if (fakeToken) {
           headers.Authorization = `Bearer ${fakeToken}`;
         } else {
@@ -45,7 +47,7 @@ class ApiClient {
 
   private async fetchWithTimeout(
     url: string,
-    config: RequestConfig = {}
+    config: RequestConfig = {},
   ): Promise<Response> {
     const { timeout = this.defaultTimeout, ...fetchConfig } = config;
 
@@ -70,7 +72,7 @@ class ApiClient {
 
   private async handleResponse<T>(response: Response): Promise<T> {
     const contentType = response.headers.get("content-type");
-    
+
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
       let errorBody = null;
@@ -80,7 +82,7 @@ class ApiClient {
           errorBody = await response.json();
           errorMessage = errorBody.error || errorBody.message || errorMessage;
         } else {
-          errorMessage = await response.text() || errorMessage;
+          errorMessage = (await response.text()) || errorMessage;
         }
       } catch (parseError) {
         // If we can't parse the error response, use the default message
@@ -102,14 +104,16 @@ class ApiClient {
   async request<T>(
     endpoint: string,
     config: RequestConfig = {},
-    getAccessTokenSilently?: () => Promise<string>
+    getAccessTokenSilently?: () => Promise<string>,
   ): Promise<T> {
     const { requiresAuth = true, ...requestConfig } = config;
-    
-    const url = endpoint.startsWith("http") ? endpoint : `${this.baseURL}${endpoint}`;
-    
+
+    const url = endpoint.startsWith("http")
+      ? endpoint
+      : `${this.baseURL}${endpoint}`;
+
     const headers = await this.createAuthHeaders(
-      requiresAuth ? getAccessTokenSilently : undefined
+      requiresAuth ? getAccessTokenSilently : undefined,
     );
 
     const response = await this.fetchWithTimeout(url, {
@@ -126,16 +130,20 @@ class ApiClient {
   async get<T>(
     endpoint: string,
     config: RequestConfig = {},
-    getAccessTokenSilently?: () => Promise<string>
+    getAccessTokenSilently?: () => Promise<string>,
   ): Promise<T> {
-    return this.request<T>(endpoint, { ...config, method: "GET" }, getAccessTokenSilently);
+    return this.request<T>(
+      endpoint,
+      { ...config, method: "GET" },
+      getAccessTokenSilently,
+    );
   }
 
   async post<T>(
     endpoint: string,
     data?: any,
     config: RequestConfig = {},
-    getAccessTokenSilently?: () => Promise<string>
+    getAccessTokenSilently?: () => Promise<string>,
   ): Promise<T> {
     return this.request<T>(
       endpoint,
@@ -144,7 +152,7 @@ class ApiClient {
         method: "POST",
         body: data ? JSON.stringify(data) : undefined,
       },
-      getAccessTokenSilently
+      getAccessTokenSilently,
     );
   }
 
@@ -152,7 +160,7 @@ class ApiClient {
     endpoint: string,
     data?: any,
     config: RequestConfig = {},
-    getAccessTokenSilently?: () => Promise<string>
+    getAccessTokenSilently?: () => Promise<string>,
   ): Promise<T> {
     return this.request<T>(
       endpoint,
@@ -161,7 +169,7 @@ class ApiClient {
         method: "PUT",
         body: data ? JSON.stringify(data) : undefined,
       },
-      getAccessTokenSilently
+      getAccessTokenSilently,
     );
   }
 
@@ -169,7 +177,7 @@ class ApiClient {
     endpoint: string,
     data?: any,
     config: RequestConfig = {},
-    getAccessTokenSilently?: () => Promise<string>
+    getAccessTokenSilently?: () => Promise<string>,
   ): Promise<T> {
     return this.request<T>(
       endpoint,
@@ -178,16 +186,20 @@ class ApiClient {
         method: "PATCH",
         body: data ? JSON.stringify(data) : undefined,
       },
-      getAccessTokenSilently
+      getAccessTokenSilently,
     );
   }
 
   async delete<T>(
     endpoint: string,
     config: RequestConfig = {},
-    getAccessTokenSilently?: () => Promise<string>
+    getAccessTokenSilently?: () => Promise<string>,
   ): Promise<T> {
-    return this.request<T>(endpoint, { ...config, method: "DELETE" }, getAccessTokenSilently);
+    return this.request<T>(
+      endpoint,
+      { ...config, method: "DELETE" },
+      getAccessTokenSilently,
+    );
   }
 }
 
@@ -201,16 +213,16 @@ export function useApi() {
   const authenticatedClient = {
     get: <T>(endpoint: string, config?: RequestConfig) =>
       apiClient.get<T>(endpoint, config, getAccessTokenSilently),
-    
+
     post: <T>(endpoint: string, data?: any, config?: RequestConfig) =>
       apiClient.post<T>(endpoint, data, config, getAccessTokenSilently),
-    
+
     put: <T>(endpoint: string, data?: any, config?: RequestConfig) =>
       apiClient.put<T>(endpoint, data, config, getAccessTokenSilently),
-    
+
     patch: <T>(endpoint: string, data?: any, config?: RequestConfig) =>
       apiClient.patch<T>(endpoint, data, config, getAccessTokenSilently),
-    
+
     delete: <T>(endpoint: string, config?: RequestConfig) =>
       apiClient.delete<T>(endpoint, config, getAccessTokenSilently),
   };
@@ -218,16 +230,16 @@ export function useApi() {
   const publicClient = {
     get: <T>(endpoint: string, config?: RequestConfig) =>
       apiClient.get<T>(endpoint, { ...config, requiresAuth: false }),
-    
+
     post: <T>(endpoint: string, data?: any, config?: RequestConfig) =>
       apiClient.post<T>(endpoint, data, { ...config, requiresAuth: false }),
-    
+
     put: <T>(endpoint: string, data?: any, config?: RequestConfig) =>
       apiClient.put<T>(endpoint, data, { ...config, requiresAuth: false }),
-    
+
     patch: <T>(endpoint: string, data?: any, config?: RequestConfig) =>
       apiClient.patch<T>(endpoint, data, { ...config, requiresAuth: false }),
-    
+
     delete: <T>(endpoint: string, config?: RequestConfig) =>
       apiClient.delete<T>(endpoint, { ...config, requiresAuth: false }),
   };

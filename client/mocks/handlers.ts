@@ -58,7 +58,7 @@ const mockAuth0User = {
   phone_number: "+1-555-123-4567",
   phone_number_verified: false,
   address: {
-    country: "US"
+    country: "US",
   },
   updated_at: new Date().toISOString(),
   "https://customerpanel.example.com/roles": ["customer"],
@@ -70,8 +70,8 @@ const mockAuth0User = {
     "invoices:read",
     "tickets:read",
     "tickets:write",
-    "notifications:read"
-  ]
+    "notifications:read",
+  ],
 };
 
 export const handlers = [
@@ -80,66 +80,76 @@ export const handlers = [
   // =======================
 
   // Auth0 userinfo endpoint
-  http.get("https://dev-customer-panel.auth0.com/userinfo", async ({ request }) => {
-    await delay(randomDelay(100, 300));
+  http.get(
+    "https://dev-customer-panel.auth0.com/userinfo",
+    async ({ request }) => {
+      await delay(randomDelay(100, 300));
 
-    const authHeader = request.headers.get("Authorization");
+      const authHeader = request.headers.get("Authorization");
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return HttpResponse.json(
-        { error: "unauthorized", error_description: "Missing or invalid authorization header" },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.replace("Bearer ", "");
-
-    // Simulate invalid token
-    if (token === "invalid_token") {
-      return HttpResponse.json(
-        { error: "invalid_token", error_description: "Invalid access token" },
-        { status: 401 }
-      );
-    }
-
-    return HttpResponse.json(mockAuth0User);
-  }),
-
-  // Auth0 token endpoint for refresh
-  http.post("https://dev-customer-panel.auth0.com/oauth/token", async ({ request }) => {
-    await delay(randomDelay(100, 500));
-
-    const body = await request.text();
-    const params = new URLSearchParams(body);
-
-    const grantType = params.get("grant_type");
-    const refreshToken = params.get("refresh_token");
-
-    if (grantType === "refresh_token") {
-      if (!refreshToken || refreshToken === "invalid_refresh_token") {
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return HttpResponse.json(
           {
-            error: "invalid_grant",
-            error_description: "Invalid refresh token"
+            error: "unauthorized",
+            error_description: "Missing or invalid authorization header",
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
 
-      return HttpResponse.json({
-        access_token: `mock_access_token_${Date.now()}`,
-        id_token: `mock_id_token_${Date.now()}`,
-        token_type: "Bearer",
-        expires_in: 3600,
-        scope: "openid profile email profile:read profile:write domains:read domains:write invoices:read tickets:read tickets:write notifications:read"
-      });
-    }
+      const token = authHeader.replace("Bearer ", "");
 
-    return HttpResponse.json(
-      { error: "unsupported_grant_type" },
-      { status: 400 }
-    );
-  }),
+      // Simulate invalid token
+      if (token === "invalid_token") {
+        return HttpResponse.json(
+          { error: "invalid_token", error_description: "Invalid access token" },
+          { status: 401 },
+        );
+      }
+
+      return HttpResponse.json(mockAuth0User);
+    },
+  ),
+
+  // Auth0 token endpoint for refresh
+  http.post(
+    "https://dev-customer-panel.auth0.com/oauth/token",
+    async ({ request }) => {
+      await delay(randomDelay(100, 500));
+
+      const body = await request.text();
+      const params = new URLSearchParams(body);
+
+      const grantType = params.get("grant_type");
+      const refreshToken = params.get("refresh_token");
+
+      if (grantType === "refresh_token") {
+        if (!refreshToken || refreshToken === "invalid_refresh_token") {
+          return HttpResponse.json(
+            {
+              error: "invalid_grant",
+              error_description: "Invalid refresh token",
+            },
+            { status: 401 },
+          );
+        }
+
+        return HttpResponse.json({
+          access_token: `mock_access_token_${Date.now()}`,
+          id_token: `mock_id_token_${Date.now()}`,
+          token_type: "Bearer",
+          expires_in: 3600,
+          scope:
+            "openid profile email profile:read profile:write domains:read domains:write invoices:read tickets:read tickets:write notifications:read",
+        });
+      }
+
+      return HttpResponse.json(
+        { error: "unsupported_grant_type" },
+        { status: 400 },
+      );
+    },
+  ),
 
   // Auth0 logout endpoint
   http.get("https://dev-customer-panel.auth0.com/v2/logout", async () => {
@@ -489,14 +499,17 @@ export const handlers = [
     if (!authHeader) {
       return HttpResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     // Simulate rate limiting (429 Too Many Requests)
     if (shouldFail(8)) {
       return HttpResponse.json(
-        { error: "Rate limit exceeded. Please wait before making more requests." },
+        {
+          error:
+            "Rate limit exceeded. Please wait before making more requests.",
+        },
         {
           status: 429,
           headers: {
@@ -518,7 +531,7 @@ export const handlers = [
     if (shouldFail(5)) {
       return HttpResponse.json(
         { error: "Service temporarily unavailable" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -528,13 +541,13 @@ export const handlers = [
         subscriptions: { total: 8, active: 7, suspended: 1 },
         tickets: { total: 4, open: 2, pending: 1, closed: 1 },
         billing: {
-          balance: 127.50,
+          balance: 127.5,
           currency: "USD",
           nextPayment: "2024-12-15",
-          overdue: 0
-        }
+          overdue: 0,
+        },
       },
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     });
   }),
 
@@ -551,7 +564,7 @@ export const handlers = [
     if (!authHeader) {
       return HttpResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -559,7 +572,7 @@ export const handlers = [
     if (shouldFail(10)) {
       return HttpResponse.json(
         { error: "Failed to fetch renewal data" },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -567,7 +580,7 @@ export const handlers = [
     if (filterType === "nonexistent") {
       return HttpResponse.json(
         { error: "Service type not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -583,7 +596,7 @@ export const handlers = [
         autoRenew: true,
         urgent: true,
         daysUntilExpiry: 8,
-        status: "active"
+        status: "active",
       },
       {
         id: "ren_002",
@@ -596,7 +609,7 @@ export const handlers = [
         autoRenew: false,
         urgent: false,
         daysUntilExpiry: 15,
-        status: "active"
+        status: "active",
       },
       {
         id: "ren_003",
@@ -609,7 +622,7 @@ export const handlers = [
         autoRenew: true,
         urgent: false,
         daysUntilExpiry: 29,
-        status: "active"
+        status: "active",
       },
       {
         id: "ren_004",
@@ -622,16 +635,18 @@ export const handlers = [
         autoRenew: false,
         urgent: false,
         daysUntilExpiry: 36,
-        status: "warning"
-      }
+        status: "warning",
+      },
     ];
 
     // Filter by window
-    const filteredRenewals = mockRenewals.filter(r => r.daysUntilExpiry <= window);
+    const filteredRenewals = mockRenewals.filter(
+      (r) => r.daysUntilExpiry <= window,
+    );
 
     // Filter by type if specified
     const typeFilteredRenewals = filterType
-      ? filteredRenewals.filter(r => r.type === filterType)
+      ? filteredRenewals.filter((r) => r.type === filterType)
       : filteredRenewals;
 
     // Sort renewals
@@ -653,7 +668,7 @@ export const handlers = [
       totalAmount: sortedRenewals.reduce((sum, r) => sum + r.price, 0),
       currency: "USD",
       window,
-      count: sortedRenewals.length
+      count: sortedRenewals.length,
     });
   }),
 
@@ -668,7 +683,7 @@ export const handlers = [
     if (!authHeader) {
       return HttpResponse.json(
         { error: "Unauthorized access" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -676,7 +691,7 @@ export const handlers = [
     if (shouldFail(3)) {
       return HttpResponse.json(
         { error: "Insufficient permissions to view activity" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -693,7 +708,7 @@ export const handlers = [
         description: "example.com has been renewed for 1 year",
         timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
         status: "success",
-        metadata: { domain: "example.com", duration: "1 year" }
+        metadata: { domain: "example.com", duration: "1 year" },
       },
       {
         id: "act_002",
@@ -702,7 +717,7 @@ export const handlers = [
         description: "SSL certificate activated for mysite.org",
         timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
         status: "success",
-        metadata: { domain: "mysite.org", type: "Let's Encrypt" }
+        metadata: { domain: "mysite.org", type: "Let's Encrypt" },
       },
       {
         id: "act_003",
@@ -711,7 +726,7 @@ export const handlers = [
         description: "#12345 - Email configuration help",
         timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
         status: "info",
-        metadata: { ticketId: "12345", category: "email" }
+        metadata: { ticketId: "12345", category: "email" },
       },
       {
         id: "act_004",
@@ -720,26 +735,30 @@ export const handlers = [
         description: "A record updated for business.net",
         timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         status: "info",
-        metadata: { domain: "business.net", recordType: "A" }
+        metadata: { domain: "business.net", recordType: "A" },
       },
       {
         id: "act_005",
         type: "payment_received",
         title: "Payment processed",
         description: "Invoice #INV-2024-001 paid successfully",
-        timestamp: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        timestamp: new Date(
+          Date.now() - 10 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
         status: "success",
-        metadata: { invoiceId: "INV-2024-001", amount: 89.99 }
+        metadata: { invoiceId: "INV-2024-001", amount: 89.99 },
       },
       {
         id: "act_006",
         type: "security_alert",
         title: "Security scan completed",
         description: "Weekly security scan found no issues",
-        timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+        timestamp: new Date(
+          Date.now() - 14 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
         status: "success",
-        metadata: { scanType: "weekly", issues: 0 }
-      }
+        metadata: { scanType: "weekly", issues: 0 },
+      },
     ];
 
     const limitedActivities = mockActivities.slice(0, limit);
@@ -747,7 +766,7 @@ export const handlers = [
     return HttpResponse.json({
       activities: limitedActivities,
       hasMore: mockActivities.length > limit,
-      total: mockActivities.length
+      total: mockActivities.length,
     });
   }),
 

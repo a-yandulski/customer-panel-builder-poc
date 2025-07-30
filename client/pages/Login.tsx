@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Loader2, ArrowRight, Shield, Eye, EyeOff, ToggleLeft, ToggleRight } from "lucide-react";
+import {
+  Loader2,
+  ArrowRight,
+  Shield,
+  Eye,
+  EyeOff,
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +25,7 @@ export default function Login() {
   const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth();
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
-  
+
   // Fake login state
   const [useFakeLogin, setUseFakeLogin] = useState(true);
   const [email, setEmail] = useState("john.doe@example.com");
@@ -47,7 +55,7 @@ export default function Login() {
     setIsLoggingIn(true);
 
     // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Simple fake authentication - just store user data in localStorage
     const fakeUser = {
@@ -57,18 +65,18 @@ export default function Login() {
       family_name: email === "john.doe@example.com" ? "Doe" : "User",
       email: email,
       email_verified: true,
-      picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=035BFF&color=fff`,
+      picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split("@")[0])}&background=035BFF&color=fff`,
       updated_at: new Date().toISOString(),
     };
 
     // Store fake auth state
-    localStorage.setItem('fake_auth_user', JSON.stringify(fakeUser));
-    localStorage.setItem('fake_auth_token', 'fake_jwt_token_' + Date.now());
-    
+    localStorage.setItem("fake_auth_user", JSON.stringify(fakeUser));
+    localStorage.setItem("fake_auth_token", "fake_jwt_token_" + Date.now());
+
     setIsLoggingIn(false);
-    
+
     // Trigger a page reload to reinitialize auth state
-    window.location.href = '/dashboard';
+    window.location.href = "/dashboard";
   };
 
   // Show loading state while Auth0 is initializing
@@ -126,10 +134,9 @@ export default function Login() {
               {useFakeLogin ? "Demo Login" : "Sign in to continue"}
             </CardTitle>
             <CardDescription className="text-center body-sm">
-              {useFakeLogin 
+              {useFakeLogin
                 ? "Use demo credentials for testing (pre-filled)"
-                : "We use enterprise-grade security to protect your account"
-              }
+                : "We use enterprise-grade security to protect your account"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -137,7 +144,10 @@ export default function Login() {
               /* Fake Login Form */
               <form onSubmit={handleFakeLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
+                  <Label
+                    htmlFor="email"
+                    className="text-sm font-semibold text-gray-700"
+                  >
                     Email address
                   </Label>
                   <Input
@@ -152,7 +162,10 @@ export default function Login() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
+                  <Label
+                    htmlFor="password"
+                    className="text-sm font-semibold text-gray-700"
+                  >
                     Password
                   </Label>
                   <div className="relative">
@@ -184,7 +197,8 @@ export default function Login() {
                     <strong>Demo Credentials:</strong>
                   </p>
                   <p className="text-xs text-blue-600 mt-1">
-                    Email: john.doe@example.com<br />
+                    Email: john.doe@example.com
+                    <br />
                     Password: password123
                   </p>
                 </div>
@@ -212,7 +226,9 @@ export default function Login() {
                   <Shield className="h-5 w-5 text-blue-600 flex-shrink-0" />
                   <div className="text-sm text-blue-800">
                     <p className="font-medium">Secure Authentication</p>
-                    <p className="text-blue-600">Powered by Auth0 with enterprise security</p>
+                    <p className="text-blue-600">
+                      Powered by Auth0 with enterprise security
+                    </p>
                   </div>
                 </div>
 
