@@ -17,11 +17,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Auth0 configuration
 const auth0Config: Auth0ProviderOptions = {
-  domain: process.env.VITE_AUTH0_DOMAIN || "dev-customer-panel.auth0.com",
-  clientId: process.env.VITE_AUTH0_CLIENT_ID || "your_client_id_here",
+  domain: import.meta.env.VITE_AUTH0_DOMAIN || "dev-customer-panel.auth0.com",
+  clientId: import.meta.env.VITE_AUTH0_CLIENT_ID || "your_client_id_here",
   authorizationParams: {
     redirect_uri: window.location.origin,
-    audience: process.env.VITE_AUTH0_AUDIENCE || "https://api.customerpanel.example.com",
+    audience: import.meta.env.VITE_AUTH0_AUDIENCE || "https://api.customerpanel.example.com",
     scope: "openid profile email profile:read profile:write domains:read domains:write invoices:read tickets:read tickets:write notifications:read"
   },
   cacheLocation: "localstorage" as const,
