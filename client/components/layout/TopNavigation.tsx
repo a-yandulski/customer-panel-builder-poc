@@ -242,10 +242,12 @@ export default function TopNavigation() {
 }
 
 interface MobileNavigationProps {
+  user: any;
   onItemClick: () => void;
+  onLogout: () => void;
 }
 
-function MobileNavigation({ onItemClick }: MobileNavigationProps) {
+function MobileNavigation({ user, onItemClick, onLogout }: MobileNavigationProps) {
   const location = useLocation();
 
   return (
