@@ -208,18 +208,32 @@ export default function TopNavigation() {
             )}
 
             {/* Mobile Menu Button */}
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="md:hidden">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[260px] p-0">
-                <MobileNavigation
-                  onItemClick={() => setIsMobileMenuOpen(false)}
-                />
-              </SheetContent>
-            </Sheet>
+            {isAuthenticated && (
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="md:hidden"
+                    aria-label="Open mobile menu"
+                  >
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent
+                  ref={mobileMenuRef}
+                  side="left"
+                  className="w-[280px] p-0 transition-drawer"
+                  aria-label="Mobile navigation menu"
+                >
+                  <MobileNavigation
+                    user={user}
+                    onItemClick={() => setIsMobileMenuOpen(false)}
+                    onLogout={handleLogout}
+                  />
+                </SheetContent>
+              </Sheet>
+            )}
           </div>
         </div>
       </div>
