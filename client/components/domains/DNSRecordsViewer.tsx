@@ -1,10 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -23,16 +18,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { 
-  RefreshCw, 
-  Filter, 
-  Search, 
-  AlertCircle, 
-  Globe, 
-  SortAsc, 
+import {
+  RefreshCw,
+  Filter,
+  Search,
+  AlertCircle,
+  Globe,
+  SortAsc,
   SortDesc,
   Copy,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { useDNSRecords, type DNSRecord } from "@/hooks/useDomains";
 import { toast } from "@/hooks/use-toast";
@@ -42,15 +37,28 @@ interface DNSRecordsViewerProps {
   domainName: string;
 }
 
-const DNS_RECORD_TYPES = ["all", "A", "AAAA", "CNAME", "MX", "TXT", "NS", "SRV"];
+const DNS_RECORD_TYPES = [
+  "all",
+  "A",
+  "AAAA",
+  "CNAME",
+  "MX",
+  "TXT",
+  "NS",
+  "SRV",
+];
 
-export default function DNSRecordsViewer({ domainId, domainName }: DNSRecordsViewerProps) {
+export default function DNSRecordsViewer({
+  domainId,
+  domainName,
+}: DNSRecordsViewerProps) {
   const [recordTypeFilter, setRecordTypeFilter] = useState("all");
   const [searchFilter, setSearchFilter] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const { records, loading, error, fetchDNSRecords, refetch } = useDNSRecords(domainId);
+  const { records, loading, error, fetchDNSRecords, refetch } =
+    useDNSRecords(domainId);
 
   // Filter and sort records
   const filteredRecords = useMemo(() => {
@@ -58,16 +66,17 @@ export default function DNSRecordsViewer({ domainId, domainName }: DNSRecordsVie
 
     // Filter by record type
     if (recordTypeFilter !== "all") {
-      filtered = filtered.filter(record => record.type === recordTypeFilter);
+      filtered = filtered.filter((record) => record.type === recordTypeFilter);
     }
 
     // Filter by search term
     if (searchFilter) {
       const search = searchFilter.toLowerCase();
-      filtered = filtered.filter(record =>
-        record.name.toLowerCase().includes(search) ||
-        record.value.toLowerCase().includes(search) ||
-        record.type.toLowerCase().includes(search)
+      filtered = filtered.filter(
+        (record) =>
+          record.name.toLowerCase().includes(search) ||
+          record.value.toLowerCase().includes(search) ||
+          record.type.toLowerCase().includes(search),
       );
     }
 
@@ -150,7 +159,9 @@ export default function DNSRecordsViewer({ domainId, domainName }: DNSRecordsVie
             onClick={handleRefresh}
             disabled={loading}
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
         </div>
@@ -172,7 +183,7 @@ export default function DNSRecordsViewer({ domainId, domainName }: DNSRecordsVie
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {DNS_RECORD_TYPES.map(type => (
+              {DNS_RECORD_TYPES.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type === "all" ? "All Types" : type}
                 </SelectItem>
@@ -203,13 +214,14 @@ export default function DNSRecordsViewer({ domainId, domainName }: DNSRecordsVie
               <div className="text-center py-8 text-gray-500">
                 <Globe className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                 <h3 className="text-lg font-medium text-gray-700 mb-2">
-                  {records.length === 0 ? "No DNS Records" : "No Matching Records"}
+                  {records.length === 0
+                    ? "No DNS Records"
+                    : "No Matching Records"}
                 </h3>
                 <p className="text-gray-600">
-                  {records.length === 0 
+                  {records.length === 0
                     ? "No DNS records found for this domain."
-                    : "Try adjusting your search or filter criteria."
-                  }
+                    : "Try adjusting your search or filter criteria."}
                 </p>
               </div>
             ) : (
@@ -238,44 +250,47 @@ export default function DNSRecordsViewer({ domainId, domainName }: DNSRecordsVie
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead 
+                        <TableHead
                           className="cursor-pointer hover:bg-gray-50"
                           onClick={() => handleSortToggle("type")}
                         >
                           <div className="flex items-center">
                             Type
-                            {sortBy === "type" && (
-                              sortOrder === "asc" ? 
-                                <SortAsc className="ml-1 h-4 w-4" /> : 
+                            {sortBy === "type" &&
+                              (sortOrder === "asc" ? (
+                                <SortAsc className="ml-1 h-4 w-4" />
+                              ) : (
                                 <SortDesc className="ml-1 h-4 w-4" />
-                            )}
+                              ))}
                           </div>
                         </TableHead>
-                        <TableHead 
+                        <TableHead
                           className="cursor-pointer hover:bg-gray-50"
                           onClick={() => handleSortToggle("name")}
                         >
                           <div className="flex items-center">
                             Name
-                            {sortBy === "name" && (
-                              sortOrder === "asc" ? 
-                                <SortAsc className="ml-1 h-4 w-4" /> : 
+                            {sortBy === "name" &&
+                              (sortOrder === "asc" ? (
+                                <SortAsc className="ml-1 h-4 w-4" />
+                              ) : (
                                 <SortDesc className="ml-1 h-4 w-4" />
-                            )}
+                              ))}
                           </div>
                         </TableHead>
                         <TableHead>Value</TableHead>
-                        <TableHead 
+                        <TableHead
                           className="cursor-pointer hover:bg-gray-50"
                           onClick={() => handleSortToggle("ttl")}
                         >
                           <div className="flex items-center">
                             TTL
-                            {sortBy === "ttl" && (
-                              sortOrder === "asc" ? 
-                                <SortAsc className="ml-1 h-4 w-4" /> : 
+                            {sortBy === "ttl" &&
+                              (sortOrder === "asc" ? (
+                                <SortAsc className="ml-1 h-4 w-4" />
+                              ) : (
                                 <SortDesc className="ml-1 h-4 w-4" />
-                            )}
+                              ))}
                           </div>
                         </TableHead>
                         <TableHead>Priority</TableHead>
@@ -335,25 +350,37 @@ export default function DNSRecordsViewer({ domainId, domainName }: DNSRecordsVie
                             <Copy className="h-4 w-4" />
                           </Button>
                         </div>
-                        
+
                         <div>
-                          <div className="text-sm font-medium text-gray-700">Name</div>
-                          <div className="font-mono text-sm">{record.name || "@"}</div>
+                          <div className="text-sm font-medium text-gray-700">
+                            Name
+                          </div>
+                          <div className="font-mono text-sm">
+                            {record.name || "@"}
+                          </div>
                         </div>
-                        
+
                         <div>
-                          <div className="text-sm font-medium text-gray-700">Value</div>
-                          <div className="font-mono text-sm break-all">{record.value}</div>
+                          <div className="text-sm font-medium text-gray-700">
+                            Value
+                          </div>
+                          <div className="font-mono text-sm break-all">
+                            {record.value}
+                          </div>
                         </div>
-                        
+
                         <div className="flex justify-between text-sm">
                           <div>
-                            <span className="font-medium text-gray-700">TTL: </span>
+                            <span className="font-medium text-gray-700">
+                              TTL:{" "}
+                            </span>
                             {formatTTL(record.ttl)}
                           </div>
                           {record.priority && (
                             <div>
-                              <span className="font-medium text-gray-700">Priority: </span>
+                              <span className="font-medium text-gray-700">
+                                Priority:{" "}
+                              </span>
                               {record.priority}
                             </div>
                           )}

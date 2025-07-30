@@ -255,7 +255,7 @@ export const handlers = [
     if (!authHeader) {
       return HttpResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -263,7 +263,7 @@ export const handlers = [
     if (shouldFail(5)) {
       return HttpResponse.json(
         { error: "Database connection failed" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -281,7 +281,7 @@ export const handlers = [
         dnsProvider: "Cloudflare",
         locked: true,
         tags: ["production", "primary"],
-        contactId: "contact_001"
+        contactId: "contact_001",
       },
       {
         id: "dom_002",
@@ -295,7 +295,7 @@ export const handlers = [
         dnsProvider: "DNS Made Easy",
         locked: false,
         tags: ["development"],
-        contactId: "contact_001"
+        contactId: "contact_001",
       },
       {
         id: "dom_003",
@@ -309,7 +309,7 @@ export const handlers = [
         dnsProvider: "Route53",
         locked: true,
         tags: ["business", "production"],
-        contactId: "contact_002"
+        contactId: "contact_002",
       },
       {
         id: "dom_004",
@@ -323,7 +323,7 @@ export const handlers = [
         dnsProvider: "GoDaddy",
         locked: false,
         tags: ["testing"],
-        contactId: "contact_001"
+        contactId: "contact_001",
       },
       {
         id: "dom_005",
@@ -337,8 +337,8 @@ export const handlers = [
         dnsProvider: "Cloudflare",
         locked: true,
         tags: ["demo"],
-        contactId: "contact_001"
-      }
+        contactId: "contact_001",
+      },
     ];
 
     // Filter domains
@@ -346,15 +346,18 @@ export const handlers = [
 
     // Search filter
     if (search) {
-      filteredDomains = filteredDomains.filter(domain =>
-        domain.name.toLowerCase().includes(search) ||
-        domain.tags.some(tag => tag.toLowerCase().includes(search))
+      filteredDomains = filteredDomains.filter(
+        (domain) =>
+          domain.name.toLowerCase().includes(search) ||
+          domain.tags.some((tag) => tag.toLowerCase().includes(search)),
       );
     }
 
     // Status filter
     if (status && status !== "all") {
-      filteredDomains = filteredDomains.filter(domain => domain.status === status);
+      filteredDomains = filteredDomains.filter(
+        (domain) => domain.status === status,
+      );
     }
 
     // Sort domains
@@ -393,14 +396,14 @@ export const handlers = [
         totalPages,
         totalCount,
         hasNext: page < totalPages,
-        hasPrev: page > 1
+        hasPrev: page > 1,
       },
       filters: {
         search,
         status,
         sortBy,
-        sortOrder
-      }
+        sortOrder,
+      },
     });
   }),
 
@@ -417,7 +420,7 @@ export const handlers = [
     if (shouldFail(3)) {
       return HttpResponse.json(
         { error: "Failed to retrieve domain details" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -433,7 +436,7 @@ export const handlers = [
       dnsProvider: "Cloudflare",
       locked: true,
       tags: ["production", "primary"],
-      contactId: "contact_001"
+      contactId: "contact_001",
     };
 
     return HttpResponse.json({ domain });
@@ -451,10 +454,10 @@ export const handlers = [
         {
           error: "Validation failed",
           details: {
-            autoRenew: ["Auto-renew field is required"]
-          }
+            autoRenew: ["Auto-renew field is required"],
+          },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -462,7 +465,7 @@ export const handlers = [
     if (params.id === "dom_locked") {
       return HttpResponse.json(
         { error: "Domain is locked and cannot be modified" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -470,7 +473,7 @@ export const handlers = [
     if (params.id === "dom_expired") {
       return HttpResponse.json(
         { error: "Cannot modify expired domain" },
-        { status: 422 }
+        { status: 422 },
       );
     }
 
@@ -478,7 +481,7 @@ export const handlers = [
     if (shouldFail(5)) {
       return HttpResponse.json(
         { error: "Failed to update domain settings" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -486,8 +489,8 @@ export const handlers = [
       domain: {
         id: params.id,
         autoRenew: body.autoRenew,
-        updatedAt: new Date().toISOString()
-      }
+        updatedAt: new Date().toISOString(),
+      },
     });
   }),
 
@@ -501,33 +504,74 @@ export const handlers = [
 
     // Simulate domain not found
     if (params.id === "nonexistent") {
-      return HttpResponse.json(
-        { error: "Domain not found" },
-        { status: 404 }
-      );
+      return HttpResponse.json({ error: "Domain not found" }, { status: 404 });
     }
 
     // Simulate DNS service unavailable
     if (shouldFail(8)) {
       return HttpResponse.json(
         { error: "DNS service temporarily unavailable" },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
     // Mock DNS records
     let dnsRecords = [
-      { id: "dns_001", type: "A", name: "@", value: "192.0.2.1", ttl: 3600, priority: null },
-      { id: "dns_002", type: "A", name: "www", value: "192.0.2.1", ttl: 3600, priority: null },
-      { id: "dns_003", type: "CNAME", name: "blog", value: "example.com", ttl: 3600, priority: null },
-      { id: "dns_004", type: "MX", name: "@", value: "mail.example.com", ttl: 3600, priority: 10 },
-      { id: "dns_005", type: "TXT", name: "@", value: "v=spf1 include:_spf.google.com ~all", ttl: 3600, priority: null },
-      { id: "dns_006", type: "AAAA", name: "@", value: "2001:db8::1", ttl: 3600, priority: null }
+      {
+        id: "dns_001",
+        type: "A",
+        name: "@",
+        value: "192.0.2.1",
+        ttl: 3600,
+        priority: null,
+      },
+      {
+        id: "dns_002",
+        type: "A",
+        name: "www",
+        value: "192.0.2.1",
+        ttl: 3600,
+        priority: null,
+      },
+      {
+        id: "dns_003",
+        type: "CNAME",
+        name: "blog",
+        value: "example.com",
+        ttl: 3600,
+        priority: null,
+      },
+      {
+        id: "dns_004",
+        type: "MX",
+        name: "@",
+        value: "mail.example.com",
+        ttl: 3600,
+        priority: 10,
+      },
+      {
+        id: "dns_005",
+        type: "TXT",
+        name: "@",
+        value: "v=spf1 include:_spf.google.com ~all",
+        ttl: 3600,
+        priority: null,
+      },
+      {
+        id: "dns_006",
+        type: "AAAA",
+        name: "@",
+        value: "2001:db8::1",
+        ttl: 3600,
+        priority: null,
+      },
     ];
 
     // Filter by record type
     if (recordType && recordType !== "all") {
-      dnsRecords = dnsRecords.filter(record => record.type === recordType.toUpperCase());
+      dnsRecords = dnsRecords.filter(
+        (record) => record.type === recordType.toUpperCase(),
+      );
     }
 
     // Sort records
@@ -540,7 +584,7 @@ export const handlers = [
     return HttpResponse.json({
       records: dnsRecords,
       domain: params.id,
-      totalCount: dnsRecords.length
+      totalCount: dnsRecords.length,
     });
   }),
 
@@ -556,10 +600,10 @@ export const handlers = [
         {
           error: "Validation failed",
           details: {
-            nameservers: ["Nameservers array is required"]
-          }
+            nameservers: ["Nameservers array is required"],
+          },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -568,10 +612,10 @@ export const handlers = [
         {
           error: "Validation failed",
           details: {
-            nameservers: ["Must provide between 2 and 5 nameservers"]
-          }
+            nameservers: ["Must provide between 2 and 5 nameservers"],
+          },
         },
-        { status: 422 }
+        { status: 422 },
       );
     }
 
@@ -583,21 +627,24 @@ export const handlers = [
         {
           error: "Validation failed",
           details: {
-            nameservers: [`Invalid nameserver format: ${invalidNs}`]
-          }
+            nameservers: [`Invalid nameserver format: ${invalidNs}`],
+          },
         },
-        { status: 422 }
+        { status: 422 },
       );
     }
 
     // Simulate rate limiting
     if (shouldFail(10)) {
       return HttpResponse.json(
-        { error: "Too many nameserver updates. Please wait before trying again." },
+        {
+          error:
+            "Too many nameserver updates. Please wait before trying again.",
+        },
         {
           status: 429,
-          headers: { "Retry-After": "300" }
-        }
+          headers: { "Retry-After": "300" },
+        },
       );
     }
 
@@ -605,7 +652,7 @@ export const handlers = [
     if (shouldFail(5)) {
       return HttpResponse.json(
         { error: "Failed to update nameservers" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -613,8 +660,8 @@ export const handlers = [
       domain: {
         id: params.id,
         nameservers: body.nameservers,
-        updatedAt: new Date().toISOString()
-      }
+        updatedAt: new Date().toISOString(),
+      },
     });
   }),
 

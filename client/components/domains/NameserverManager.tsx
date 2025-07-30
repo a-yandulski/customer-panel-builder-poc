@@ -5,15 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogTitle,
-  DialogFooter 
+  DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus, Trash2, Save, X, AlertCircle, Server, Loader2 } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Save,
+  X,
+  AlertCircle,
+  Server,
+  Loader2,
+} from "lucide-react";
 import { nameserverSchema, type NameserverFormData } from "./DomainValidation";
 import { toast } from "@/hooks/use-toast";
 
@@ -45,7 +53,8 @@ export default function NameserverManager({
   } = useForm<NameserverFormData>({
     resolver: zodResolver(nameserverSchema),
     defaultValues: {
-      nameservers: initialNameservers.length > 0 ? initialNameservers : ["", ""],
+      nameservers:
+        initialNameservers.length > 0 ? initialNameservers : ["", ""],
     },
   });
 
@@ -59,13 +68,16 @@ export default function NameserverManager({
   // Reset form when initial nameservers change
   useEffect(() => {
     reset({
-      nameservers: initialNameservers.length > 0 ? initialNameservers : ["", ""],
+      nameservers:
+        initialNameservers.length > 0 ? initialNameservers : ["", ""],
     });
   }, [initialNameservers, reset]);
 
   const onSubmit = async (data: NameserverFormData) => {
-    const filteredNameservers = data.nameservers.filter(ns => ns.trim() !== "");
-    
+    const filteredNameservers = data.nameservers.filter(
+      (ns) => ns.trim() !== "",
+    );
+
     if (filteredNameservers.length < 2) {
       toast({
         title: "Validation Error",
@@ -76,7 +88,7 @@ export default function NameserverManager({
     }
 
     setIsSubmitting(true);
-    
+
     try {
       await onUpdate(filteredNameservers);
       setIsEditing(false);
@@ -94,7 +106,8 @@ export default function NameserverManager({
 
   const handleCancel = () => {
     reset({
-      nameservers: initialNameservers.length > 0 ? initialNameservers : ["", ""],
+      nameservers:
+        initialNameservers.length > 0 ? initialNameservers : ["", ""],
     });
     setIsEditing(false);
   };
@@ -190,7 +203,9 @@ export default function NameserverManager({
                   {...control.register(`nameservers.${index}`)}
                   placeholder={`ns${index + 1}.${domainName}`}
                   disabled={!isEditing || isSubmitting}
-                  className={errors.nameservers?.[index] ? "border-red-500" : ""}
+                  className={
+                    errors.nameservers?.[index] ? "border-red-500" : ""
+                  }
                 />
                 {errors.nameservers?.[index] && (
                   <div className="flex items-center text-sm text-red-600">
@@ -201,12 +216,13 @@ export default function NameserverManager({
               </div>
             ))}
 
-            {errors.nameservers && typeof errors.nameservers.message === "string" && (
-              <div className="flex items-center text-sm text-red-600 bg-red-50 p-3 rounded">
-                <AlertCircle className="mr-2 h-4 w-4" />
-                {errors.nameservers.message}
-              </div>
-            )}
+            {errors.nameservers &&
+              typeof errors.nameservers.message === "string" && (
+                <div className="flex items-center text-sm text-red-600 bg-red-50 p-3 rounded">
+                  <AlertCircle className="mr-2 h-4 w-4" />
+                  {errors.nameservers.message}
+                </div>
+              )}
 
             {isEditing && (
               <div className="flex justify-between items-center pt-4 border-t">
@@ -250,31 +266,43 @@ export default function NameserverManager({
           <DialogHeader>
             <DialogTitle>Confirm Nameserver Changes</DialogTitle>
             <DialogDescription>
-              Are you sure you want to update the nameservers for {domainName}? 
+              Are you sure you want to update the nameservers for {domainName}?
               This change may affect your website's availability.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
-              <h4 className="font-medium text-sm text-gray-700 mb-2">Current nameservers:</h4>
+              <h4 className="font-medium text-sm text-gray-700 mb-2">
+                Current nameservers:
+              </h4>
               <div className="space-y-1">
                 {initialNameservers.map((ns, index) => (
-                  <div key={index} className="text-sm font-mono text-gray-600 bg-gray-50 p-2 rounded">
+                  <div
+                    key={index}
+                    className="text-sm font-mono text-gray-600 bg-gray-50 p-2 rounded"
+                  >
                     {ns}
                   </div>
                 ))}
               </div>
             </div>
-            
+
             <div>
-              <h4 className="font-medium text-sm text-gray-700 mb-2">New nameservers:</h4>
+              <h4 className="font-medium text-sm text-gray-700 mb-2">
+                New nameservers:
+              </h4>
               <div className="space-y-1">
-                {watchedNameservers.filter(ns => ns.trim() !== "").map((ns, index) => (
-                  <div key={index} className="text-sm font-mono text-gray-900 bg-blue-50 p-2 rounded">
-                    {ns}
-                  </div>
-                ))}
+                {watchedNameservers
+                  .filter((ns) => ns.trim() !== "")
+                  .map((ns, index) => (
+                    <div
+                      key={index}
+                      className="text-sm font-mono text-gray-900 bg-blue-50 p-2 rounded"
+                    >
+                      {ns}
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -287,10 +315,7 @@ export default function NameserverManager({
             >
               Cancel
             </Button>
-            <Button
-              onClick={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
-            >
+            <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

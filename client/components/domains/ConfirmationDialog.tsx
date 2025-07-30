@@ -57,11 +57,7 @@ export default function ConfirmationDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {children && (
-          <div className="py-4">
-            {children}
-          </div>
-        )}
+        {children && <div className="py-4">{children}</div>}
 
         <DialogFooter className="sm:justify-end gap-2">
           <Button
@@ -126,7 +122,9 @@ export function AutoRenewConfirmDialog({
       destructive={action === "disable"}
     >
       <div className="bg-gray-50 p-4 rounded-lg">
-        <h4 className="font-medium text-sm text-gray-700 mb-2">Domain Details:</h4>
+        <h4 className="font-medium text-sm text-gray-700 mb-2">
+          Domain Details:
+        </h4>
         <div className="text-sm">
           <div className="flex justify-between mb-1">
             <span className="text-gray-600">Domain:</span>
@@ -178,15 +176,16 @@ export function DomainLockConfirmDialog({
       destructive={action === "unlock"}
     >
       <div className="bg-gray-50 p-4 rounded-lg">
-        <h4 className="font-medium text-sm text-gray-700 mb-2">Security Impact:</h4>
+        <h4 className="font-medium text-sm text-gray-700 mb-2">
+          Security Impact:
+        </h4>
         <div className="text-sm space-y-1">
           <div className="flex items-start gap-2">
             <span className="text-gray-600 mt-0.5">•</span>
             <span>
-              {action === "lock" 
+              {action === "lock"
                 ? "Domain will be protected from unauthorized transfers"
-                : "Domain will be vulnerable to unauthorized transfers"
-              }
+                : "Domain will be vulnerable to unauthorized transfers"}
             </span>
           </div>
           <div className="flex items-start gap-2">
@@ -194,8 +193,7 @@ export function DomainLockConfirmDialog({
             <span>
               {action === "lock"
                 ? "Additional security layer for your domain"
-                : "Required for legitimate domain transfers"
-              }
+                : "Required for legitimate domain transfers"}
             </span>
           </div>
         </div>
@@ -236,7 +234,9 @@ export function DomainTransferConfirmDialog({
     >
       <div className="space-y-4">
         <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-          <h4 className="font-medium text-sm text-red-700 mb-2">⚠️ Important Notice:</h4>
+          <h4 className="font-medium text-sm text-red-700 mb-2">
+            ⚠️ Important Notice:
+          </h4>
           <ul className="text-sm text-red-600 space-y-1">
             <li>• Domain transfer typically takes 5-7 business days</li>
             <li>• Your website and email may be affected during transfer</li>
@@ -244,9 +244,11 @@ export function DomainTransferConfirmDialog({
             <li>• Domain will be locked for 60 days after transfer</li>
           </ul>
         </div>
-        
+
         <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-medium text-sm text-gray-700 mb-2">Transfer Details:</h4>
+          <h4 className="font-medium text-sm text-gray-700 mb-2">
+            Transfer Details:
+          </h4>
           <div className="text-sm space-y-1">
             <div className="flex justify-between">
               <span className="text-gray-600">Domain:</span>

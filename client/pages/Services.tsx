@@ -160,7 +160,10 @@ export default function Services() {
     });
   };
 
-  const handleNameserverUpdate = async (domainId: string, nameservers: string[]) => {
+  const handleNameserverUpdate = async (
+    domainId: string,
+    nameservers: string[],
+  ) => {
     await updateNameservers(domainId, nameservers);
   };
 
@@ -205,7 +208,10 @@ export default function Services() {
                     />
                   </div>
                   <div className="flex gap-3">
-                    <Select value={statusFilter} onValueChange={handleStatusFilter}>
+                    <Select
+                      value={statusFilter}
+                      onValueChange={handleStatusFilter}
+                    >
                       <SelectTrigger className="w-40">
                         <Filter className="mr-2 h-4 w-4" />
                         <SelectValue />
@@ -215,7 +221,9 @@ export default function Services() {
                         <SelectItem value="active">Active</SelectItem>
                         <SelectItem value="expired">Expired</SelectItem>
                         <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="pending_transfer">Transferring</SelectItem>
+                        <SelectItem value="pending_transfer">
+                          Transferring
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <Select value={sortBy} onValueChange={handleSort}>
@@ -226,7 +234,9 @@ export default function Services() {
                         <SelectItem value="name">Name</SelectItem>
                         <SelectItem value="expiryDate">Expiration</SelectItem>
                         <SelectItem value="status">Status</SelectItem>
-                        <SelectItem value="registrationDate">Registration</SelectItem>
+                        <SelectItem value="registrationDate">
+                          Registration
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <Button
@@ -289,7 +299,7 @@ export default function Services() {
                 ) : (
                   domains.map((domain) => {
                     const daysRemaining = getDaysRemaining(domain.expiryDate);
-                    
+
                     return (
                       <Card key={domain.id} className="shadow-md">
                         <Collapsible>
@@ -310,12 +320,16 @@ export default function Services() {
                                     <p className="body-sm text-gray-600">
                                       Expires: {formatDate(domain.expiryDate)}
                                     </p>
-                                    <span className={`body-sm ${getDaysRemainingColor(daysRemaining)}`}>
+                                    <span
+                                      className={`body-sm ${getDaysRemainingColor(daysRemaining)}`}
+                                    >
                                       ({daysRemaining} days remaining)
                                     </span>
                                     <div className="flex items-center space-x-1">
                                       {getStatusIcon(domain.status)}
-                                      <span className="text-sm text-gray-600">{domain.registrar}</span>
+                                      <span className="text-sm text-gray-600">
+                                        {domain.registrar}
+                                      </span>
                                     </div>
                                   </div>
                                 </div>
@@ -329,7 +343,7 @@ export default function Services() {
                               </CollapsibleTrigger>
 
                               <div className="flex items-center space-x-3 ml-4">
-                                <Badge 
+                                <Badge
                                   variant={getStatusColor(domain.status)}
                                   className="capitalize"
                                 >
@@ -345,7 +359,9 @@ export default function Services() {
                                   <Switch
                                     id={`auto-renew-${domain.id}`}
                                     checked={domain.autoRenew}
-                                    onCheckedChange={() => toggleAutoRenew(domain.id)}
+                                    onCheckedChange={() =>
+                                      toggleAutoRenew(domain.id)
+                                    }
                                   />
                                 </div>
                                 <DropdownMenu>
@@ -401,7 +417,9 @@ export default function Services() {
                                             Registration Date:
                                           </span>
                                           <span className="body-sm font-medium">
-                                            {formatDate(domain.registrationDate)}
+                                            {formatDate(
+                                              domain.registrationDate,
+                                            )}
                                           </span>
                                         </div>
                                         <div className="flex justify-between">
@@ -423,7 +441,9 @@ export default function Services() {
                                               <Unlock className="h-4 w-4 text-warning" />
                                             )}
                                             <span className="body-sm">
-                                              {domain.locked ? "Locked" : "Unlocked"}
+                                              {domain.locked
+                                                ? "Locked"
+                                                : "Unlocked"}
                                             </span>
                                           </div>
                                         </div>
@@ -458,7 +478,8 @@ export default function Services() {
                                         {showAuthCode === domain.id && (
                                           <div className="bg-gray-50 p-3 rounded border">
                                             <code className="body-sm font-mono">
-                                              AUTH-CODE-{domain.id.toUpperCase()}
+                                              AUTH-CODE-
+                                              {domain.id.toUpperCase()}
                                             </code>
                                           </div>
                                         )}
@@ -469,7 +490,11 @@ export default function Services() {
                                             </span>
                                             <div className="flex flex-wrap gap-1">
                                               {domain.tags.map((tag, index) => (
-                                                <Badge key={index} variant="outline" className="text-xs">
+                                                <Badge
+                                                  key={index}
+                                                  variant="outline"
+                                                  className="text-xs"
+                                                >
                                                   {tag}
                                                 </Badge>
                                               ))}
@@ -484,8 +509,11 @@ export default function Services() {
                                       domainId={domain.id}
                                       domainName={domain.name}
                                       initialNameservers={domain.nameservers}
-                                      onUpdate={(nameservers) => 
-                                        handleNameserverUpdate(domain.id, nameservers)
+                                      onUpdate={(nameservers) =>
+                                        handleNameserverUpdate(
+                                          domain.id,
+                                          nameservers,
+                                        )
                                       }
                                       disabled={domain.status !== "active"}
                                     />
@@ -510,15 +538,20 @@ export default function Services() {
                 {pagination.totalPages > 1 && (
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-600">
-                      Showing {((pagination.page - 1) * pagination.limit) + 1} to{" "}
-                      {Math.min(pagination.page * pagination.limit, pagination.totalCount)} of{" "}
-                      {pagination.totalCount} domains
+                      Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+                      {Math.min(
+                        pagination.page * pagination.limit,
+                        pagination.totalCount,
+                      )}{" "}
+                      of {pagination.totalCount} domains
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => fetchDomains({ page: pagination.page - 1 })}
+                        onClick={() =>
+                          fetchDomains({ page: pagination.page - 1 })
+                        }
                         disabled={!pagination.hasPrev || loading}
                       >
                         Previous
@@ -529,7 +562,9 @@ export default function Services() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => fetchDomains({ page: pagination.page + 1 })}
+                        onClick={() =>
+                          fetchDomains({ page: pagination.page + 1 })
+                        }
                         disabled={!pagination.hasNext || loading}
                       >
                         Next

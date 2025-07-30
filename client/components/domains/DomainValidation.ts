@@ -9,8 +9,8 @@ export const nameserverSchema = z.object({
         .min(1, "Nameserver is required")
         .regex(
           /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-          "Invalid nameserver format. Must be a valid hostname (e.g., ns1.example.com)"
-        )
+          "Invalid nameserver format. Must be a valid hostname (e.g., ns1.example.com)",
+        ),
     )
     .min(2, "At least 2 nameservers are required")
     .max(5, "Maximum 5 nameservers allowed")
@@ -21,7 +21,7 @@ export const nameserverSchema = z.object({
       },
       {
         message: "Duplicate nameservers are not allowed",
-      }
+      },
     ),
 });
 
@@ -39,10 +39,13 @@ export const dnsRecordSchema = z.object({
     .min(1, "Name is required")
     .regex(
       /^[a-zA-Z0-9._*-]*$/,
-      "Invalid characters in name. Use only letters, numbers, dots, hyphens, and underscores"
+      "Invalid characters in name. Use only letters, numbers, dots, hyphens, and underscores",
     ),
   value: z.string().min(1, "Value is required"),
-  ttl: z.number().min(60, "TTL must be at least 60 seconds").max(86400, "TTL cannot exceed 24 hours"),
+  ttl: z
+    .number()
+    .min(60, "TTL must be at least 60 seconds")
+    .max(86400, "TTL cannot exceed 24 hours"),
   priority: z.number().min(0).max(65535).optional(),
 });
 
@@ -82,7 +85,10 @@ export const validateIPv6 = (ip: string): boolean => {
 };
 
 // DNS record type specific validations
-export const validateDNSRecordValue = (type: string, value: string): boolean => {
+export const validateDNSRecordValue = (
+  type: string,
+  value: string,
+): boolean => {
   switch (type) {
     case "A":
       return validateIPv4(value);
@@ -94,18 +100,22 @@ export const validateDNSRecordValue = (type: string, value: string): boolean => 
     case "MX":
       // MX records should be in format "priority hostname"
       const mxParts = value.split(" ");
-      return mxParts.length === 2 && 
-             !isNaN(parseInt(mxParts[0])) && 
-             validateDomainName(mxParts[1]);
+      return (
+        mxParts.length === 2 &&
+        !isNaN(parseInt(mxParts[0])) &&
+        validateDomainName(mxParts[1])
+      );
     case "TXT":
       // TXT records can contain any text, but should be reasonable length
       return value.length <= 255;
     case "SRV":
       // SRV records: "priority weight port target"
       const srvParts = value.split(" ");
-      return srvParts.length === 4 && 
-             srvParts.slice(0, 3).every(part => !isNaN(parseInt(part))) &&
-             validateDomainName(srvParts[3]);
+      return (
+        srvParts.length === 4 &&
+        srvParts.slice(0, 3).every((part) => !isNaN(parseInt(part))) &&
+        validateDomainName(srvParts[3])
+      );
     default:
       return true; // Allow any value for unknown types
   }
@@ -115,7 +125,8 @@ export const validateDNSRecordValue = (type: string, value: string): boolean => 
 export const validationMessages = {
   nameserver: {
     required: "Nameserver is required",
-    invalid: "Invalid nameserver format. Must be a valid hostname (e.g., ns1.example.com)",
+    invalid:
+      "Invalid nameserver format. Must be a valid hostname (e.g., ns1.example.com)",
     duplicate: "Duplicate nameservers are not allowed",
     minCount: "At least 2 nameservers are required",
     maxCount: "Maximum 5 nameservers allowed",

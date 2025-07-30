@@ -29,10 +29,18 @@ const defaultAuthContext: AuthContextType = {
   isAuthenticated: false,
   isLoading: true,
   error: undefined,
-  loginWithRedirect: async () => { throw new Error("AuthProvider not initialized"); },
-  logout: async () => { throw new Error("AuthProvider not initialized"); },
-  getAccessTokenSilently: async () => { throw new Error("AuthProvider not initialized"); },
-  getIdTokenClaims: async () => { throw new Error("AuthProvider not initialized"); },
+  loginWithRedirect: async () => {
+    throw new Error("AuthProvider not initialized");
+  },
+  logout: async () => {
+    throw new Error("AuthProvider not initialized");
+  },
+  getAccessTokenSilently: async () => {
+    throw new Error("AuthProvider not initialized");
+  },
+  getIdTokenClaims: async () => {
+    throw new Error("AuthProvider not initialized");
+  },
 };
 
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
