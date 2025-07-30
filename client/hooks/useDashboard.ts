@@ -180,8 +180,21 @@ export function useDashboard(): UseDashboardReturn {
 
   // Initial data fetch
   useEffect(() => {
-    refetchAll();
-  }, [refetchAll]);
+    const initialFetch = async () => {
+      setIsRefreshing(true);
+      try {
+        await Promise.all([
+          fetchSummary(),
+          fetchRenewals({ window: 30 }),
+          fetchActivities({ limit: 5 })
+        ]);
+      } finally {
+        setIsRefreshing(false);
+      }
+    };
+
+    initialFetch();
+  }, []); // Empty dependency array for initial fetch only
 
   return {
     data,
