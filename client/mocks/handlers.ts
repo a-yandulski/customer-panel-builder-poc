@@ -236,112 +236,386 @@ export const handlers = [
   }),
 
   // =======================
-  // DOMAIN MANAGEMENT
+  // DOMAIN MANAGEMENT SYSTEM
   // =======================
 
-  // Get domains with various failure scenarios
+  // Enhanced mock domain data
   http.get("/api/domains", async ({ request }) => {
-    await delay(randomDelay());
+    await delay(randomDelay(200, 1000));
 
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+    const search = url.searchParams.get("search")?.toLowerCase() || "";
+    const status = url.searchParams.get("status");
+    const sortBy = url.searchParams.get("sortBy") || "name";
+    const sortOrder = url.searchParams.get("sortOrder") || "asc";
 
-    // Simulate unauthorized access (401)
     const authHeader = request.headers.get("Authorization");
     if (!authHeader) {
       return HttpResponse.json(
         { error: "Authentication required" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
-    // Simulate rate limiting (429 Too Many Requests)
+    // Simulate server errors (5% chance)
     if (shouldFail(5)) {
       return HttpResponse.json(
-        { error: "Rate limit exceeded" },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": "60",
-            "X-RateLimit-Limit": "100",
-            "X-RateLimit-Remaining": "0",
-            "X-RateLimit-Reset": String(Date.now() + 60000),
-          },
-        },
-      );
-    }
-
-    // Simulate network timeout (simulate slow response)
-    if (shouldFail(3)) {
-      await delay(10000); // 10 second delay to trigger timeout
-    }
-
-    // Simulate intermittent server error
-    if (shouldFail(8)) {
-      return HttpResponse.json(
         { error: "Database connection failed" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
-    // Successful response
+    // Enhanced mock domains data
+    const domainsData = [
+      {
+        id: "dom_001",
+        name: "example.com",
+        status: "active",
+        expiryDate: "2024-12-15",
+        registrationDate: "2022-12-15",
+        autoRenew: true,
+        registrar: "GoDaddy",
+        nameservers: ["ns1.example.com", "ns2.example.com"],
+        dnsProvider: "Cloudflare",
+        locked: true,
+        tags: ["production", "primary"],
+        contactId: "contact_001"
+      },
+      {
+        id: "dom_002",
+        name: "mysite.org",
+        status: "active",
+        expiryDate: "2025-03-20",
+        registrationDate: "2023-03-20",
+        autoRenew: false,
+        registrar: "Namecheap",
+        nameservers: ["ns1.mysite.org", "ns2.mysite.org", "ns3.mysite.org"],
+        dnsProvider: "DNS Made Easy",
+        locked: false,
+        tags: ["development"],
+        contactId: "contact_001"
+      },
+      {
+        id: "dom_003",
+        name: "business.net",
+        status: "active",
+        expiryDate: "2024-08-10",
+        registrationDate: "2021-08-10",
+        autoRenew: true,
+        registrar: "Domain.com",
+        nameservers: ["ns1.business.net", "ns2.business.net"],
+        dnsProvider: "Route53",
+        locked: true,
+        tags: ["business", "production"],
+        contactId: "contact_002"
+      },
+      {
+        id: "dom_004",
+        name: "testdomain.co",
+        status: "expired",
+        expiryDate: "2024-01-15",
+        registrationDate: "2022-01-15",
+        autoRenew: false,
+        registrar: "GoDaddy",
+        nameservers: ["ns1.godaddy.com", "ns2.godaddy.com"],
+        dnsProvider: "GoDaddy",
+        locked: false,
+        tags: ["testing"],
+        contactId: "contact_001"
+      },
+      {
+        id: "dom_005",
+        name: "demo.app",
+        status: "pending_transfer",
+        expiryDate: "2025-06-30",
+        registrationDate: "2023-06-30",
+        autoRenew: true,
+        registrar: "Transferring to Namecheap",
+        nameservers: ["ns1.demo.app", "ns2.demo.app"],
+        dnsProvider: "Cloudflare",
+        locked: true,
+        tags: ["demo"],
+        contactId: "contact_001"
+      }
+    ];
+
+    // Filter domains
+    let filteredDomains = [...domainsData];
+
+    // Search filter
+    if (search) {
+      filteredDomains = filteredDomains.filter(domain =>
+        domain.name.toLowerCase().includes(search) ||
+        domain.tags.some(tag => tag.toLowerCase().includes(search))
+      );
+    }
+
+    // Status filter
+    if (status && status !== "all") {
+      filteredDomains = filteredDomains.filter(domain => domain.status === status);
+    }
+
+    // Sort domains
+    filteredDomains.sort((a, b) => {
+      let aValue = a[sortBy as keyof typeof a];
+      let bValue = b[sortBy as keyof typeof b];
+
+      if (sortBy === "expiryDate") {
+        aValue = new Date(aValue as string).getTime();
+        bValue = new Date(bValue as string).getTime();
+      }
+
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (sortOrder === "desc") {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    });
+
+    // Paginate results
+    const totalCount = filteredDomains.length;
+    const totalPages = Math.ceil(totalCount / limit);
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedDomains = filteredDomains.slice(startIndex, endIndex);
+
     return HttpResponse.json({
-      domains: mockDomains,
+      domains: paginatedDomains,
       pagination: {
         page,
-        totalPages: 2,
-        totalItems: mockDomains.length,
+        limit,
+        totalPages,
+        totalCount,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
       },
+      filters: {
+        search,
+        status,
+        sortBy,
+        sortOrder
+      }
     });
   }),
 
-  // Get specific domain with 404 scenarios
+  // Get specific domain details
   http.get("/api/domains/:id", async ({ params }) => {
-    await delay(randomDelay());
+    await delay(randomDelay(100, 500));
 
-    const domain = mockDomains.find((d) => d.id === params.id);
-
-    // Simulate domain not found (404)
-    if (!domain || params.id === "nonexistent") {
+    // Simulate domain not found
+    if (params.id === "nonexistent") {
       return HttpResponse.json({ error: "Domain not found" }, { status: 404 });
     }
+
+    // Simulate server error
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Failed to retrieve domain details" },
+        { status: 500 }
+      );
+    }
+
+    const domain = {
+      id: params.id,
+      name: params.id === "dom_001" ? "example.com" : "mysite.org",
+      status: "active",
+      expiryDate: "2024-12-15",
+      registrationDate: "2022-12-15",
+      autoRenew: true,
+      registrar: "GoDaddy",
+      nameservers: ["ns1.example.com", "ns2.example.com"],
+      dnsProvider: "Cloudflare",
+      locked: true,
+      tags: ["production", "primary"],
+      contactId: "contact_001"
+    };
 
     return HttpResponse.json({ domain });
   }),
 
-  // Update domain with validation errors
-  http.put("/api/domains/:id", async ({ request, params }) => {
-    await delay(randomDelay());
+  // Update domain auto-renew toggle
+  http.patch("/api/domains/:id", async ({ request, params }) => {
+    await delay(randomDelay(200, 800));
 
     const body = (await request.json()) as any;
 
-    // Simulate validation errors (400)
-    if (body.name && !/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(body.name)) {
+    // Simulate validation errors
+    if (body.autoRenew === undefined) {
       return HttpResponse.json(
         {
           error: "Validation failed",
           details: {
-            name: ["Invalid domain name format"],
-          },
+            autoRenew: ["Auto-renew field is required"]
+          }
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    // Simulate insufficient permissions (403)
-    if (params.id === "restricted-domain") {
+    // Simulate domain locked error
+    if (params.id === "dom_locked") {
       return HttpResponse.json(
-        { error: "Insufficient permissions to modify this domain" },
-        { status: 403 },
+        { error: "Domain is locked and cannot be modified" },
+        { status: 409 }
       );
     }
 
-    const domain = mockDomains.find((d) => d.id === params.id);
-    if (!domain) {
-      return HttpResponse.json({ error: "Domain not found" }, { status: 404 });
+    // Simulate expired domain error
+    if (params.id === "dom_expired") {
+      return HttpResponse.json(
+        { error: "Cannot modify expired domain" },
+        { status: 422 }
+      );
     }
 
-    return HttpResponse.json({ domain: { ...domain, ...body } });
+    // Simulate server error
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Failed to update domain settings" },
+        { status: 500 }
+      );
+    }
+
+    return HttpResponse.json({
+      domain: {
+        id: params.id,
+        autoRenew: body.autoRenew,
+        updatedAt: new Date().toISOString()
+      }
+    });
+  }),
+
+  // Get DNS records for domain
+  http.get("/api/domains/:id/dns", async ({ params, request }) => {
+    await delay(randomDelay(300, 1200));
+
+    const url = new URL(request.url);
+    const recordType = url.searchParams.get("type");
+    const sortBy = url.searchParams.get("sortBy") || "name";
+
+    // Simulate domain not found
+    if (params.id === "nonexistent") {
+      return HttpResponse.json(
+        { error: "Domain not found" },
+        { status: 404 }
+      );
+    }
+
+    // Simulate DNS service unavailable
+    if (shouldFail(8)) {
+      return HttpResponse.json(
+        { error: "DNS service temporarily unavailable" },
+        { status: 503 }
+      );
+    }
+
+    // Mock DNS records
+    let dnsRecords = [
+      { id: "dns_001", type: "A", name: "@", value: "192.0.2.1", ttl: 3600, priority: null },
+      { id: "dns_002", type: "A", name: "www", value: "192.0.2.1", ttl: 3600, priority: null },
+      { id: "dns_003", type: "CNAME", name: "blog", value: "example.com", ttl: 3600, priority: null },
+      { id: "dns_004", type: "MX", name: "@", value: "mail.example.com", ttl: 3600, priority: 10 },
+      { id: "dns_005", type: "TXT", name: "@", value: "v=spf1 include:_spf.google.com ~all", ttl: 3600, priority: null },
+      { id: "dns_006", type: "AAAA", name: "@", value: "2001:db8::1", ttl: 3600, priority: null }
+    ];
+
+    // Filter by record type
+    if (recordType && recordType !== "all") {
+      dnsRecords = dnsRecords.filter(record => record.type === recordType.toUpperCase());
+    }
+
+    // Sort records
+    dnsRecords.sort((a, b) => {
+      const aValue = a[sortBy as keyof typeof a];
+      const bValue = b[sortBy as keyof typeof b];
+      return String(aValue).localeCompare(String(bValue));
+    });
+
+    return HttpResponse.json({
+      records: dnsRecords,
+      domain: params.id,
+      totalCount: dnsRecords.length
+    });
+  }),
+
+  // Update nameservers
+  http.patch("/api/domains/:id/nameservers", async ({ request, params }) => {
+    await delay(randomDelay(500, 1500));
+
+    const body = (await request.json()) as any;
+
+    // Simulate validation errors
+    if (!body.nameservers || !Array.isArray(body.nameservers)) {
+      return HttpResponse.json(
+        {
+          error: "Validation failed",
+          details: {
+            nameservers: ["Nameservers array is required"]
+          }
+        },
+        { status: 400 }
+      );
+    }
+
+    if (body.nameservers.length < 2 || body.nameservers.length > 5) {
+      return HttpResponse.json(
+        {
+          error: "Validation failed",
+          details: {
+            nameservers: ["Must provide between 2 and 5 nameservers"]
+          }
+        },
+        { status: 422 }
+      );
+    }
+
+    // Validate nameserver format
+    const nsRegex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const invalidNs = body.nameservers.find((ns: string) => !nsRegex.test(ns));
+    if (invalidNs) {
+      return HttpResponse.json(
+        {
+          error: "Validation failed",
+          details: {
+            nameservers: [`Invalid nameserver format: ${invalidNs}`]
+          }
+        },
+        { status: 422 }
+      );
+    }
+
+    // Simulate rate limiting
+    if (shouldFail(10)) {
+      return HttpResponse.json(
+        { error: "Too many nameserver updates. Please wait before trying again." },
+        {
+          status: 429,
+          headers: { "Retry-After": "300" }
+        }
+      );
+    }
+
+    // Simulate server error
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Failed to update nameservers" },
+        { status: 500 }
+      );
+    }
+
+    return HttpResponse.json({
+      domain: {
+        id: params.id,
+        nameservers: body.nameservers,
+        updatedAt: new Date().toISOString()
+      }
+    });
   }),
 
   // =======================
