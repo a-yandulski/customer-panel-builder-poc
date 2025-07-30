@@ -12,23 +12,44 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth();
+  const navigate = useNavigate();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
-      // Redirect to dashboard on successful login
-      window.location.href = "/dashboard";
-    }, 1500);
+  const handleLogin = async () => {
+    try {
+      setIsRedirecting(true);
+      await loginWithRedirect({
+        appState: { returnTo: "/dashboard" }
+      });
+    } catch (err) {
+      setIsRedirecting(false);
+      console.error("Login error:", err);
+    }
   };
+
+  // Show loading state while Auth0 is initializing
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 text-center">
+          <div className="flex justify-center">
+            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+              <Loader2 className="h-6 w-6 text-white animate-spin" />
+            </div>
+          </div>
+          <p className="text-gray-600">Initializing authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
