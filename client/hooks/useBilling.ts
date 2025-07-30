@@ -355,7 +355,7 @@ export function useSubscriptions() {
   // Initial fetch
   useEffect(() => {
     fetchSubscriptions();
-  }, [fetchSubscriptions]);
+  }, []);
 
   return {
     subscriptions,
