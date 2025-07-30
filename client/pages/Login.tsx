@@ -17,7 +17,7 @@ export default function Login() {
   const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth();
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
-
+  
   // Fake login state
   const [useFakeLogin, setUseFakeLogin] = useState(true);
   const [email, setEmail] = useState("john.doe@example.com");
@@ -64,9 +64,9 @@ export default function Login() {
     // Store fake auth state
     localStorage.setItem('fake_auth_user', JSON.stringify(fakeUser));
     localStorage.setItem('fake_auth_token', 'fake_jwt_token_' + Date.now());
-
+    
     setIsLoggingIn(false);
-
+    
     // Trigger a page reload to reinitialize auth state
     window.location.href = '/dashboard';
   };
@@ -103,77 +103,172 @@ export default function Login() {
           </p>
         </div>
 
-        {/* Auth0 Login Card */}
+        {/* Login Options Toggle */}
+        <div className="flex items-center justify-center space-x-4 p-4 bg-gray-100 rounded-lg border">
+          <span className="text-sm font-medium text-gray-700">Demo Login</span>
+          <button
+            onClick={() => setUseFakeLogin(!useFakeLogin)}
+            className="flex items-center"
+          >
+            {useFakeLogin ? (
+              <ToggleLeft className="h-6 w-6 text-primary" />
+            ) : (
+              <ToggleRight className="h-6 w-6 text-primary" />
+            )}
+          </button>
+          <span className="text-sm font-medium text-gray-700">Auth0 Login</span>
+        </div>
+
+        {/* Login Card */}
         <Card className="border-gray-200 shadow-lg">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-xl font-semibold text-center">
-              Sign in to continue
+              {useFakeLogin ? "Demo Login" : "Sign in to continue"}
             </CardTitle>
             <CardDescription className="text-center body-sm">
-              We use enterprise-grade security to protect your account
+              {useFakeLogin 
+                ? "Use demo credentials for testing (pre-filled)"
+                : "We use enterprise-grade security to protect your account"
+              }
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Security Info */}
-            <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <Shield className="h-5 w-5 text-blue-600 flex-shrink-0" />
-              <div className="text-sm text-blue-800">
-                <p className="font-medium">Secure Authentication</p>
-                <p className="text-blue-600">Powered by Auth0 with enterprise security</p>
-              </div>
-            </div>
+            {useFakeLogin ? (
+              /* Fake Login Form */
+              <form onSubmit={handleFakeLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
+                    Email address
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="john.doe@example.com"
+                    required
+                    className="h-11"
+                  />
+                </div>
 
-            {/* Error Display */}
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-800">
-                  <strong>Authentication Error:</strong> {error.message}
-                </p>
-                <p className="text-xs text-red-600 mt-1">
-                  Please try again or contact support if the issue persists.
-                </p>
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
+                    Password
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter password"
+                      required
+                      className="h-11 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Demo Credentials:</strong>
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Email: john.doe@example.com<br />
+                    Password: password123
+                  </p>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-12 btn-primary text-base font-semibold"
+                  disabled={isLoggingIn}
+                >
+                  {isLoggingIn ? (
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Signing in...</span>
+                    </div>
+                  ) : (
+                    "Sign In with Demo"
+                  )}
+                </Button>
+              </form>
+            ) : (
+              /* Auth0 Login */
+              <>
+                {/* Security Info */}
+                <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <Shield className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                  <div className="text-sm text-blue-800">
+                    <p className="font-medium">Secure Authentication</p>
+                    <p className="text-blue-600">Powered by Auth0 with enterprise security</p>
+                  </div>
+                </div>
+
+                {/* Error Display */}
+                {error && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-800">
+                      <strong>Authentication Error:</strong> {error.message}
+                    </p>
+                    <p className="text-xs text-red-600 mt-1">
+                      Please try again or contact support if the issue persists.
+                    </p>
+                  </div>
+                )}
+
+                {/* Login Button */}
+                <Button
+                  onClick={handleAuth0Login}
+                  className="w-full h-12 btn-primary text-base font-semibold"
+                  disabled={isRedirecting}
+                >
+                  {isRedirecting ? (
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Redirecting to login...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <span>Continue with Auth0</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
+                  )}
+                </Button>
+
+                {/* Features */}
+                <div className="space-y-3">
+                  <div className="text-center text-sm text-gray-500">
+                    What you'll get access to:
+                  </div>
+                  <div className="grid grid-cols-1 gap-2 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                      <span>Domain management and DNS controls</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                      <span>Billing and subscription management</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                      <span>24/7 priority support access</span>
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
-
-            {/* Login Button */}
-            <Button
-              onClick={handleLogin}
-              className="w-full h-12 btn-primary text-base font-semibold"
-              disabled={isRedirecting}
-            >
-              {isRedirecting ? (
-                <div className="flex items-center space-x-2">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <span>Redirecting to login...</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <span>Continue with Auth0</span>
-                  <ArrowRight className="h-4 w-4" />
-                </div>
-              )}
-            </Button>
-
-            {/* Features */}
-            <div className="space-y-3">
-              <div className="text-center text-sm text-gray-500">
-                What you'll get access to:
-              </div>
-              <div className="grid grid-cols-1 gap-2 text-sm text-gray-600">
-                <div className="flex items-center space-x-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                  <span>Domain management and DNS controls</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                  <span>Billing and subscription management</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                  <span>24/7 priority support access</span>
-                </div>
-              </div>
-            </div>
 
             {/* Divider */}
             <div className="relative">
