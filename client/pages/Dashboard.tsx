@@ -49,7 +49,7 @@ export default function Dashboard() {
         {/* Personalized Welcome Section */}
         <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg mobile-card-spacing border border-gray-200">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
-            Welcome back, John!
+            Welcome back, {user?.given_name || user?.name?.split(' ')[0] || 'there'}!
           </h1>
           <p className="body sm:body-large text-gray-700">
             Great to see you again. Here's what's happening with your services
