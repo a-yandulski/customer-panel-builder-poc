@@ -1,10 +1,5 @@
 import { useState } from "react";
 import AppShell from "@/components/layout/AppShell";
-import MobileTable, {
-  TableBadge,
-  TableActions,
-  MobileActionButton,
-} from "@/components/MobileTable";
 import {
   Card,
   CardContent,
@@ -13,55 +8,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  CreditCard,
-  Download,
   DollarSign,
   Calendar,
-  Receipt,
-  Plus,
-  Edit,
-  Trash2,
-  Search,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
-  Shield,
-  Lock,
-  Star,
-  TrendingUp,
-  Settings,
   Wallet,
+  TrendingUp,
+  RefreshCw,
+  AlertCircle,
 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import InvoiceList from "@/components/billing/InvoiceList";
+import InvoiceDetail from "@/components/billing/InvoiceDetail";
+import SubscriptionOverview from "@/components/billing/SubscriptionOverview";
+import PaymentMethodsManager from "@/components/billing/PaymentMethodsManager";
+import { useBillingSummary, useInvoices, type Invoice } from "@/hooks/useBilling";
 
 type PaymentMethod = {
   id: string;
