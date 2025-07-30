@@ -27,7 +27,7 @@ const App = () => (
       <ToastProvider>
         <TooltipProvider>
           <Sonner />
-          <BrowserRouter>
+          <BrowserRouter basename="/customer-panel-builder-poc">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />

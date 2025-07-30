@@ -2,6 +2,7 @@
   "name": "fusion-starter",
   "private": true,
   "type": "module",
+  "homepage": "https://a-yandulski.github.io/customer-panel-builder-poc",
   "pkg": {
     "assets": [
       "dist/spa/*"
@@ -15,10 +16,13 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build",
     "build:server": "vite build --config vite.config.server.ts",
+    "build:gh-pages": "vite build --config vite.config.gh-pages.ts",
     "start": "node dist/server/node-build.mjs",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "predeploy": "npm run build:gh-pages",
+    "deploy": "gh-pages -d dist/spa"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.4.0",
@@ -76,6 +80,7 @@
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
     "framer-motion": "^12.6.2",
+    "gh-pages": "^6.3.0",
     "globals": "^15.9.0",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.462.0",
