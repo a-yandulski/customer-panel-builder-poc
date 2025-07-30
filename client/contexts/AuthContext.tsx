@@ -46,11 +46,17 @@ interface AuthProviderProps {
 }
 
 export function Auth0Provider({ children }: AuthProviderProps) {
-  return (
-    <Auth0ProviderBase {...auth0Config}>
-      <AuthProvider>{children}</AuthProvider>
-    </Auth0ProviderBase>
-  );
+  try {
+    return (
+      <Auth0ProviderBase {...auth0Config}>
+        <AuthProvider>{children}</AuthProvider>
+      </Auth0ProviderBase>
+    );
+  } catch (error) {
+    console.error("Auth0 initialization error:", error);
+    // Fallback to just the AuthProvider in case Auth0 fails
+    return <AuthProvider>{children}</AuthProvider>;
+  }
 }
 
 function AuthProvider({ children }: AuthProviderProps) {
