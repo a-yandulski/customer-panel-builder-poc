@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { Loader2, ArrowRight, Shield } from "lucide-react";
+import { Loader2, ArrowRight, Shield, Eye, EyeOff, ToggleLeft, ToggleRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
