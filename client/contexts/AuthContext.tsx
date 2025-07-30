@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useContext,
   useEffect,
@@ -11,7 +11,6 @@ import {
   Auth0ProviderOptions,
 } from "@auth0/auth0-react";
 import { User } from "@auth0/auth0-spa-js";
-import { useNavigate } from "react-router-dom";
 import { getFullUrl } from "@/lib/config";
 
 interface AuthContextType {
@@ -20,6 +19,7 @@ interface AuthContextType {
   isLoading: boolean;
   error: Error | undefined;
   loginWithRedirect: () => Promise<void>;
+  loginDemo: () => Promise<void>; // Add demo login method
   logout: (options?: any) => Promise<void>;
   getAccessTokenSilently: () => Promise<string>;
   getIdTokenClaims: () => Promise<any>;
@@ -32,6 +32,9 @@ const defaultAuthContext: AuthContextType = {
   isLoading: true,
   error: undefined,
   loginWithRedirect: async () => {
+    throw new Error("AuthProvider not initialized");
+  },
+  loginDemo: async () => {
     throw new Error("AuthProvider not initialized");
   },
   logout: async () => {
@@ -54,9 +57,9 @@ const getRedirectUri = () => {
 
 const auth0Config: Auth0ProviderOptions = {
   domain: import.meta.env.VITE_AUTH0_DOMAIN || "dev-customer-panel.auth0.com",
-  clientId: import.meta.env.VITE_AUTH0_CLIENT_ID || "your_client_id_here",
+  clientId: import.meta.env.VITE_AUTH0_CLIENT_ID || "demo_client_id",
   authorizationParams: {
-    redirect_uri: getRedirectUri(),
+    redirect_uri: getFullUrl(),
     audience:
       import.meta.env.VITE_AUTH0_AUDIENCE ||
       "https://api.customerpanel.example.com",
@@ -65,6 +68,8 @@ const auth0Config: Auth0ProviderOptions = {
   },
   cacheLocation: "localstorage" as const,
   useRefreshTokens: true,
+  // Skip Auth0's initialization in demo mode to avoid real Auth0 calls
+  skipRedirectCallback: false,
 };
 
 interface AuthProviderProps {
@@ -81,70 +86,72 @@ export function Auth0Provider({ children }: AuthProviderProps) {
 
 function AuthProvider({ children }: AuthProviderProps) {
   const auth0 = useAuth0();
-  const navigate = useNavigate();
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [fakeUser, setFakeUser] = useState<any>(null);
-  const [fakeAuthLoading, setFakeAuthLoading] = useState(true);
+  const [demoUser, setDemoUser] = useState<User | null>(null);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
-  // Check for fake authentication on mount
-  useEffect(() => {
-    const checkFakeAuth = () => {
-      const storedUser = localStorage.getItem("fake_auth_user");
-      const storedToken = localStorage.getItem("fake_auth_token");
-
-      if (storedUser && storedToken) {
-        try {
-          setFakeUser(JSON.parse(storedUser));
-        } catch (error) {
-          localStorage.removeItem("fake_auth_user");
-          localStorage.removeItem("fake_auth_token");
-        }
-      }
-      setFakeAuthLoading(false);
+  // Demo login function
+  const loginDemo = async () => {
+    console.log("🔐 Demo login initiated...");
+    
+    const mockUser: User = {
+      sub: "demo|123456789",
+      name: "John Doe",
+      given_name: "John",
+      family_name: "Doe",
+      email: "john.doe@example.com",
+      email_verified: true,
+      picture: "https://ui-avatars.com/api/?name=John+Doe&background=035BFF&color=fff",
+      updated_at: new Date().toISOString(),
     };
 
-    checkFakeAuth();
-  }, []);
-
-  useEffect(() => {
-    if (!auth0.isLoading && !fakeAuthLoading) {
-      setIsInitialized(true);
-    }
-  }, [auth0.isLoading, fakeAuthLoading]);
-
-  const fakeLogout = async () => {
-    localStorage.removeItem("fake_auth_user");
-    localStorage.removeItem("fake_auth_token");
-    setFakeUser(null);
-    navigate("/login");
+    // Simulate async login
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    setDemoUser(mockUser);
+    setIsDemoMode(true);
+    console.log("🔐 Demo login successful:", mockUser.email);
   };
 
-  const fakeGetAccessToken = async () => {
-    const token = localStorage.getItem("fake_auth_token");
-    if (!token) throw new Error("No fake token available");
-    return token;
+  const demoLogout = async () => {
+    setDemoUser(null);
+    setIsDemoMode(false);
+    console.log("🔐 Demo logout successful");
   };
 
-  const fakeGetIdTokenClaims = async () => {
-    return fakeUser;
-  };
+  const isUsingDemo = isDemoMode && demoUser;
+  const currentUser = isUsingDemo ? demoUser : auth0.user;
+  const currentIsAuthenticated = isUsingDemo ? !!demoUser : auth0.isAuthenticated;
+  const currentIsLoading = isUsingDemo ? false : auth0.isLoading;
 
-  // Use fake auth if fake user exists, otherwise use Auth0
-  const isUsingFakeAuth = !!fakeUser;
+  console.log("🔐 Auth State:", {
+    isDemoMode,
+    demoUser: demoUser?.email,
+    isAuthenticated: currentIsAuthenticated,
+    isLoading: currentIsLoading,
+    user: currentUser?.email,
+    error: auth0.error
+  });
 
   const contextValue: AuthContextType = {
-    user: isUsingFakeAuth ? fakeUser : auth0.user,
-    isAuthenticated: isUsingFakeAuth ? !!fakeUser : auth0.isAuthenticated,
-    isLoading: (auth0.isLoading || fakeAuthLoading) && !isInitialized,
+    user: currentUser,
+    isAuthenticated: currentIsAuthenticated,
+    isLoading: currentIsLoading,
     error: auth0.error,
     loginWithRedirect: auth0.loginWithRedirect,
-    logout: isUsingFakeAuth ? fakeLogout : auth0.logout,
-    getAccessTokenSilently: isUsingFakeAuth
-      ? fakeGetAccessToken
-      : auth0.getAccessTokenSilently,
-    getIdTokenClaims: isUsingFakeAuth
-      ? fakeGetIdTokenClaims
-      : auth0.getIdTokenClaims,
+    loginDemo,
+    logout: isUsingDemo ? demoLogout : auth0.logout,
+    getAccessTokenSilently: async () => {
+      if (isUsingDemo) {
+        return "demo_access_token_" + Date.now();
+      }
+      return auth0.getAccessTokenSilently();
+    },
+    getIdTokenClaims: async () => {
+      if (isUsingDemo) {
+        return demoUser;
+      }
+      return auth0.getIdTokenClaims();
+    },
   };
 
   return (

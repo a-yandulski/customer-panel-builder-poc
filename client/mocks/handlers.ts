@@ -79,6 +79,99 @@ export const handlers = [
   // AUTH0 MOCK ENDPOINTS
   // =======================
 
+  // Auth0 authorization endpoint (redirect to login)
+  http.get(
+    "https://dev-customer-panel.auth0.com/authorize",
+    async ({ request }) => {
+      const url = new URL(request.url);
+      const redirectUri = url.searchParams.get("redirect_uri");
+      const state = url.searchParams.get("state");
+      
+      console.log("🔐 Auth0 authorization request intercepted:", {
+        redirectUri,
+        state,
+        fullUrl: request.url
+      });
+      
+      // In a real browser environment, we need to simulate the redirect differently
+      // Instead of trying to redirect, we'll let Auth0 proceed but mock the token exchange
+      
+      // For now, let's just log and continue with the normal flow
+      // The actual redirect handling will be done by mocking the token exchange
+      console.log("🔐 Allowing Auth0 redirect to proceed...");
+      
+      // Return a response that doesn't interfere with Auth0's redirect
+      return HttpResponse.text("Proceeding with Auth0 login...", { status: 200 });
+    },
+  ),
+
+  // Auth0 token exchange endpoint
+  http.post(
+    "https://dev-customer-panel.auth0.com/oauth/token",
+    async ({ request }) => {
+      await delay(randomDelay(100, 500));
+
+      const body = await request.text();
+      const params = new URLSearchParams(body);
+
+      const grantType = params.get("grant_type");
+
+      if (grantType === "authorization_code") {
+        const code = params.get("code");
+        
+        if (!code || code !== "mock_auth_code_123") {
+          return HttpResponse.json(
+            {
+              error: "invalid_grant",
+              error_description: "Invalid authorization code",
+            },
+            { status: 400 },
+          );
+        }
+
+        console.log("🔐 Auth0 token exchange successful");
+        
+        return HttpResponse.json({
+          access_token: `mock_access_token_${Date.now()}`,
+          id_token: `mock_id_token_${Date.now()}`,
+          token_type: "Bearer",
+          expires_in: 3600,
+          scope:
+            "openid profile email profile:read profile:write domains:read domains:write invoices:read tickets:read tickets:write notifications:read",
+          refresh_token: `mock_refresh_token_${Date.now()}`,
+        });
+      }
+
+      if (grantType === "refresh_token") {
+        const refreshToken = params.get("refresh_token");
+        
+        if (!refreshToken || refreshToken === "invalid_refresh_token") {
+          return HttpResponse.json(
+            {
+              error: "invalid_grant",
+              error_description: "Invalid refresh token",
+            },
+            { status: 401 },
+          );
+        }
+
+        return HttpResponse.json({
+          access_token: `mock_access_token_${Date.now()}`,
+          id_token: `mock_id_token_${Date.now()}`,
+          token_type: "Bearer",
+          expires_in: 3600,
+          scope:
+            "openid profile email profile:read profile:write domains:read domains:write invoices:read tickets:read tickets:write notifications:read",
+        });
+      }
+
+      return HttpResponse.json(
+        { error: "unsupported_grant_type" },
+        { status: 400 },
+      );
+    },
+  ),
+
   // Auth0 userinfo endpoint
   http.get(
     "https://dev-customer-panel.auth0.com/userinfo",
@@ -107,47 +200,8 @@ export const handlers = [
         );
       }
 
+      console.log("🔐 Auth0 userinfo request successful");
       return HttpResponse.json(mockAuth0User);
-    },
-  ),
-
-  // Auth0 token endpoint for refresh
-  http.post(
-    "https://dev-customer-panel.auth0.com/oauth/token",
-    async ({ request }) => {
-      await delay(randomDelay(100, 500));
-
-      const body = await request.text();
-      const params = new URLSearchParams(body);
-
-      const grantType = params.get("grant_type");
-      const refreshToken = params.get("refresh_token");
-
-      if (grantType === "refresh_token") {
-        if (!refreshToken || refreshToken === "invalid_refresh_token") {
-          return HttpResponse.json(
-            {
-              error: "invalid_grant",
-              error_description: "Invalid refresh token",
-            },
-            { status: 401 },
-          );
-        }
-
-        return HttpResponse.json({
-          access_token: `mock_access_token_${Date.now()}`,
-          id_token: `mock_id_token_${Date.now()}`,
-          token_type: "Bearer",
-          expires_in: 3600,
-          scope:
-            "openid profile email profile:read profile:write domains:read domains:write invoices:read tickets:read tickets:write notifications:read",
-        });
-      }
-
-      return HttpResponse.json(
-        { error: "unsupported_grant_type" },
-        { status: 400 },
-      );
     },
   ),
 

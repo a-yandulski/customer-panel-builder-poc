@@ -1,5 +1,6 @@
-import React, { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
@@ -35,14 +36,25 @@ export default function ProtectedRoute({
   fallback,
   requiredScopes = [],
 }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading, user, getIdTokenClaims } = useAuth();
+  const { isAuthenticated, isLoading, user, loginWithRedirect } = useAuth();
+
+  // Handle redirect to login when not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      const timer = setTimeout(() => {
+        loginWithRedirect();
+      }, 100); // Small delay to ensure component is mounted
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, isAuthenticated, loginWithRedirect]);
 
   // Show loading spinner while checking authentication
   if (isLoading) {
     return fallback || <LoadingSpinner message="Checking authentication..." />;
   }
 
-  // Redirect to login if not authenticated
+  // Show redirecting message if not authenticated
   if (!isAuthenticated) {
     return fallback || <LoadingSpinner message="Redirecting to login..." />;
   }

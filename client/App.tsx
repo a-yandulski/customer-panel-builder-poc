@@ -82,18 +82,18 @@ const AppRoutes = () => {
 };
 
 const App = () => (
-  <Auth0Provider>
-    <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <TooltipProvider>
-          <Sonner />
-          <BrowserRouter basename={getBasePath()}>
+  <BrowserRouter basename={getBasePath()}>
+    <Auth0Provider>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider>
+          <TooltipProvider>
+            <Sonner />
             <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </ToastProvider>
-    </QueryClientProvider>
-  </Auth0Provider>
+          </TooltipProvider>
+        </ToastProvider>
+      </QueryClientProvider>
+    </Auth0Provider>
+  </BrowserRouter>
 );
 
 // Initialize MSW and render the app

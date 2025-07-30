@@ -3,14 +3,8 @@ import {
   Loader2,
   ArrowRight,
   Shield,
-  Eye,
-  EyeOff,
-  ToggleLeft,
-  ToggleRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -22,16 +16,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth();
+  const { isAuthenticated, isLoading, loginDemo, error } = useAuth();
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
-
-  // Fake login state
-  const [useFakeLogin, setUseFakeLogin] = useState(true);
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [password, setPassword] = useState("password123");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Redirect to dashboard if already authenticated
   useEffect(() => {
@@ -40,43 +27,16 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleAuth0Login = async () => {
+  const handleLogin = async () => {
     try {
       setIsRedirecting(true);
-      await loginWithRedirect();
+      console.log("🔐 Initiating demo login...");
+      await loginDemo();
+      // Navigation will happen automatically via useEffect when isAuthenticated becomes true
     } catch (err) {
       setIsRedirecting(false);
       console.error("Login error:", err);
     }
-  };
-
-  const handleFakeLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoggingIn(true);
-
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Simple fake authentication - just store user data in localStorage
-    const fakeUser = {
-      sub: "fake|123456789",
-      name: email === "john.doe@example.com" ? "John Doe" : "Demo User",
-      given_name: email === "john.doe@example.com" ? "John" : "Demo",
-      family_name: email === "john.doe@example.com" ? "Doe" : "User",
-      email: email,
-      email_verified: true,
-      picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split("@")[0])}&background=035BFF&color=fff`,
-      updated_at: new Date().toISOString(),
-    };
-
-    // Store fake auth state
-    localStorage.setItem("fake_auth_user", JSON.stringify(fakeUser));
-    localStorage.setItem("fake_auth_token", "fake_jwt_token_" + Date.now());
-
-    setIsLoggingIn(false);
-
-    // Navigate to dashboard using React Router
-    navigate("/dashboard");
   };
 
   // Show loading state while Auth0 is initializing
@@ -105,231 +65,73 @@ export default function Login() {
               <span className="text-white font-bold text-xl">D</span>
             </div>
           </div>
-          <h2 className="mt-6 h2 text-gray-900">Welcome to DomainHost</h2>
-          <p className="mt-2 body-sm text-gray-500">
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">Welcome to DomainHost</h2>
+          <p className="mt-2 text-sm text-gray-500">
             Secure access to your customer panel
           </p>
-        </div>
-
-        {/* Login Options Toggle */}
-        <div className="flex items-center justify-center space-x-4 p-4 bg-gray-100 rounded-lg border">
-          <span className="text-sm font-medium text-gray-700">Demo Login</span>
-          <button
-            onClick={() => setUseFakeLogin(!useFakeLogin)}
-            className="flex items-center"
-          >
-            {useFakeLogin ? (
-              <ToggleLeft className="h-6 w-6 text-primary" />
-            ) : (
-              <ToggleRight className="h-6 w-6 text-primary" />
-            )}
-          </button>
-          <span className="text-sm font-medium text-gray-700">Auth0 Login</span>
         </div>
 
         {/* Login Card */}
         <Card className="border-gray-200 shadow-lg">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-xl font-semibold text-center">
-              {useFakeLogin ? "Demo Login" : "Sign in to continue"}
+              Sign in to continue
             </CardTitle>
-            <CardDescription className="text-center body-sm">
-              {useFakeLogin
-                ? "Use demo credentials for testing (pre-filled)"
-                : "We use enterprise-grade security to protect your account"}
+            <CardDescription className="text-center text-sm">
+              We use enterprise-grade security to protect your account
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {useFakeLogin ? (
-              /* Fake Login Form */
-              <form onSubmit={handleFakeLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="email"
-                    className="text-sm font-semibold text-gray-700"
-                  >
-                    Email address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="john.doe@example.com"
-                    required
-                    className="h-11"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="password"
-                    className="text-sm font-semibold text-gray-700"
-                  >
-                    Password
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter password"
-                      required
-                      className="h-11 pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    <strong>Demo Credentials:</strong>
-                  </p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    Email: john.doe@example.com
-                    <br />
-                    Password: password123
-                  </p>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full h-12 btn-primary text-base font-semibold"
-                  disabled={isLoggingIn}
-                >
-                  {isLoggingIn ? (
-                    <div className="flex items-center space-x-2">
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      <span>Signing in...</span>
-                    </div>
-                  ) : (
-                    "Sign In with Demo"
-                  )}
-                </Button>
-              </form>
-            ) : (
-              /* Auth0 Login */
-              <>
-                {/* Security Info */}
-                <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <Shield className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                  <div className="text-sm text-blue-800">
-                    <p className="font-medium">Secure Authentication</p>
-                    <p className="text-blue-600">
-                      Powered by Auth0 with enterprise security
-                    </p>
-                  </div>
-                </div>
-
-                {/* Error Display */}
-                {error && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm text-red-800">
-                      <strong>Authentication Error:</strong> {error.message}
-                    </p>
-                    <p className="text-xs text-red-600 mt-1">
-                      Please try again or contact support if the issue persists.
-                    </p>
-                  </div>
+            {/* Auth0 Login */}
+            <div className="space-y-4">
+              <Button
+                onClick={handleLogin}
+                disabled={isRedirecting}
+                className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+              >
+                {isRedirecting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Redirecting to login...</span>
+                  </>
+                ) : (
+                  <>
+                    <Shield className="h-4 w-4" />
+                    <span>Sign in (Demo)</span>
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </>
                 )}
+              </Button>
 
-                {/* Login Button */}
-                <Button
-                  onClick={handleAuth0Login}
-                  className="w-full h-12 btn-primary text-base font-semibold"
-                  disabled={isRedirecting}
-                >
-                  {isRedirecting ? (
-                    <div className="flex items-center space-x-2">
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      <span>Redirecting to login...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center space-x-2">
-                      <span>Continue with Auth0</span>
-                      <ArrowRight className="h-4 w-4" />
-                    </div>
-                  )}
-                </Button>
-
-                {/* Features */}
-                <div className="space-y-3">
-                  <div className="text-center text-sm text-gray-500">
-                    What you'll get access to:
-                  </div>
-                  <div className="grid grid-cols-1 gap-2 text-sm text-gray-600">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                      <span>Domain management and DNS controls</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                      <span>Billing and subscription management</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                      <span>24/7 priority support access</span>
-                    </div>
-                  </div>
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">
+                    Authentication error: {error.message}
+                  </p>
                 </div>
-              </>
-            )}
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Need help?</span>
-              </div>
+              )}
             </div>
 
-            {/* Help Links */}
-            <div className="text-center space-y-2">
-              <p className="body-sm text-gray-500">
-                New customer?{" "}
-                <a
-                  href="/register"
-                  className="text-primary hover:text-secondary font-semibold transition-colors"
-                >
-                  Create an account
-                </a>
-              </p>
-              <p className="body-sm text-gray-500">
-                <a
-                  href="/support"
-                  className="text-primary hover:text-secondary font-semibold transition-colors"
-                >
-                  Contact Support
-                </a>
-              </p>
+            {/* Security Notice */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <Shield className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-blue-800">
+                  <p className="font-medium mb-1">Demo Authentication</p>
+                  <p className="text-blue-700">
+                    This uses a simulated Auth0 authentication flow for demonstration purposes.
+                    All requests are mocked locally.
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Footer */}
+        {/* Demo Notice */}
         <div className="text-center">
           <p className="text-xs text-gray-500">
-            By signing in, you agree to our{" "}
-            <a href="/terms" className="text-primary hover:underline">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="/privacy" className="text-primary hover:underline">
-              Privacy Policy
-            </a>
+            This is a demo application. Authentication is mocked for demonstration purposes.
           </p>
         </div>
       </div>
