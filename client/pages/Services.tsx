@@ -1,5 +1,8 @@
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import AppShell from "@/components/layout/AppShell";
+import { useDomains, type Domain } from "@/hooks/useDomains";
+import NameserverManager from "@/components/domains/NameserverManager";
+import DNSRecordsViewer from "@/components/domains/DNSRecordsViewer";
 import {
   Card,
   CardContent,
@@ -29,18 +32,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Globe,
   Server,
@@ -50,8 +51,6 @@ import {
   Filter,
   Settings,
   Plus,
-  Edit,
-  Trash2,
   ChevronDown,
   ChevronUp,
   Lock,
@@ -60,252 +59,109 @@ import {
   EyeOff,
   Calendar,
   ExternalLink,
-  Save,
-  X,
+  MoreHorizontal,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
-
-type DNSRecord = {
-  id: string;
-  type: string;
-  name: string;
-  value: string;
-  ttl: string;
-};
-
-type Domain = {
-  id: string;
-  name: string;
-  status: "Active" | "Expired" | "Pending" | "Pending Transfer";
-  expires: string;
-  daysRemaining: number;
-  autoRenew: boolean;
-  registrar: string;
-  locked: boolean;
-  nameservers: string[];
-  dnsRecords: DNSRecord[];
-};
+import { toast } from "@/hooks/use-toast";
 
 export default function Services() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("name");
+  const {
+    domains,
+    loading,
+    error,
+    pagination,
+    filters,
+    fetchDomains,
+    toggleAutoRenew,
+    updateNameservers,
+  } = useDomains();
+
+  const [searchTerm, setSearchTerm] = useState(filters.search);
+  const [statusFilter, setStatusFilter] = useState(filters.status);
+  const [sortBy, setSortBy] = useState(filters.sortBy);
   const [expandedDomain, setExpandedDomain] = useState<string | null>(null);
   const [showAuthCode, setShowAuthCode] = useState<string | null>(null);
-  const [editingRecord, setEditingRecord] = useState<string | null>(null);
-  const [newRecord, setNewRecord] = useState<DNSRecord>({
-    id: "",
-    type: "A",
-    name: "",
-    value: "",
-    ttl: "3600",
-  });
-  const [showAddRecord, setShowAddRecord] = useState(false);
-  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
-  const [editingNameservers, setEditingNameservers] = useState<{
-    [key: string]: string[];
-  }>({});
 
-  const [domains, setDomains] = useState<Domain[]>([
-    {
-      id: "1",
-      name: "example.com",
-      status: "Active",
-      expires: "Dec 15, 2024",
-      daysRemaining: 8,
-      autoRenew: true,
-      registrar: "DomainHost",
-      locked: true,
-      nameservers: ["ns1.domainhost.com", "ns2.domainhost.com"],
-      dnsRecords: [
-        { id: "1", type: "A", name: "@", value: "192.168.1.1", ttl: "3600" },
-        {
-          id: "2",
-          type: "CNAME",
-          name: "www",
-          value: "example.com",
-          ttl: "3600",
-        },
-        {
-          id: "3",
-          type: "MX",
-          name: "@",
-          value: "10 mail.example.com",
-          ttl: "3600",
-        },
-      ],
-    },
-    {
-      id: "2",
-      name: "mysite.org",
-      status: "Active",
-      expires: "Mar 22, 2025",
-      daysRemaining: 98,
-      autoRenew: false,
-      registrar: "DomainHost",
-      locked: false,
-      nameservers: ["ns1.domainhost.com", "ns2.domainhost.com"],
-      dnsRecords: [
-        { id: "4", type: "A", name: "@", value: "192.168.1.2", ttl: "3600" },
-        {
-          id: "5",
-          type: "CNAME",
-          name: "www",
-          value: "mysite.org",
-          ttl: "3600",
-        },
-      ],
-    },
-    {
-      id: "3",
-      name: "business.net",
-      status: "Pending Transfer",
-      expires: "Jan 5, 2025",
-      daysRemaining: 29,
-      autoRenew: true,
-      registrar: "External",
-      locked: true,
-      nameservers: ["ns1.external.com", "ns2.external.com"],
-      dnsRecords: [],
-    },
-  ]);
+  // Handle search with debouncing
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    const timeoutId = setTimeout(() => {
+      fetchDomains({ search: value, page: 1 });
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  };
+
+  // Handle filter changes
+  const handleStatusFilter = (status: string) => {
+    setStatusFilter(status);
+    fetchDomains({ status, page: 1 });
+  };
+
+  const handleSort = (newSortBy: string) => {
+    setSortBy(newSortBy);
+    fetchDomains({ sortBy: newSortBy, page: 1 });
+  };
 
   const toggleDomainExpansion = (domainId: string) => {
     setExpandedDomain(expandedDomain === domainId ? null : domainId);
   };
 
-  const toggleAutoRenewal = (domainId: string) => {
-    setDomains(
-      domains.map((domain) =>
-        domain.id === domainId
-          ? { ...domain, autoRenew: !domain.autoRenew }
-          : domain,
-      ),
-    );
-  };
-
-  const toggleDomainLock = (domainId: string) => {
-    setDomains(
-      domains.map((domain) =>
-        domain.id === domainId ? { ...domain, locked: !domain.locked } : domain,
-      ),
-    );
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Active":
+      case "active":
         return "default";
-      case "Expired":
+      case "expired":
         return "destructive";
-      case "Pending":
+      case "pending":
         return "secondary";
-      case "Pending Transfer":
+      case "pending_transfer":
         return "secondary";
       default:
         return "secondary";
     }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "active":
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case "expired":
+        return <AlertTriangle className="h-4 w-4 text-red-600" />;
+      case "pending_transfer":
+        return <Clock className="h-4 w-4 text-yellow-600" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  const getDaysRemaining = (expiryDate: string) => {
+    const expiry = new Date(expiryDate);
+    const now = new Date();
+    const diffTime = expiry.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
   const getDaysRemainingColor = (days: number) => {
-    if (days <= 7) return "text-error";
-    if (days <= 30) return "text-warning";
+    if (days <= 7) return "text-red-600 font-medium";
+    if (days <= 30) return "text-yellow-600 font-medium";
     return "text-gray-600";
   };
 
-  const filteredDomains = domains.filter((domain) => {
-    const matchesSearch = domain.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || domain.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const sortedDomains = [...filteredDomains].sort((a, b) => {
-    switch (sortBy) {
-      case "name":
-        return a.name.localeCompare(b.name);
-      case "expiration":
-        return a.daysRemaining - b.daysRemaining;
-      case "status":
-        return a.status.localeCompare(b.status);
-      default:
-        return 0;
-    }
-  });
-
-  const handleAddRecord = () => {
-    const domain = domains.find((d) => d.id === expandedDomain);
-    if (domain) {
-      const recordWithId = { ...newRecord, id: Date.now().toString() };
-      setDomains(
-        domains.map((d) =>
-          d.id === expandedDomain
-            ? { ...d, dnsRecords: [...d.dnsRecords, recordWithId] }
-            : d,
-        ),
-      );
-      setNewRecord({ id: "", type: "A", name: "", value: "", ttl: "3600" });
-      setShowAddRecord(false);
-    }
-  };
-
-  const handleDeleteRecord = (domainId: string, recordId: string) => {
-    setDomains(
-      domains.map((domain) =>
-        domain.id === domainId
-          ? {
-              ...domain,
-              dnsRecords: domain.dnsRecords.filter((r) => r.id !== recordId),
-            }
-          : domain,
-      ),
-    );
-  };
-
-  const handleNameserverChange = (
-    domainId: string,
-    index: number,
-    value: string,
-  ) => {
-    setEditingNameservers((prev) => {
-      const current =
-        prev[domainId] ||
-        domains.find((d) => d.id === domainId)?.nameservers ||
-        [];
-      const updated = [...current];
-      updated[index] = value;
-      return { ...prev, [domainId]: updated };
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
-  const saveNameservers = (domainId: string) => {
-    const updatedNameservers = editingNameservers[domainId];
-    if (updatedNameservers) {
-      setDomains(
-        domains.map((domain) =>
-          domain.id === domainId
-            ? { ...domain, nameservers: updatedNameservers }
-            : domain,
-        ),
-      );
-      setEditingNameservers((prev) => {
-        const updated = { ...prev };
-        delete updated[domainId];
-        return updated;
-      });
-    }
-  };
-
-  const addNameserver = (domainId: string) => {
-    const current =
-      editingNameservers[domainId] ||
-      domains.find((d) => d.id === domainId)?.nameservers ||
-      [];
-    setEditingNameservers((prev) => ({
-      ...prev,
-      [domainId]: [...current, ""],
-    }));
+  const handleNameserverUpdate = async (domainId: string, nameservers: string[]) => {
+    await updateNameservers(domainId, nameservers);
   };
 
   return (
@@ -344,450 +200,348 @@ export default function Services() {
                     <Input
                       placeholder="Search domains..."
                       value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onChange={(e) => handleSearch(e.target.value)}
                       className="pl-10"
                     />
                   </div>
                   <div className="flex gap-3">
-                    <Select
-                      value={statusFilter}
-                      onValueChange={setStatusFilter}
-                    >
+                    <Select value={statusFilter} onValueChange={handleStatusFilter}>
                       <SelectTrigger className="w-40">
                         <Filter className="mr-2 h-4 w-4" />
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="Active">Active</SelectItem>
-                        <SelectItem value="Expired">Expired</SelectItem>
-                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="expired">Expired</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="pending_transfer">Transferring</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Select value={sortBy} onValueChange={setSortBy}>
+                    <Select value={sortBy} onValueChange={handleSort}>
                       <SelectTrigger className="w-40">
                         <SelectValue placeholder="Sort by" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="name">Name</SelectItem>
-                        <SelectItem value="expiration">Expiration</SelectItem>
+                        <SelectItem value="expiryDate">Expiration</SelectItem>
                         <SelectItem value="status">Status</SelectItem>
+                        <SelectItem value="registrationDate">Registration</SelectItem>
                       </SelectContent>
                     </Select>
+                    <Button
+                      variant="outline"
+                      onClick={() => fetchDomains()}
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-4 w-4" />
+                      )}
+                    </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Loading State */}
+            {loading && (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin mr-3" />
+                <span className="text-lg">Loading domains...</span>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <Card className="border-red-200 bg-red-50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center text-red-600">
+                    <AlertTriangle className="h-5 w-5 mr-2" />
+                    <span>{error}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Domains List */}
-            <div className="space-y-4">
-              {sortedDomains.map((domain) => (
-                <Card key={domain.id} className="shadow-md">
-                  <Collapsible>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center justify-between">
-                        <CollapsibleTrigger
-                          className="flex items-center space-x-4 flex-1 text-left"
-                          onClick={() => toggleDomainExpansion(domain.id)}
-                        >
-                          <div className="p-2 bg-primary/10 rounded-lg">
-                            <Globe className="h-5 w-5 text-primary" />
-                          </div>
-                          <div className="text-left">
-                            <h3 className="text-xl font-bold text-gray-900">
-                              {domain.name}
-                            </h3>
-                            <div className="flex items-center space-x-4 mt-1">
-                              <p className="body-sm text-gray-600">
-                                Expires: {domain.expires}
-                              </p>
-                              <span
-                                className={`body-sm font-medium ${getDaysRemainingColor(domain.daysRemaining)}`}
-                              >
-                                ({domain.daysRemaining} days remaining)
-                              </span>
-                            </div>
-                          </div>
-                          <div className="ml-auto">
-                            {expandedDomain === domain.id ? (
-                              <ChevronUp className="h-4 w-4" />
-                            ) : (
-                              <ChevronDown className="h-4 w-4" />
-                            )}
-                          </div>
-                        </CollapsibleTrigger>
-
-                        <div className="flex items-center space-x-3 ml-4">
-                          <Badge variant={getStatusColor(domain.status)}>
-                            {domain.status}
-                          </Badge>
-                          <div className="flex items-center space-x-2">
-                            <Label
-                              htmlFor={`auto-renew-${domain.id}`}
-                              className="body-sm text-gray-600"
-                            >
-                              Auto-renew
-                            </Label>
-                            <Switch
-                              id={`auto-renew-${domain.id}`}
-                              checked={domain.autoRenew}
-                              onCheckedChange={() =>
-                                toggleAutoRenewal(domain.id)
-                              }
-                            />
-                          </div>
-                          <Button variant="outline" size="sm">
-                            <Settings className="mr-2 h-4 w-4" />
-                            Manage
-                          </Button>
-                        </div>
-                      </div>
+            {!loading && !error && (
+              <div className="space-y-4">
+                {domains.length === 0 ? (
+                  <Card className="text-center py-12">
+                    <CardContent>
+                      <Globe className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                      <h3 className="text-lg font-medium text-gray-700 mb-2">
+                        No domains found
+                      </h3>
+                      <p className="text-gray-600 mb-4">
+                        {filters.search || filters.status !== "all"
+                          ? "Try adjusting your search or filter criteria."
+                          : "Get started by registering your first domain."}
+                      </p>
+                      <Button>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Register Domain
+                      </Button>
                     </CardContent>
-
-                    {/* Expanded Domain Details */}
-                    <CollapsibleContent>
-                      {expandedDomain === domain.id && (
-                        <CardContent className="pt-0 space-y-6">
-                          <div className="border-t pt-6">
-                            {/* Registration Details Panel */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                              <Card>
-                                <CardHeader>
-                                  <CardTitle className="flex items-center">
-                                    <Globe className="mr-2 h-4 w-4" />
-                                    Registration Details
-                                  </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
-                                  <div className="flex justify-between">
-                                    <span className="body-sm text-gray-600">
-                                      Registrar:
+                  </Card>
+                ) : (
+                  domains.map((domain) => {
+                    const daysRemaining = getDaysRemaining(domain.expiryDate);
+                    
+                    return (
+                      <Card key={domain.id} className="shadow-md">
+                        <Collapsible>
+                          <CardContent className="pt-6">
+                            <div className="flex items-center justify-between">
+                              <CollapsibleTrigger
+                                className="flex items-center space-x-4 flex-1 text-left"
+                                onClick={() => toggleDomainExpansion(domain.id)}
+                              >
+                                <div className="p-2 bg-primary/10 rounded-lg">
+                                  <Globe className="h-5 w-5 text-primary" />
+                                </div>
+                                <div className="text-left flex-1">
+                                  <h3 className="text-xl font-bold text-gray-900">
+                                    {domain.name}
+                                  </h3>
+                                  <div className="flex items-center space-x-4 mt-1">
+                                    <p className="body-sm text-gray-600">
+                                      Expires: {formatDate(domain.expiryDate)}
+                                    </p>
+                                    <span className={`body-sm ${getDaysRemainingColor(daysRemaining)}`}>
+                                      ({daysRemaining} days remaining)
                                     </span>
-                                    <span className="body-sm font-medium">
-                                      {domain.registrar}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span className="body-sm text-gray-600">
-                                      Registration Date:
-                                    </span>
-                                    <span className="body-sm font-medium">
-                                      Dec 15, 2022
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="body-sm text-gray-600">
-                                      Domain Lock:
-                                    </span>
-                                    <div className="flex items-center space-x-2">
-                                      {domain.locked ? (
-                                        <Lock className="h-4 w-4 text-success" />
-                                      ) : (
-                                        <Unlock className="h-4 w-4 text-warning" />
-                                      )}
-                                      <Switch
-                                        checked={domain.locked}
-                                        onCheckedChange={() =>
-                                          toggleDomainLock(domain.id)
-                                        }
-                                      />
+                                    <div className="flex items-center space-x-1">
+                                      {getStatusIcon(domain.status)}
+                                      <span className="text-sm text-gray-600">{domain.registrar}</span>
                                     </div>
                                   </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="body-sm text-gray-600">
-                                      EPP/Auth Code:
-                                    </span>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() =>
-                                        setShowAuthCode(
-                                          showAuthCode === domain.id
-                                            ? null
-                                            : domain.id,
-                                        )
-                                      }
-                                    >
-                                      {showAuthCode === domain.id ? (
-                                        <>
-                                          <EyeOff className="mr-2 h-4 w-4" />
-                                          Hide
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Eye className="mr-2 h-4 w-4" />
-                                          Reveal
-                                        </>
-                                      )}
-                                    </Button>
-                                  </div>
-                                  {showAuthCode === domain.id && (
-                                    <div className="bg-gray-50 p-3 rounded border">
-                                      <code className="body-sm font-mono">
-                                        AUTH-CODE-12345678
-                                      </code>
-                                    </div>
+                                </div>
+                                <div className="ml-auto">
+                                  {expandedDomain === domain.id ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronDown className="h-4 w-4" />
                                   )}
-                                </CardContent>
-                              </Card>
+                                </div>
+                              </CollapsibleTrigger>
 
-                              {/* Nameserver Management */}
-                              <Card>
-                                <CardHeader>
-                                  <CardTitle className="flex items-center">
-                                    <Server className="mr-2 h-4 w-4" />
-                                    Nameservers
-                                  </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
-                                  {(
-                                    editingNameservers[domain.id] ||
-                                    domain.nameservers
-                                  ).map((ns, index) => (
-                                    <div key={index}>
-                                      <Label className="body-sm text-gray-600">
-                                        Nameserver {index + 1}
-                                      </Label>
-                                      <Input
-                                        value={ns}
-                                        onChange={(e) =>
-                                          handleNameserverChange(
-                                            domain.id,
-                                            index,
-                                            e.target.value,
-                                          )
-                                        }
-                                        className="mt-1"
-                                        placeholder={`ns${index + 1}.domainhost.com`}
-                                      />
-                                    </div>
-                                  ))}
-                                  <div className="flex space-x-2">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="flex-1"
-                                      onClick={() => addNameserver(domain.id)}
-                                    >
-                                      <Plus className="mr-2 h-4 w-4" />
-                                      Add Nameserver
-                                    </Button>
-                                    {editingNameservers[domain.id] && (
-                                      <Button
-                                        size="sm"
-                                        className="bg-primary hover:bg-primary/90"
-                                        onClick={() =>
-                                          saveNameservers(domain.id)
-                                        }
-                                      >
-                                        <Save className="mr-2 h-4 w-4" />
-                                        Save
-                                      </Button>
-                                    )}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            </div>
-
-                            {/* DNS Records Table */}
-                            <Card>
-                              <CardHeader>
-                                <div className="flex items-center justify-between">
-                                  <CardTitle>DNS Records</CardTitle>
-                                  <Dialog
-                                    open={showAddRecord}
-                                    onOpenChange={setShowAddRecord}
+                              <div className="flex items-center space-x-3 ml-4">
+                                <Badge 
+                                  variant={getStatusColor(domain.status)}
+                                  className="capitalize"
+                                >
+                                  {domain.status.replace("_", " ")}
+                                </Badge>
+                                <div className="flex items-center space-x-2">
+                                  <Label
+                                    htmlFor={`auto-renew-${domain.id}`}
+                                    className="body-sm text-gray-600 cursor-pointer"
                                   >
-                                    <DialogTrigger asChild>
-                                      <Button
-                                        size="sm"
-                                        className="bg-primary hover:bg-primary/90"
-                                      >
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Add Record
-                                      </Button>
-                                    </DialogTrigger>
-                                    <DialogContent>
-                                      <DialogHeader>
-                                        <DialogTitle>
-                                          Add DNS Record
-                                        </DialogTitle>
-                                        <DialogDescription>
-                                          Create a new DNS record for{" "}
-                                          {domain.name}
-                                        </DialogDescription>
-                                      </DialogHeader>
-                                      <div className="space-y-4">
-                                        <div>
-                                          <Label>Record Type</Label>
-                                          <Select
-                                            value={newRecord.type}
-                                            onValueChange={(value) =>
-                                              setNewRecord({
-                                                ...newRecord,
-                                                type: value,
-                                              })
-                                            }
-                                          >
-                                            <SelectTrigger>
-                                              <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="A">
-                                                A
-                                              </SelectItem>
-                                              <SelectItem value="AAAA">
-                                                AAAA
-                                              </SelectItem>
-                                              <SelectItem value="CNAME">
-                                                CNAME
-                                              </SelectItem>
-                                              <SelectItem value="MX">
-                                                MX
-                                              </SelectItem>
-                                              <SelectItem value="TXT">
-                                                TXT
-                                              </SelectItem>
-                                              <SelectItem value="NS">
-                                                NS
-                                              </SelectItem>
-                                            </SelectContent>
-                                          </Select>
+                                    Auto-renew
+                                  </Label>
+                                  <Switch
+                                    id={`auto-renew-${domain.id}`}
+                                    checked={domain.autoRenew}
+                                    onCheckedChange={() => toggleAutoRenew(domain.id)}
+                                  />
+                                </div>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem>
+                                      <Settings className="mr-2 h-4 w-4" />
+                                      Manage
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                      <ExternalLink className="mr-2 h-4 w-4" />
+                                      Transfer
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                      <Calendar className="mr-2 h-4 w-4" />
+                                      Renew
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </div>
+                          </CardContent>
+
+                          {/* Expanded Domain Details */}
+                          <CollapsibleContent>
+                            {expandedDomain === domain.id && (
+                              <CardContent className="pt-0 space-y-6">
+                                <div className="border-t pt-6">
+                                  {/* Registration Details Panel */}
+                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                                    <Card>
+                                      <CardHeader>
+                                        <CardTitle className="flex items-center">
+                                          <Globe className="mr-2 h-4 w-4" />
+                                          Registration Details
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent className="space-y-3">
+                                        <div className="flex justify-between">
+                                          <span className="body-sm text-gray-600">
+                                            Registrar:
+                                          </span>
+                                          <span className="body-sm font-medium">
+                                            {domain.registrar}
+                                          </span>
                                         </div>
-                                        <div>
-                                          <Label>Name</Label>
-                                          <Input
-                                            value={newRecord.name}
-                                            onChange={(e) =>
-                                              setNewRecord({
-                                                ...newRecord,
-                                                name: e.target.value,
-                                              })
-                                            }
-                                            placeholder="@, www, mail, etc."
-                                          />
+                                        <div className="flex justify-between">
+                                          <span className="body-sm text-gray-600">
+                                            Registration Date:
+                                          </span>
+                                          <span className="body-sm font-medium">
+                                            {formatDate(domain.registrationDate)}
+                                          </span>
                                         </div>
-                                        <div>
-                                          <Label>Value</Label>
-                                          <Input
-                                            value={newRecord.value}
-                                            onChange={(e) =>
-                                              setNewRecord({
-                                                ...newRecord,
-                                                value: e.target.value,
-                                              })
-                                            }
-                                            placeholder="192.168.1.1, example.com, etc."
-                                          />
+                                        <div className="flex justify-between">
+                                          <span className="body-sm text-gray-600">
+                                            DNS Provider:
+                                          </span>
+                                          <span className="body-sm font-medium">
+                                            {domain.dnsProvider}
+                                          </span>
                                         </div>
-                                        <div>
-                                          <Label>TTL (seconds)</Label>
-                                          <Input
-                                            value={newRecord.ttl}
-                                            onChange={(e) =>
-                                              setNewRecord({
-                                                ...newRecord,
-                                                ttl: e.target.value,
-                                              })
-                                            }
-                                          />
+                                        <div className="flex justify-between items-center">
+                                          <span className="body-sm text-gray-600">
+                                            Domain Lock:
+                                          </span>
+                                          <div className="flex items-center space-x-2">
+                                            {domain.locked ? (
+                                              <Lock className="h-4 w-4 text-success" />
+                                            ) : (
+                                              <Unlock className="h-4 w-4 text-warning" />
+                                            )}
+                                            <span className="body-sm">
+                                              {domain.locked ? "Locked" : "Unlocked"}
+                                            </span>
+                                          </div>
                                         </div>
-                                        <div className="flex space-x-2">
-                                          <Button
-                                            onClick={handleAddRecord}
-                                            className="flex-1"
-                                          >
-                                            Add Record
-                                          </Button>
+                                        <div className="flex justify-between items-center">
+                                          <span className="body-sm text-gray-600">
+                                            EPP/Auth Code:
+                                          </span>
                                           <Button
                                             variant="outline"
+                                            size="sm"
                                             onClick={() =>
-                                              setShowAddRecord(false)
+                                              setShowAuthCode(
+                                                showAuthCode === domain.id
+                                                  ? null
+                                                  : domain.id,
+                                              )
                                             }
-                                            className="flex-1"
                                           >
-                                            Cancel
+                                            {showAuthCode === domain.id ? (
+                                              <>
+                                                <EyeOff className="mr-2 h-4 w-4" />
+                                                Hide
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Eye className="mr-2 h-4 w-4" />
+                                                Reveal
+                                              </>
+                                            )}
                                           </Button>
                                         </div>
-                                      </div>
-                                    </DialogContent>
-                                  </Dialog>
-                                </div>
-                              </CardHeader>
-                              <CardContent>
-                                <Table>
-                                  <TableHeader>
-                                    <TableRow>
-                                      <TableHead>Type</TableHead>
-                                      <TableHead>Name</TableHead>
-                                      <TableHead>Value</TableHead>
-                                      <TableHead>TTL</TableHead>
-                                      <TableHead className="text-right">
-                                        Actions
-                                      </TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    {domain.dnsRecords.map((record) => (
-                                      <TableRow key={record.id}>
-                                        <TableCell>
-                                          <Badge variant="outline">
-                                            {record.type}
-                                          </Badge>
-                                        </TableCell>
-                                        <TableCell className="font-mono body-sm">
-                                          {record.name}
-                                        </TableCell>
-                                        <TableCell className="font-mono body-sm">
-                                          {record.value}
-                                        </TableCell>
-                                        <TableCell className="body-sm">
-                                          {record.ttl}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                          <div className="flex items-center justify-end space-x-2">
-                                            <Button variant="ghost" size="sm">
-                                              <Edit className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                              variant="ghost"
-                                              size="sm"
-                                              onClick={() =>
-                                                handleDeleteRecord(
-                                                  domain.id,
-                                                  record.id,
-                                                )
-                                              }
-                                            >
-                                              <Trash2 className="h-4 w-4 text-error" />
-                                            </Button>
+                                        {showAuthCode === domain.id && (
+                                          <div className="bg-gray-50 p-3 rounded border">
+                                            <code className="body-sm font-mono">
+                                              AUTH-CODE-{domain.id.toUpperCase()}
+                                            </code>
                                           </div>
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                                {domain.dnsRecords.length === 0 && (
-                                  <div className="text-center py-8 text-gray-500">
-                                    <p>
-                                      No DNS records found. Add your first
-                                      record above.
-                                    </p>
+                                        )}
+                                        {domain.tags.length > 0 && (
+                                          <div>
+                                            <span className="body-sm text-gray-600 block mb-2">
+                                              Tags:
+                                            </span>
+                                            <div className="flex flex-wrap gap-1">
+                                              {domain.tags.map((tag, index) => (
+                                                <Badge key={index} variant="outline" className="text-xs">
+                                                  {tag}
+                                                </Badge>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </CardContent>
+                                    </Card>
+
+                                    {/* Nameserver Management */}
+                                    <NameserverManager
+                                      domainId={domain.id}
+                                      domainName={domain.name}
+                                      initialNameservers={domain.nameservers}
+                                      onUpdate={(nameservers) => 
+                                        handleNameserverUpdate(domain.id, nameservers)
+                                      }
+                                      disabled={domain.status !== "active"}
+                                    />
                                   </div>
-                                )}
+
+                                  {/* DNS Records Viewer */}
+                                  <DNSRecordsViewer
+                                    domainId={domain.id}
+                                    domainName={domain.name}
+                                  />
+                                </div>
                               </CardContent>
-                            </Card>
-                          </div>
-                        </CardContent>
-                      )}
-                    </CollapsibleContent>
-                  </Collapsible>
-                </Card>
-              ))}
-            </div>
+                            )}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      </Card>
+                    );
+                  })
+                )}
+
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-600">
+                      Showing {((pagination.page - 1) * pagination.limit) + 1} to{" "}
+                      {Math.min(pagination.page * pagination.limit, pagination.totalCount)} of{" "}
+                      {pagination.totalCount} domains
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fetchDomains({ page: pagination.page - 1 })}
+                        disabled={!pagination.hasPrev || loading}
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm text-gray-600">
+                        Page {pagination.page} of {pagination.totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fetchDomains({ page: pagination.page + 1 })}
+                        disabled={!pagination.hasNext || loading}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </TabsContent>
 
-          {/* Other tabs content remains the same but with updated styling */}
+          {/* Other tabs content */}
           <TabsContent value="hosting" className="space-y-4">
             <div className="text-center py-12 text-gray-500">
               <Server className="h-12 w-12 mx-auto mb-4 text-gray-400" />
@@ -818,31 +572,6 @@ export default function Services() {
             </div>
           </TabsContent>
         </Tabs>
-
-        {/* Domain Actions Bar - Fixed bottom */}
-        {selectedDomains.length > 0 && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
-            <div className="container mx-auto flex items-center justify-between">
-              <span className="body text-gray-600">
-                {selectedDomains.length} domain(s) selected
-              </span>
-              <div className="flex space-x-3">
-                <Button variant="outline">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  Transfer Domain
-                </Button>
-                <Button variant="outline">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Renew Now
-                </Button>
-                <Button variant="outline">
-                  <Edit className="mr-2 h-4 w-4" />
-                  Update Contact Info
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </AppShell>
   );
