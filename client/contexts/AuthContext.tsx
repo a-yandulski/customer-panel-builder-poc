@@ -120,6 +120,8 @@ function AuthProvider({ children }: AuthProviderProps) {
       : auth0.getIdTokenClaims,
   };
 
+  console.log("AuthProvider rendering with contextValue:", contextValue);
+
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
