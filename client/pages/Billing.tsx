@@ -24,208 +24,29 @@ import SubscriptionOverview from "@/components/billing/SubscriptionOverview";
 import PaymentMethodsManager from "@/components/billing/PaymentMethodsManager";
 import { useBillingSummary, useInvoices, type Invoice } from "@/hooks/useBilling";
 
-type PaymentMethod = {
-  id: string;
-  type: "Visa" | "Mastercard" | "American Express" | "PayPal";
-  last4: string;
-  expiry: string;
-  isDefault: boolean;
-  name: string;
-};
-
-type Invoice = {
-  id: string;
-  number: string;
-  date: string;
-  amount: string;
-  status: "Paid" | "Pending" | "Overdue";
-  description: string;
-  dueDate?: string;
-};
-
-type Subscription = {
-  id: string;
-  service: string;
-  plan: string;
-  amount: string;
-  billingCycle: "Monthly" | "Yearly";
-  nextPayment: string;
-  paymentMethod: string;
-  autoRenewal: boolean;
-  status: "Active" | "Paused" | "Cancelled";
-};
-
 export default function Billing() {
-  const [showAddCard, setShowAddCard] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [dateRange, setDateRange] = useState("all");
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [activeTab, setActiveTab] = useState("overview");
 
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
-    {
-      id: "1",
-      type: "Visa",
-      last4: "4242",
-      expiry: "12/26",
-      isDefault: true,
-      name: "John Doe",
-    },
-    {
-      id: "2",
-      type: "Mastercard",
-      last4: "8888",
-      expiry: "08/27",
-      isDefault: false,
-      name: "John Doe",
-    },
-    {
-      id: "3",
-      type: "PayPal",
-      last4: "john@example.com",
-      expiry: "",
-      isDefault: false,
-      name: "john@example.com",
-    },
-  ]);
+  const { summary, loading: summaryLoading, error: summaryError } = useBillingSummary();
+  const { downloadInvoicePDF } = useInvoices();
 
-  const [invoices] = useState<Invoice[]>([
-    {
-      id: "1",
-      number: "INV-2024-001",
-      date: "Dec 1, 2024",
-      amount: "$47.00",
-      status: "Paid",
-      description: "Domain renewal - example.com",
-    },
-    {
-      id: "2",
-      number: "INV-2024-002",
-      date: "Nov 15, 2024",
-      amount: "$120.00",
-      status: "Pending",
-      description: "Hosting plan upgrade",
-      dueDate: "Dec 15, 2024",
-    },
-    {
-      id: "3",
-      number: "INV-2024-003",
-      date: "Oct 20, 2024",
-      amount: "$89.99",
-      status: "Overdue",
-      description: "SSL certificate renewal",
-      dueDate: "Nov 20, 2024",
-    },
-    {
-      id: "4",
-      number: "INV-2024-004",
-      date: "Oct 1, 2024",
-      amount: "$15.99",
-      status: "Paid",
-      description: "Domain registration - newsite.com",
-    },
-  ]);
-
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([
-    {
-      id: "1",
-      service: "Web Hosting Pro",
-      plan: "Professional Plan",
-      amount: "$29.99",
-      billingCycle: "Monthly",
-      nextPayment: "Dec 15, 2024",
-      paymentMethod: "Visa •••• 4242",
-      autoRenewal: true,
-      status: "Active",
-    },
-    {
-      id: "2",
-      service: "Domain Registration",
-      plan: "example.com",
-      amount: "$12.99",
-      billingCycle: "Yearly",
-      nextPayment: "Dec 15, 2024",
-      paymentMethod: "Visa •••• 4242",
-      autoRenewal: true,
-      status: "Active",
-    },
-    {
-      id: "3",
-      service: "SSL Certificate",
-      plan: "Extended Validation",
-      amount: "$49.99",
-      billingCycle: "Yearly",
-      nextPayment: "Jan 5, 2025",
-      paymentMethod: "Mastercard •••• 8888",
-      autoRenewal: false,
-      status: "Active",
-    },
-  ]);
-
-  const setAsDefault = (cardId: string) => {
-    setPaymentMethods((prev) =>
-      prev.map((card) => ({
-        ...card,
-        isDefault: card.id === cardId,
-      })),
-    );
+  const formatCurrency = (amount: number, currency: string = "USD") => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+    }).format(amount);
   };
 
-  const deleteCard = (cardId: string) => {
-    setPaymentMethods((prev) => prev.filter((card) => card.id !== cardId));
+  const handleInvoiceSelect = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setActiveTab("invoice-detail");
   };
 
-  const toggleSubscriptionRenewal = (subId: string) => {
-    setSubscriptions((prev) =>
-      prev.map((sub) =>
-        sub.id === subId ? { ...sub, autoRenewal: !sub.autoRenewal } : sub,
-      ),
-    );
+  const handleBackToInvoices = () => {
+    setSelectedInvoice(null);
+    setActiveTab("invoices");
   };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Paid":
-        return "bg-success text-white";
-      case "Pending":
-        return "bg-warning text-white";
-      case "Overdue":
-        return "bg-error text-white";
-      default:
-        return "bg-gray-500 text-white";
-    }
-  };
-
-  const getCardIcon = (type: string) => {
-    switch (type) {
-      case "Visa":
-        return "💳";
-      case "Mastercard":
-        return "💳";
-      case "American Express":
-        return "💳";
-      case "PayPal":
-        return "🅿️";
-      default:
-        return "💳";
-    }
-  };
-
-  const filteredInvoices = invoices.filter((invoice) => {
-    const matchesSearch =
-      invoice.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || invoice.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
-  const paginatedInvoices = filteredInvoices.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
 
   return (
     <AppShell>
