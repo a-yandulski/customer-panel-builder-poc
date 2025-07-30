@@ -139,11 +139,6 @@ function AuthProvider({ children }: AuthProviderProps) {
 
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
-  // Since we now have a default context, we don't need to check for undefined
-  // But we can check if it's the default uninitialized state
-  if (context === defaultAuthContext) {
-    console.warn("Using default auth context - AuthProvider may not be properly initialized");
-  }
   return context;
 }
 
