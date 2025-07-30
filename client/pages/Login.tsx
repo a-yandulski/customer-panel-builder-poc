@@ -61,115 +61,86 @@ export default function Login() {
               <span className="text-white font-bold text-xl">D</span>
             </div>
           </div>
-          <h2 className="mt-6 h2 text-gray-900">Sign in to your account</h2>
+          <h2 className="mt-6 h2 text-gray-900">Welcome to DomainHost</h2>
           <p className="mt-2 body-sm text-gray-500">
-            Manage your domains, hosting, and services
+            Secure access to your customer panel
           </p>
         </div>
 
-        {/* Login Form */}
+        {/* Auth0 Login Card */}
         <Card className="border-gray-200 shadow-lg">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-xl font-semibold text-center">
-              Welcome back
+              Sign in to continue
             </CardTitle>
             <CardDescription className="text-center body-sm">
-              Enter your credentials to access your customer panel
+              We use enterprise-grade security to protect your account
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="email"
-                  className="body-sm font-semibold text-gray-700"
-                >
-                  Email address
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="john@example.com"
-                  required
-                  className="h-11"
-                />
+          <CardContent className="space-y-6">
+            {/* Security Info */}
+            <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <Shield className="h-5 w-5 text-blue-600 flex-shrink-0" />
+              <div className="text-sm text-blue-800">
+                <p className="font-medium">Secure Authentication</p>
+                <p className="text-blue-600">Powered by Auth0 with enterprise security</p>
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label
-                  htmlFor="password"
-                  className="body-sm font-semibold text-gray-700"
-                >
-                  Password
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                    className="h-11 pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
+            {/* Error Display */}
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-800">
+                  <strong>Authentication Error:</strong> {error.message}
+                </p>
+                <p className="text-xs text-red-600 mt-1">
+                  Please try again or contact support if the issue persists.
+                </p>
               </div>
+            )}
 
-              <div className="flex items-center justify-between">
+            {/* Login Button */}
+            <Button
+              onClick={handleLogin}
+              className="w-full h-12 btn-primary text-base font-semibold"
+              disabled={isRedirecting}
+            >
+              {isRedirecting ? (
                 <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="remember"
-                    checked={rememberMe}
-                    onCheckedChange={(checked) =>
-                      setRememberMe(checked as boolean)
-                    }
-                  />
-                  <Label
-                    htmlFor="remember"
-                    className="body-sm text-gray-500 cursor-pointer"
-                  >
-                    Remember me
-                  </Label>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Redirecting to login...</span>
                 </div>
-                <a
-                  href="/forgot-password"
-                  className="body-sm text-primary hover:text-secondary font-semibold transition-colors"
-                >
-                  Forgot password?
-                </a>
-              </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <span>Continue with Auth0</span>
+                  <ArrowRight className="h-4 w-4" />
+                </div>
+              )}
+            </Button>
 
-              <Button
-                type="submit"
-                className="w-full h-11 btn-primary"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Signing in...</span>
-                  </div>
-                ) : (
-                  "Sign in"
-                )}
-              </Button>
-            </form>
+            {/* Features */}
+            <div className="space-y-3">
+              <div className="text-center text-sm text-gray-500">
+                What you'll get access to:
+              </div>
+              <div className="grid grid-cols-1 gap-2 text-sm text-gray-600">
+                <div className="flex items-center space-x-2">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                  <span>Domain management and DNS controls</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                  <span>Billing and subscription management</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                  <span>24/7 priority support access</span>
+                </div>
+              </div>
+            </div>
 
             {/* Divider */}
-            <div className="relative my-6">
+            <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
               </div>
@@ -181,12 +152,12 @@ export default function Login() {
             {/* Help Links */}
             <div className="text-center space-y-2">
               <p className="body-sm text-gray-500">
-                Don't have an account?{" "}
+                New customer?{" "}
                 <a
                   href="/register"
                   className="text-primary hover:text-secondary font-semibold transition-colors"
                 >
-                  Create one here
+                  Create an account
                 </a>
               </p>
               <p className="body-sm text-gray-500">
