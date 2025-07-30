@@ -470,7 +470,7 @@ export function usePaymentSources() {
   // Initial fetch
   useEffect(() => {
     fetchPaymentSources();
-  }, [fetchPaymentSources]);
+  }, []);
 
   return {
     paymentSources,
