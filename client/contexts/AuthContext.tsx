@@ -60,7 +60,24 @@ export function Auth0Provider({ children }: AuthProviderProps) {
 }
 
 function AuthProvider({ children }: AuthProviderProps) {
-  const auth0 = useAuth0();
+  let auth0;
+  try {
+    auth0 = useAuth0();
+  } catch (error) {
+    console.warn("Auth0 not available, using fallback:", error);
+    // Provide a fallback auth0 object
+    auth0 = {
+      user: undefined,
+      isAuthenticated: false,
+      isLoading: false,
+      error: undefined,
+      loginWithRedirect: async () => { console.warn("Auth0 not available"); },
+      logout: async () => { console.warn("Auth0 not available"); },
+      getAccessTokenSilently: async () => { throw new Error("Auth0 not available"); },
+      getIdTokenClaims: async () => { throw new Error("Auth0 not available"); }
+    };
+  }
+
   const [isInitialized, setIsInitialized] = useState(false);
   const [fakeUser, setFakeUser] = useState<any>(null);
   const [fakeAuthLoading, setFakeAuthLoading] = useState(true);
