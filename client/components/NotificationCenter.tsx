@@ -17,7 +17,7 @@ import {
   MessageCircle,
   CheckCircle,
   ExternalLink,
-  MarkdownIcon as MarkAsRead,
+  Check as MarkAsRead,
 } from "lucide-react";
 
 type NotificationType =
