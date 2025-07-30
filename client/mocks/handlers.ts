@@ -478,6 +478,280 @@ export const handlers = [
   }),
 
   // =======================
+  // DASHBOARD ENDPOINTS
+  // =======================
+
+  // Get dashboard services summary
+  http.get("/api/services/summary", async ({ request }) => {
+    await delay(randomDelay(200, 800));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
+    // Simulate rate limiting (429 Too Many Requests)
+    if (shouldFail(8)) {
+      return HttpResponse.json(
+        { error: "Rate limit exceeded. Please wait before making more requests." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": "60",
+            "X-RateLimit-Limit": "100",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": String(Date.now() + 60000),
+          },
+        },
+      );
+    }
+
+    // Simulate timeout (3% chance)
+    if (shouldFail(3)) {
+      await delay(10000); // 10 second delay to trigger timeout
+    }
+
+    // Simulate server error (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Service temporarily unavailable" },
+        { status: 500 }
+      );
+    }
+
+    return HttpResponse.json({
+      summary: {
+        domains: { total: 12, active: 11, expiring: 2 },
+        subscriptions: { total: 8, active: 7, suspended: 1 },
+        tickets: { total: 4, open: 2, pending: 1, closed: 1 },
+        billing: {
+          balance: 127.50,
+          currency: "USD",
+          nextPayment: "2024-12-15",
+          overdue: 0
+        }
+      },
+      lastUpdated: new Date().toISOString()
+    });
+  }),
+
+  // Get upcoming renewals
+  http.get("/api/renewals", async ({ request }) => {
+    await delay(randomDelay(300, 1200));
+
+    const url = new URL(request.url);
+    const window = parseInt(url.searchParams.get("window") || "30");
+    const sortBy = url.searchParams.get("sortBy") || "expiry";
+    const filterType = url.searchParams.get("type");
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
+    // Simulate intermittent failures (10% chance)
+    if (shouldFail(10)) {
+      return HttpResponse.json(
+        { error: "Failed to fetch renewal data" },
+        { status: 503 }
+      );
+    }
+
+    // Simulate 404 for specific filters
+    if (filterType === "nonexistent") {
+      return HttpResponse.json(
+        { error: "Service type not found" },
+        { status: 404 }
+      );
+    }
+
+    const mockRenewals = [
+      {
+        id: "ren_001",
+        service: "example.com",
+        type: "domain",
+        displayType: "Domain Registration",
+        expiryDate: "2024-12-15",
+        price: 12.99,
+        currency: "USD",
+        autoRenew: true,
+        urgent: true,
+        daysUntilExpiry: 8,
+        status: "active"
+      },
+      {
+        id: "ren_002",
+        service: "mysite.org",
+        type: "hosting",
+        displayType: "Web Hosting",
+        expiryDate: "2024-12-22",
+        price: 89.99,
+        currency: "USD",
+        autoRenew: false,
+        urgent: false,
+        daysUntilExpiry: 15,
+        status: "active"
+      },
+      {
+        id: "ren_003",
+        service: "business.net",
+        type: "ssl",
+        displayType: "SSL Certificate",
+        expiryDate: "2025-01-05",
+        price: 49.99,
+        currency: "USD",
+        autoRenew: true,
+        urgent: false,
+        daysUntilExpiry: 29,
+        status: "active"
+      },
+      {
+        id: "ren_004",
+        service: "shop.example.com",
+        type: "hosting",
+        displayType: "Premium Hosting",
+        expiryDate: "2025-01-12",
+        price: 199.99,
+        currency: "USD",
+        autoRenew: false,
+        urgent: false,
+        daysUntilExpiry: 36,
+        status: "warning"
+      }
+    ];
+
+    // Filter by window
+    const filteredRenewals = mockRenewals.filter(r => r.daysUntilExpiry <= window);
+
+    // Filter by type if specified
+    const typeFilteredRenewals = filterType
+      ? filteredRenewals.filter(r => r.type === filterType)
+      : filteredRenewals;
+
+    // Sort renewals
+    const sortedRenewals = [...typeFilteredRenewals].sort((a, b) => {
+      switch (sortBy) {
+        case "expiry":
+          return a.daysUntilExpiry - b.daysUntilExpiry;
+        case "price":
+          return b.price - a.price;
+        case "service":
+          return a.service.localeCompare(b.service);
+        default:
+          return a.daysUntilExpiry - b.daysUntilExpiry;
+      }
+    });
+
+    return HttpResponse.json({
+      renewals: sortedRenewals,
+      totalAmount: sortedRenewals.reduce((sum, r) => sum + r.price, 0),
+      currency: "USD",
+      window,
+      count: sortedRenewals.length
+    });
+  }),
+
+  // Get recent activity/tickets
+  http.get("/api/dashboard/activity", async ({ request }) => {
+    await delay(randomDelay(100, 600));
+
+    const url = new URL(request.url);
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Unauthorized access" },
+        { status: 401 }
+      );
+    }
+
+    // Simulate forbidden access (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Insufficient permissions to view activity" },
+        { status: 403 }
+      );
+    }
+
+    // Simulate network timeout (2% chance)
+    if (shouldFail(2)) {
+      await delay(15000); // 15 second delay
+    }
+
+    const mockActivities = [
+      {
+        id: "act_001",
+        type: "domain_renewal",
+        title: "Domain renewed successfully",
+        description: "example.com has been renewed for 1 year",
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        status: "success",
+        metadata: { domain: "example.com", duration: "1 year" }
+      },
+      {
+        id: "act_002",
+        type: "ssl_install",
+        title: "SSL certificate installed",
+        description: "SSL certificate activated for mysite.org",
+        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        status: "success",
+        metadata: { domain: "mysite.org", type: "Let's Encrypt" }
+      },
+      {
+        id: "act_003",
+        type: "ticket_created",
+        title: "Support ticket created",
+        description: "#12345 - Email configuration help",
+        timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        status: "info",
+        metadata: { ticketId: "12345", category: "email" }
+      },
+      {
+        id: "act_004",
+        type: "dns_update",
+        title: "DNS settings updated",
+        description: "A record updated for business.net",
+        timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        status: "info",
+        metadata: { domain: "business.net", recordType: "A" }
+      },
+      {
+        id: "act_005",
+        type: "payment_received",
+        title: "Payment processed",
+        description: "Invoice #INV-2024-001 paid successfully",
+        timestamp: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        status: "success",
+        metadata: { invoiceId: "INV-2024-001", amount: 89.99 }
+      },
+      {
+        id: "act_006",
+        type: "security_alert",
+        title: "Security scan completed",
+        description: "Weekly security scan found no issues",
+        timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+        status: "success",
+        metadata: { scanType: "weekly", issues: 0 }
+      }
+    ];
+
+    const limitedActivities = mockActivities.slice(0, limit);
+
+    return HttpResponse.json({
+      activities: limitedActivities,
+      hasMore: mockActivities.length > limit,
+      total: mockActivities.length
+    });
+  }),
+
+  // =======================
   // USER ACCOUNT
   // =======================
 
