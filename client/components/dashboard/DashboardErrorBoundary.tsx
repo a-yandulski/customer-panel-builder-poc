@@ -18,6 +18,7 @@ interface ErrorBoundaryState {
 interface DashboardErrorBoundaryProps {
   children: React.ReactNode;
   fallback?: React.ComponentType<{ error: Error; retry: () => void }>;
+  onNavigateHome?: () => void;
 }
 
 export class DashboardErrorBoundary extends React.Component<
@@ -57,7 +58,12 @@ export class DashboardErrorBoundary extends React.Component<
   };
 
   handleGoHome = () => {
-    window.location.href = "/";
+    if (this.props.onNavigateHome) {
+      this.props.onNavigateHome();
+    } else {
+      // Fallback to window navigation if no callback provided
+      window.location.href = "/";
+    }
   };
 
   render() {

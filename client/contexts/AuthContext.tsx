@@ -11,6 +11,8 @@ import {
   Auth0ProviderOptions,
 } from "@auth0/auth0-react";
 import { User } from "@auth0/auth0-spa-js";
+import { useNavigate } from "react-router-dom";
+import { getFullUrl } from "@/lib/config";
 
 interface AuthContextType {
   user: User | undefined;
@@ -46,11 +48,15 @@ const defaultAuthContext: AuthContextType = {
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 // Auth0 configuration
+const getRedirectUri = () => {
+  return getFullUrl();
+};
+
 const auth0Config: Auth0ProviderOptions = {
   domain: import.meta.env.VITE_AUTH0_DOMAIN || "dev-customer-panel.auth0.com",
   clientId: import.meta.env.VITE_AUTH0_CLIENT_ID || "your_client_id_here",
   authorizationParams: {
-    redirect_uri: window.location.origin,
+    redirect_uri: getRedirectUri(),
     audience:
       import.meta.env.VITE_AUTH0_AUDIENCE ||
       "https://api.customerpanel.example.com",
@@ -75,6 +81,7 @@ export function Auth0Provider({ children }: AuthProviderProps) {
 
 function AuthProvider({ children }: AuthProviderProps) {
   const auth0 = useAuth0();
+  const navigate = useNavigate();
   const [isInitialized, setIsInitialized] = useState(false);
   const [fakeUser, setFakeUser] = useState<any>(null);
   const [fakeAuthLoading, setFakeAuthLoading] = useState(true);
@@ -105,11 +112,11 @@ function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [auth0.isLoading, fakeAuthLoading]);
 
-  const fakeLogout = () => {
+  const fakeLogout = async () => {
     localStorage.removeItem("fake_auth_user");
     localStorage.removeItem("fake_auth_token");
     setFakeUser(null);
-    window.location.href = "/login";
+    navigate("/login");
   };
 
   const fakeGetAccessToken = async () => {

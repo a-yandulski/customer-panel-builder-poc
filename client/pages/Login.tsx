@@ -75,8 +75,8 @@ export default function Login() {
 
     setIsLoggingIn(false);
 
-    // Trigger a page reload to reinitialize auth state
-    window.location.href = "/dashboard";
+    // Navigate to dashboard using React Router
+    navigate("/dashboard");
   };
 
   // Show loading state while Auth0 is initializing

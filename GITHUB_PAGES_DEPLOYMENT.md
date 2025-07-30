@@ -1,6 +1,26 @@
 # Customer Panel Builder POC - GitHub Pages Deployment
 
-This React application has been configured for deployment to GitHub Pages using gh-pages.
+This React application has been configured for deployment to GitHub Pages using gh-pages with proper routing support.
+
+## 🔧 Router Configuration for GitHub Pages
+
+### Issues Fixed
+
+The application now properly handles GitHub Pages routing by:
+
+1. **Dynamic Base Path Detection**: The app automatically detects if it's running on GitHub Pages and adjusts the base path accordingly
+2. **Auth0 Redirect URLs**: Fixed Auth0 configuration to use the correct redirect URL including the repository path
+3. **React Router Integration**: All navigation uses React Router instead of direct `window.location` manipulation
+4. **SPA Routing Support**: Added proper 404.html handling for client-side routing
+
+### Key Files Changed
+
+- `client/lib/config.ts` - Dynamic base path configuration
+- `client/contexts/AuthContext.tsx` - Fixed Auth0 redirect URI and logout navigation
+- `client/App.tsx` - Updated to use dynamic base path
+- `client/pages/Login.tsx` - Fixed navigation after fake login
+- `public/404.html` - SPA routing fallback for GitHub Pages
+- `index.html` - Added SPA routing script
 
 ## Deployment Setup
 

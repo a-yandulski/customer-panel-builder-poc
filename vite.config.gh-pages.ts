@@ -4,7 +4,7 @@ import path from "path";
 
 // Vite config specifically for GitHub Pages deployment
 export default defineConfig({
-  base: "/customer-panel-builder-poc/",
+  base: process.env.VITE_BASE_PATH || "/customer-panel-builder-poc/",
   build: {
     outDir: "dist/spa",
   },
