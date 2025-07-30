@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [showPromoBanner, setShowPromoBanner] = useState(true);
   const [renewalToggles, setRenewalToggles] = useState({
     "example.com": true,
