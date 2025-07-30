@@ -167,16 +167,41 @@ export function useDashboard(): UseDashboardReturn {
   // Refetch all data
   const refetchAll = useCallback(async () => {
     setIsRefreshing(true);
+    setLoading({ summary: true, renewals: true, activities: true });
+    setError({ summary: null, renewals: null, activities: null });
+
     try {
-      await Promise.all([
-        fetchSummary(),
-        fetchRenewals({ window: 30 }),
-        fetchActivities({ limit: 5 })
+      const [summaryRes, renewalsRes, activitiesRes] = await Promise.allSettled([
+        api.get<{ summary: ServiceSummary; lastUpdated: string }>('/services/summary'),
+        api.get<{renewals: Renewal[]; totalAmount: number; currency: string; window: number; count: number;}>('/renewals?window=30'),
+        api.get<{activities: Activity[]; hasMore: boolean; total: number;}>('/dashboard/activity?limit=5')
       ]);
+
+      if (summaryRes.status === 'fulfilled') {
+        setData(prev => ({ ...prev, summary: summaryRes.value.summary }));
+      } else {
+        const errorMessage = summaryRes.reason instanceof Error ? summaryRes.reason.message : 'Failed to fetch service summary';
+        setError(prev => ({ ...prev, summary: errorMessage }));
+      }
+
+      if (renewalsRes.status === 'fulfilled') {
+        setData(prev => ({ ...prev, renewals: renewalsRes.value.renewals }));
+      } else {
+        const errorMessage = renewalsRes.reason instanceof Error ? renewalsRes.reason.message : 'Failed to fetch renewals';
+        setError(prev => ({ ...prev, renewals: errorMessage }));
+      }
+
+      if (activitiesRes.status === 'fulfilled') {
+        setData(prev => ({ ...prev, activities: activitiesRes.value.activities }));
+      } else {
+        const errorMessage = activitiesRes.reason instanceof Error ? activitiesRes.reason.message : 'Failed to fetch activities';
+        setError(prev => ({ ...prev, activities: errorMessage }));
+      }
     } finally {
+      setLoading({ summary: false, renewals: false, activities: false });
       setIsRefreshing(false);
     }
-  }, [fetchSummary, fetchRenewals, fetchActivities]);
+  }, [api]);
 
   // Initial data fetch
   useEffect(() => {
