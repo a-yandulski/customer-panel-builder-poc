@@ -513,7 +513,7 @@ export function useBillingSummary() {
   // Initial fetch
   useEffect(() => {
     fetchSummary();
-  }, [fetchSummary]);
+  }, []);
 
   return {
     summary,
