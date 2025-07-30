@@ -140,58 +140,66 @@ export function useInvoices() {
     limit: 10,
   });
 
-  const fetchInvoices = useCallback(async (newFilters?: Partial<InvoiceFilters>) => {
-    const currentFilters = { ...filters, ...newFilters };
-    setLoading(true);
-    setError(null);
+  const fetchInvoices = useCallback(
+    async (newFilters?: Partial<InvoiceFilters>) => {
+      const currentFilters = { ...filters, ...newFilters };
+      setLoading(true);
+      setError(null);
 
-    try {
-      const params = new URLSearchParams();
-      if (currentFilters.search) params.append("search", currentFilters.search);
-      if (currentFilters.status !== "all") params.append("status", currentFilters.status);
-      params.append("sortBy", currentFilters.sortBy);
-      params.append("sortOrder", currentFilters.sortOrder);
-      params.append("page", currentFilters.page.toString());
-      params.append("limit", currentFilters.limit.toString());
+      try {
+        const params = new URLSearchParams();
+        if (currentFilters.search)
+          params.append("search", currentFilters.search);
+        if (currentFilters.status !== "all")
+          params.append("status", currentFilters.status);
+        params.append("sortBy", currentFilters.sortBy);
+        params.append("sortOrder", currentFilters.sortOrder);
+        params.append("page", currentFilters.page.toString());
+        params.append("limit", currentFilters.limit.toString());
 
-      const response = await api.get<InvoicesResponse>(`/invoices?${params.toString()}`);
-      
-      setInvoices(response.invoices);
-      setPagination(response.pagination);
-      setFilters(currentFilters);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch invoices";
-      setError(errorMessage);
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [api, filters]);
+        const response = await api.get<InvoicesResponse>(
+          `/invoices?${params.toString()}`,
+        );
+
+        setInvoices(response.invoices);
+        setPagination(response.pagination);
+        setFilters(currentFilters);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to fetch invoices";
+        setError(errorMessage);
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [api, filters],
+  );
 
   const downloadInvoicePDF = useCallback(async (invoiceId: string) => {
     try {
       // Open PDF in new window/tab for download
       const pdfUrl = `/api/invoices/${invoiceId}/pdf`;
       const response = await fetch(pdfUrl, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
+          Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
         },
       });
 
       if (response.status === 302) {
         // Handle redirect to actual PDF URL
-        const location = response.headers.get('Location');
+        const location = response.headers.get("Location");
         if (location) {
-          window.open(location, '_blank');
+          window.open(location, "_blank");
         }
       } else if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to download PDF');
+        throw new Error(errorData.error || "Failed to download PDF");
       }
 
       toast({
@@ -199,7 +207,8 @@ export function useInvoices() {
         description: "Invoice PDF download started",
       });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to download invoice PDF";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to download invoice PDF";
       toast({
         title: "Error",
         description: errorMessage,
@@ -239,10 +248,13 @@ export function useInvoiceDetails(invoiceId: string | null) {
     setError(null);
 
     try {
-      const response = await api.get<{ invoice: Invoice }>(`/invoices/${invoiceId}`);
+      const response = await api.get<{ invoice: Invoice }>(
+        `/invoices/${invoiceId}`,
+      );
       setInvoice(response.invoice);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch invoice details";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch invoice details";
       setError(errorMessage);
       toast({
         title: "Error",
@@ -287,7 +299,8 @@ export function useSubscriptions() {
       const response = await api.get<SubscriptionsResponse>("/subscriptions");
       setSubscriptions(response.subscriptions);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch subscriptions";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch subscriptions";
       setError(errorMessage);
       toast({
         title: "Error",
@@ -299,63 +312,73 @@ export function useSubscriptions() {
     }
   }, [api]);
 
-  const updateSubscription = useCallback(async (subscriptionId: string, updates: Partial<Subscription>) => {
-    try {
-      const response = await api.patch<{ subscription: Subscription }>(`/subscriptions/${subscriptionId}`, updates);
-      
+  const updateSubscription = useCallback(
+    async (subscriptionId: string, updates: Partial<Subscription>) => {
+      try {
+        const response = await api.patch<{ subscription: Subscription }>(
+          `/subscriptions/${subscriptionId}`,
+          updates,
+        );
+
+        // Optimistic update
+        setSubscriptions((prev) =>
+          prev.map((subscription) =>
+            subscription.id === subscriptionId
+              ? { ...subscription, ...response.subscription }
+              : subscription,
+          ),
+        );
+
+        toast({
+          title: "Success",
+          description: "Subscription updated successfully",
+        });
+
+        return response.subscription;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to update subscription";
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        throw err;
+      }
+    },
+    [api],
+  );
+
+  const toggleAutoRenewal = useCallback(
+    async (subscriptionId: string) => {
+      const subscription = subscriptions.find((s) => s.id === subscriptionId);
+      if (!subscription) return;
+
       // Optimistic update
-      setSubscriptions(prev => 
-        prev.map(subscription => 
-          subscription.id === subscriptionId 
-            ? { ...subscription, ...response.subscription }
-            : subscription
-        )
+      const newAutoRenewal = !subscription.autoRenewal;
+      setSubscriptions((prev) =>
+        prev.map((s) =>
+          s.id === subscriptionId ? { ...s, autoRenewal: newAutoRenewal } : s,
+        ),
       );
 
-      toast({
-        title: "Success",
-        description: "Subscription updated successfully",
-      });
-
-      return response.subscription;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update subscription";
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      throw err;
-    }
-  }, [api]);
-
-  const toggleAutoRenewal = useCallback(async (subscriptionId: string) => {
-    const subscription = subscriptions.find(s => s.id === subscriptionId);
-    if (!subscription) return;
-
-    // Optimistic update
-    const newAutoRenewal = !subscription.autoRenewal;
-    setSubscriptions(prev => 
-      prev.map(s => 
-        s.id === subscriptionId 
-          ? { ...s, autoRenewal: newAutoRenewal }
-          : s
-      )
-    );
-
-    try {
-      await updateSubscription(subscriptionId, { autoRenewal: newAutoRenewal });
-    } catch (err) {
-      // Rollback on error
-      setSubscriptions(prev => 
-        prev.map(s => 
-          s.id === subscriptionId 
-            ? { ...s, autoRenewal: subscription.autoRenewal }
-            : s
-        )
-      );
-    }
-  }, [subscriptions, updateSubscription]);
+      try {
+        await updateSubscription(subscriptionId, {
+          autoRenewal: newAutoRenewal,
+        });
+      } catch (err) {
+        // Rollback on error
+        setSubscriptions((prev) =>
+          prev.map((s) =>
+            s.id === subscriptionId
+              ? { ...s, autoRenewal: subscription.autoRenewal }
+              : s,
+          ),
+        );
+      }
+    },
+    [subscriptions, updateSubscription],
+  );
 
   // Initial fetch
   useEffect(() => {
@@ -384,10 +407,12 @@ export function usePaymentSources() {
     setError(null);
 
     try {
-      const response = await api.get<PaymentSourcesResponse>("/payment_sources");
+      const response =
+        await api.get<PaymentSourcesResponse>("/payment_sources");
       setPaymentSources(response.paymentSources);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch payment methods";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch payment methods";
       setError(errorMessage);
       toast({
         title: "Error",
@@ -399,78 +424,101 @@ export function usePaymentSources() {
     }
   }, [api]);
 
-  const addPaymentSource = useCallback(async (paymentData: any) => {
-    try {
-      const response = await api.post<{ paymentSource: PaymentSource }>("/payment_sources", paymentData);
-      
-      setPaymentSources(prev => [...prev, response.paymentSource]);
+  const addPaymentSource = useCallback(
+    async (paymentData: any) => {
+      try {
+        const response = await api.post<{ paymentSource: PaymentSource }>(
+          "/payment_sources",
+          paymentData,
+        );
 
-      toast({
-        title: "Success",
-        description: "Payment method added successfully",
-      });
+        setPaymentSources((prev) => [...prev, response.paymentSource]);
 
-      return response.paymentSource;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to add payment method";
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      throw err;
-    }
-  }, [api]);
+        toast({
+          title: "Success",
+          description: "Payment method added successfully",
+        });
 
-  const deletePaymentSource = useCallback(async (paymentSourceId: string) => {
-    try {
-      await api.delete(`/payment_sources/${paymentSourceId}`);
-      
-      setPaymentSources(prev => prev.filter(ps => ps.id !== paymentSourceId));
+        return response.paymentSource;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to add payment method";
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        throw err;
+      }
+    },
+    [api],
+  );
 
-      toast({
-        title: "Success",
-        description: "Payment method deleted successfully",
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to delete payment method";
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      throw err;
-    }
-  }, [api]);
+  const deletePaymentSource = useCallback(
+    async (paymentSourceId: string) => {
+      try {
+        await api.delete(`/payment_sources/${paymentSourceId}`);
 
-  const setDefaultPaymentSource = useCallback(async (paymentSourceId: string) => {
-    try {
-      const response = await api.post<{ paymentSource: PaymentSource }>(`/payment_sources/${paymentSourceId}/default`);
-      
-      // Update all payment sources - remove default from others, set for this one
-      setPaymentSources(prev => 
-        prev.map(ps => ({
-          ...ps,
-          isDefault: ps.id === paymentSourceId
-        }))
-      );
+        setPaymentSources((prev) =>
+          prev.filter((ps) => ps.id !== paymentSourceId),
+        );
 
-      toast({
-        title: "Success",
-        description: "Default payment method updated",
-      });
+        toast({
+          title: "Success",
+          description: "Payment method deleted successfully",
+        });
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : "Failed to delete payment method";
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        throw err;
+      }
+    },
+    [api],
+  );
 
-      return response.paymentSource;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update default payment method";
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      throw err;
-    }
-  }, [api]);
+  const setDefaultPaymentSource = useCallback(
+    async (paymentSourceId: string) => {
+      try {
+        const response = await api.post<{ paymentSource: PaymentSource }>(
+          `/payment_sources/${paymentSourceId}/default`,
+        );
+
+        // Update all payment sources - remove default from others, set for this one
+        setPaymentSources((prev) =>
+          prev.map((ps) => ({
+            ...ps,
+            isDefault: ps.id === paymentSourceId,
+          })),
+        );
+
+        toast({
+          title: "Success",
+          description: "Default payment method updated",
+        });
+
+        return response.paymentSource;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : "Failed to update default payment method";
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        throw err;
+      }
+    },
+    [api],
+  );
 
   // Initial fetch
   useEffect(() => {
@@ -503,7 +551,8 @@ export function useBillingSummary() {
       const response = await api.get<BillingSummary>("/billing/summary");
       setSummary(response);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch billing summary";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch billing summary";
       setError(errorMessage);
       toast({
         title: "Error",

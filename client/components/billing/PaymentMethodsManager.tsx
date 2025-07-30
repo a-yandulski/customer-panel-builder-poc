@@ -1,20 +1,20 @@
 import React, { useState } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  RefreshCw, 
-  AlertCircle, 
-  CreditCard, 
+import {
+  RefreshCw,
+  AlertCircle,
+  CreditCard,
   Plus,
   Edit,
   Trash2,
@@ -26,7 +26,7 @@ import {
   Calendar,
   MapPin,
   User,
-  Globe
+  Globe,
 } from "lucide-react";
 import {
   Dialog,
@@ -36,10 +36,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Alert,
-  AlertDescription,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Select,
   SelectContent,
@@ -70,13 +67,16 @@ interface AddPaymentMethodFormData {
   setAsDefault: boolean;
 }
 
-export default function PaymentMethodsManager({ 
-  onPaymentMethodSelect, 
+export default function PaymentMethodsManager({
+  onPaymentMethodSelect,
   showActions = true,
-  compact = false 
+  compact = false,
 }: PaymentMethodsManagerProps) {
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; paymentSource: PaymentSource | null }>({
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    paymentSource: PaymentSource | null;
+  }>({
     open: false,
     paymentSource: null,
   });
@@ -95,14 +95,14 @@ export default function PaymentMethodsManager({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { 
-    paymentSources, 
-    loading, 
-    error, 
+  const {
+    paymentSources,
+    loading,
+    error,
     addPaymentSource,
     deletePaymentSource,
     setDefaultPaymentSource,
-    refetch 
+    refetch,
   } = usePaymentSources();
 
   const handleAddPaymentMethod = async () => {
@@ -191,18 +191,20 @@ export default function PaymentMethodsManager({
 
   const formatExpiryDate = (month?: number, year?: number) => {
     if (!month || !year) return "";
-    return `${month.toString().padStart(2, '0')}/${year.toString().slice(-2)}`;
+    return `${month.toString().padStart(2, "0")}/${year.toString().slice(-2)}`;
   };
 
   const isFormValid = () => {
-    return formData.cardNumber.length >= 13 &&
-           formData.expiryMonth &&
-           formData.expiryYear &&
-           formData.cvv.length >= 3 &&
-           formData.holderName.trim() &&
-           formData.address.trim() &&
-           formData.city.trim() &&
-           formData.postalCode.trim();
+    return (
+      formData.cardNumber.length >= 13 &&
+      formData.expiryMonth &&
+      formData.expiryYear &&
+      formData.cvv.length >= 3 &&
+      formData.holderName.trim() &&
+      formData.address.trim() &&
+      formData.city.trim() &&
+      formData.postalCode.trim()
+    );
   };
 
   if (compact) {
@@ -225,7 +227,9 @@ export default function PaymentMethodsManager({
         {!loading && !error && paymentSources.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             <CreditCard className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-700 mb-2">No Payment Methods</h3>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              No Payment Methods
+            </h3>
             <p className="text-gray-600">No payment methods found.</p>
           </div>
         )}
@@ -233,8 +237,11 @@ export default function PaymentMethodsManager({
         {!loading && !error && paymentSources.length > 0 && (
           <div className="space-y-3">
             {paymentSources.slice(0, 3).map((paymentSource) => (
-              <Card key={paymentSource.id} className={`cursor-pointer hover:shadow-md transition-shadow ${getCardColor(paymentSource.brand)}`}
-                    onClick={() => onPaymentMethodSelect?.(paymentSource)}>
+              <Card
+                key={paymentSource.id}
+                className={`cursor-pointer hover:shadow-md transition-shadow ${getCardColor(paymentSource.brand)}`}
+                onClick={() => onPaymentMethodSelect?.(paymentSource)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -246,10 +253,9 @@ export default function PaymentMethodsManager({
                           {paymentSource.brand} •••• {paymentSource.last4}
                         </p>
                         <p className="text-sm text-gray-600">
-                          {paymentSource.type === "paypal" 
-                            ? paymentSource.last4 
-                            : `Expires ${formatExpiryDate(paymentSource.expiryMonth, paymentSource.expiryYear)}`
-                          }
+                          {paymentSource.type === "paypal"
+                            ? paymentSource.last4
+                            : `Expires ${formatExpiryDate(paymentSource.expiryMonth, paymentSource.expiryYear)}`}
                         </p>
                       </div>
                     </div>
@@ -285,7 +291,9 @@ export default function PaymentMethodsManager({
             onClick={refetch}
             disabled={loading}
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
@@ -302,23 +310,30 @@ export default function PaymentMethodsManager({
                   Add Payment Method
                 </DialogTitle>
                 <DialogDescription>
-                  Add a new credit card or payment method. Your information is secured with 256-bit SSL encryption.
+                  Add a new credit card or payment method. Your information is
+                  secured with 256-bit SSL encryption.
                 </DialogDescription>
               </DialogHeader>
-              
+
               {/* Security Badges */}
               <div className="flex items-center justify-center space-x-6 p-4 bg-gray-50 rounded-lg mb-6">
                 <div className="flex items-center space-x-2">
                   <Shield className="h-5 w-5 text-green-600" />
-                  <span className="text-sm font-medium text-green-600">SSL Encrypted</span>
+                  <span className="text-sm font-medium text-green-600">
+                    SSL Encrypted
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Lock className="h-5 w-5 text-green-600" />
-                  <span className="text-sm font-medium text-green-600">PCI Compliant</span>
+                  <span className="text-sm font-medium text-green-600">
+                    PCI Compliant
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Shield className="h-5 w-5 text-green-600" />
-                  <span className="text-sm font-medium text-green-600">Bank-Level Security</span>
+                  <span className="text-sm font-medium text-green-600">
+                    Bank-Level Security
+                  </span>
                 </div>
               </div>
 
@@ -326,14 +341,19 @@ export default function PaymentMethodsManager({
                 {/* Card Information */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium">Card Information</h3>
-                  
+
                   <div className="space-y-3">
                     <div>
                       <Label htmlFor="cardNumber">Card Number</Label>
                       <Input
                         id="cardNumber"
                         value={formData.cardNumber}
-                        onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value.replace(/\s/g, '') })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            cardNumber: e.target.value.replace(/\s/g, ""),
+                          })
+                        }
                         placeholder="1234 5678 9012 3456"
                         maxLength={19}
                       />
@@ -342,27 +362,45 @@ export default function PaymentMethodsManager({
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <Label htmlFor="expiryMonth">Expiry Month</Label>
-                        <Select value={formData.expiryMonth} onValueChange={(value) => setFormData({ ...formData, expiryMonth: value })}>
+                        <Select
+                          value={formData.expiryMonth}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, expiryMonth: value })
+                          }
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="MM" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                              <SelectItem key={month} value={month.toString()}>
-                                {month.toString().padStart(2, '0')}
-                              </SelectItem>
-                            ))}
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                              (month) => (
+                                <SelectItem
+                                  key={month}
+                                  value={month.toString()}
+                                >
+                                  {month.toString().padStart(2, "0")}
+                                </SelectItem>
+                              ),
+                            )}
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
                         <Label htmlFor="expiryYear">Expiry Year</Label>
-                        <Select value={formData.expiryYear} onValueChange={(value) => setFormData({ ...formData, expiryYear: value })}>
+                        <Select
+                          value={formData.expiryYear}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, expiryYear: value })
+                          }
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="YYYY" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 20 }, (_, i) => new Date().getFullYear() + i).map(year => (
+                            {Array.from(
+                              { length: 20 },
+                              (_, i) => new Date().getFullYear() + i,
+                            ).map((year) => (
                               <SelectItem key={year} value={year.toString()}>
                                 {year}
                               </SelectItem>
@@ -375,7 +413,9 @@ export default function PaymentMethodsManager({
                         <Input
                           id="cvv"
                           value={formData.cvv}
-                          onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({ ...formData, cvv: e.target.value })
+                          }
                           placeholder="123"
                           maxLength={4}
                           type="password"
@@ -388,7 +428,12 @@ export default function PaymentMethodsManager({
                       <Input
                         id="holderName"
                         value={formData.holderName}
-                        onChange={(e) => setFormData({ ...formData, holderName: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            holderName: e.target.value,
+                          })
+                        }
                         placeholder="John Doe"
                       />
                     </div>
@@ -398,14 +443,16 @@ export default function PaymentMethodsManager({
                 {/* Billing Address */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium">Billing Address</h3>
-                  
+
                   <div className="space-y-3">
                     <div>
                       <Label htmlFor="address">Street Address</Label>
                       <Input
                         id="address"
                         value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, address: e.target.value })
+                        }
                         placeholder="123 Main Street"
                       />
                     </div>
@@ -416,7 +463,9 @@ export default function PaymentMethodsManager({
                         <Input
                           id="city"
                           value={formData.city}
-                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({ ...formData, city: e.target.value })
+                          }
                           placeholder="New York"
                         />
                       </div>
@@ -425,7 +474,9 @@ export default function PaymentMethodsManager({
                         <Input
                           id="state"
                           value={formData.state}
-                          onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({ ...formData, state: e.target.value })
+                          }
                           placeholder="NY"
                         />
                       </div>
@@ -437,13 +488,23 @@ export default function PaymentMethodsManager({
                         <Input
                           id="postalCode"
                           value={formData.postalCode}
-                          onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              postalCode: e.target.value,
+                            })
+                          }
                           placeholder="10001"
                         />
                       </div>
                       <div>
                         <Label htmlFor="country">Country</Label>
-                        <Select value={formData.country} onValueChange={(value) => setFormData({ ...formData, country: value })}>
+                        <Select
+                          value={formData.country}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, country: value })
+                          }
+                        >
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
@@ -464,7 +525,12 @@ export default function PaymentMethodsManager({
                   <Checkbox
                     id="setAsDefault"
                     checked={formData.setAsDefault}
-                    onCheckedChange={(checked) => setFormData({ ...formData, setAsDefault: checked as boolean })}
+                    onCheckedChange={(checked) =>
+                      setFormData({
+                        ...formData,
+                        setAsDefault: checked as boolean,
+                      })
+                    }
                   />
                   <Label htmlFor="setAsDefault" className="text-sm">
                     Set as default payment method
@@ -472,10 +538,13 @@ export default function PaymentMethodsManager({
                 </div>
 
                 <div className="flex justify-end space-x-3 pt-4">
-                  <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAddDialog(false)}
+                  >
                     Cancel
                   </Button>
-                  <Button 
+                  <Button
                     onClick={handleAddPaymentMethod}
                     disabled={!isFormValid() || isSubmitting}
                   >
@@ -516,9 +585,12 @@ export default function PaymentMethodsManager({
         <Card>
           <CardContent className="text-center py-12">
             <CreditCard className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-xl font-medium text-gray-700 mb-2">No Payment Methods</h3>
+            <h3 className="text-xl font-medium text-gray-700 mb-2">
+              No Payment Methods
+            </h3>
             <p className="text-gray-600 mb-6">
-              Add a payment method to manage your subscriptions and pay invoices.
+              Add a payment method to manage your subscriptions and pay
+              invoices.
             </p>
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
               <DialogTrigger asChild>
@@ -535,7 +607,10 @@ export default function PaymentMethodsManager({
       {!loading && !error && paymentSources.length > 0 && (
         <div className="space-y-4">
           {paymentSources.map((paymentSource) => (
-            <Card key={paymentSource.id} className={`border-2 ${getCardColor(paymentSource.brand)} hover:shadow-lg transition-shadow`}>
+            <Card
+              key={paymentSource.id}
+              className={`border-2 ${getCardColor(paymentSource.brand)} hover:shadow-lg transition-shadow`}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
@@ -545,7 +620,9 @@ export default function PaymentMethodsManager({
                     <div className="space-y-1">
                       <div className="flex items-center space-x-3">
                         <h3 className="text-lg font-semibold">
-                          {paymentSource.brand} {paymentSource.type !== "paypal" && `ending in ${paymentSource.last4}`}
+                          {paymentSource.brand}{" "}
+                          {paymentSource.type !== "paypal" &&
+                            `ending in ${paymentSource.last4}`}
                         </h3>
                         {paymentSource.isDefault && (
                           <Badge className="bg-primary text-white">
@@ -562,7 +639,13 @@ export default function PaymentMethodsManager({
                         {paymentSource.type !== "paypal" && (
                           <div className="flex items-center space-x-1">
                             <Calendar className="h-3 w-3" />
-                            <span>Expires {formatExpiryDate(paymentSource.expiryMonth, paymentSource.expiryYear)}</span>
+                            <span>
+                              Expires{" "}
+                              {formatExpiryDate(
+                                paymentSource.expiryMonth,
+                                paymentSource.expiryYear,
+                              )}
+                            </span>
                           </div>
                         )}
                         <div className="flex items-center space-x-1">
@@ -612,7 +695,8 @@ export default function PaymentMethodsManager({
                     <div className="flex items-center space-x-2 text-blue-700">
                       <Check className="h-4 w-4" />
                       <span className="text-sm font-medium">
-                        This is your default payment method for all subscriptions and invoices.
+                        This is your default payment method for all
+                        subscriptions and invoices.
                       </span>
                     </div>
                   </div>
@@ -625,7 +709,9 @@ export default function PaymentMethodsManager({
           <Card className="border-2 border-dashed border-gray-300 hover:border-primary/50 transition-colors">
             <CardContent className="text-center py-8">
               <Plus className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-              <h3 className="text-lg font-medium text-gray-700 mb-2">Add New Payment Method</h3>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">
+                Add New Payment Method
+              </h3>
               <p className="text-gray-600 mb-4">
                 Add another credit card or payment method to your account.
               </p>
@@ -643,9 +729,10 @@ export default function PaymentMethodsManager({
       )}
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialog.open} onOpenChange={(open) => 
-        setDeleteDialog({ open, paymentSource: null })
-      }>
+      <Dialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ open, paymentSource: null })}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center text-red-600">
@@ -653,22 +740,26 @@ export default function PaymentMethodsManager({
               Delete Payment Method
             </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this payment method? This action cannot be undone.
+              Are you sure you want to delete this payment method? This action
+              cannot be undone.
               {deleteDialog.paymentSource?.isDefault && (
                 <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700">
-                  You cannot delete your default payment method. Please set another method as default first.
+                  You cannot delete your default payment method. Please set
+                  another method as default first.
                 </div>
               )}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end space-x-2 mt-4">
-            <Button 
-              variant="outline" 
-              onClick={() => setDeleteDialog({ open: false, paymentSource: null })}
+            <Button
+              variant="outline"
+              onClick={() =>
+                setDeleteDialog({ open: false, paymentSource: null })
+              }
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               variant="destructive"
               onClick={confirmDeletePaymentMethod}
               disabled={deleteDialog.paymentSource?.isDefault}

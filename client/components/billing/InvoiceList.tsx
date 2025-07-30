@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import {
   Table,
@@ -24,13 +24,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { 
-  RefreshCw, 
-  Filter, 
-  Search, 
-  AlertCircle, 
-  Receipt, 
-  SortAsc, 
+import {
+  RefreshCw,
+  Filter,
+  Search,
+  AlertCircle,
+  Receipt,
+  SortAsc,
   SortDesc,
   Download,
   Calendar,
@@ -41,7 +41,7 @@ import {
   Clock,
   AlertTriangle,
   CheckCircle,
-  Eye
+  Eye,
 } from "lucide-react";
 import { useInvoices, type Invoice } from "@/hooks/useBilling";
 import { toast } from "@/hooks/use-toast";
@@ -54,24 +54,24 @@ interface InvoiceListProps {
 
 const STATUS_FILTERS = ["all", "paid", "pending", "overdue"];
 
-export default function InvoiceList({ 
-  onInvoiceSelect, 
+export default function InvoiceList({
+  onInvoiceSelect,
   showActions = true,
-  compact = false 
+  compact = false,
 }: InvoiceListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const { 
-    invoices, 
-    loading, 
-    error, 
-    pagination, 
-    fetchInvoices, 
+  const {
+    invoices,
+    loading,
+    error,
+    pagination,
+    fetchInvoices,
     downloadInvoicePDF,
-    refetch 
+    refetch,
   } = useInvoices();
 
   // Handle filter changes
@@ -135,16 +135,16 @@ export default function InvoiceList({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const formatCurrency = (amount: number, currency: string = "USD") => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency,
     }).format(amount);
   };
@@ -169,7 +169,9 @@ export default function InvoiceList({
         {!loading && !error && invoices.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             <Receipt className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-700 mb-2">No Invoices</h3>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              No Invoices
+            </h3>
             <p className="text-gray-600">No invoices found.</p>
           </div>
         )}
@@ -177,19 +179,26 @@ export default function InvoiceList({
         {!loading && !error && invoices.length > 0 && (
           <div className="space-y-3">
             {invoices.slice(0, 5).map((invoice) => (
-              <Card key={invoice.id} className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => onInvoiceSelect?.(invoice)}>
+              <Card
+                key={invoice.id}
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => onInvoiceSelect?.(invoice)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       {getStatusIcon(invoice.status)}
                       <div>
                         <p className="font-medium">{invoice.number}</p>
-                        <p className="text-sm text-gray-600">{invoice.description}</p>
+                        <p className="text-sm text-gray-600">
+                          {invoice.description}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">{formatCurrency(invoice.amount)}</p>
+                      <p className="font-semibold">
+                        {formatCurrency(invoice.amount)}
+                      </p>
                       <Badge className={getStatusColor(invoice.status)}>
                         {invoice.status}
                       </Badge>
@@ -223,7 +232,9 @@ export default function InvoiceList({
             onClick={handleRefresh}
             disabled={loading}
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
         </div>
@@ -246,9 +257,11 @@ export default function InvoiceList({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {STATUS_FILTERS.map(status => (
+                {STATUS_FILTERS.map((status) => (
                   <SelectItem key={status} value={status}>
-                    {status === "all" ? "All Status" : status.charAt(0).toUpperCase() + status.slice(1)}
+                    {status === "all"
+                      ? "All Status"
+                      : status.charAt(0).toUpperCase() + status.slice(1)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -275,12 +288,13 @@ export default function InvoiceList({
         {!loading && !error && invoices.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             <Receipt className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-700 mb-2">No Invoices</h3>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              No Invoices
+            </h3>
             <p className="text-gray-600">
-              {searchTerm || statusFilter !== "all" 
+              {searchTerm || statusFilter !== "all"
                 ? "No invoices match your search criteria."
-                : "No invoices found."
-              }
+                : "No invoices found."}
             </p>
             {(searchTerm || statusFilter !== "all") && (
               <Button
@@ -303,9 +317,12 @@ export default function InvoiceList({
             {/* Results summary */}
             <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
               <span>
-                Showing {((pagination.page - 1) * pagination.limit) + 1} to{" "}
-                {Math.min(pagination.page * pagination.limit, pagination.totalCount)} of{" "}
-                {pagination.totalCount} invoices
+                Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+                {Math.min(
+                  pagination.page * pagination.limit,
+                  pagination.totalCount,
+                )}{" "}
+                of {pagination.totalCount} invoices
               </span>
               {(searchTerm || statusFilter !== "all") && (
                 <Button
@@ -327,54 +344,62 @@ export default function InvoiceList({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer hover:bg-gray-50"
                       onClick={() => handleSort("number")}
                     >
                       <div className="flex items-center">
                         Invoice #
-                        {sortBy === "number" && (
-                          sortOrder === "asc" ? 
-                            <SortAsc className="ml-1 h-4 w-4" /> : 
+                        {sortBy === "number" &&
+                          (sortOrder === "asc" ? (
+                            <SortAsc className="ml-1 h-4 w-4" />
+                          ) : (
                             <SortDesc className="ml-1 h-4 w-4" />
-                        )}
+                          ))}
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer hover:bg-gray-50"
                       onClick={() => handleSort("date")}
                     >
                       <div className="flex items-center">
                         Date
-                        {sortBy === "date" && (
-                          sortOrder === "asc" ? 
-                            <SortAsc className="ml-1 h-4 w-4" /> : 
+                        {sortBy === "date" &&
+                          (sortOrder === "asc" ? (
+                            <SortAsc className="ml-1 h-4 w-4" />
+                          ) : (
                             <SortDesc className="ml-1 h-4 w-4" />
-                        )}
+                          ))}
                       </div>
                     </TableHead>
                     <TableHead>Description</TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer hover:bg-gray-50"
                       onClick={() => handleSort("amount")}
                     >
                       <div className="flex items-center">
                         Amount
-                        {sortBy === "amount" && (
-                          sortOrder === "asc" ? 
-                            <SortAsc className="ml-1 h-4 w-4" /> : 
+                        {sortBy === "amount" &&
+                          (sortOrder === "asc" ? (
+                            <SortAsc className="ml-1 h-4 w-4" />
+                          ) : (
                             <SortDesc className="ml-1 h-4 w-4" />
-                        )}
+                          ))}
                       </div>
                     </TableHead>
                     <TableHead>Status</TableHead>
-                    {showActions && <TableHead className="text-right">Actions</TableHead>}
+                    {showActions && (
+                      <TableHead className="text-right">Actions</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {invoices.map((invoice) => (
-                    <TableRow key={invoice.id} className="cursor-pointer hover:bg-gray-50"
-                              onClick={() => onInvoiceSelect?.(invoice)}>
+                    <TableRow
+                      key={invoice.id}
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => onInvoiceSelect?.(invoice)}
+                    >
                       <TableCell className="font-mono font-medium">
                         {invoice.number}
                       </TableCell>
@@ -458,22 +483,29 @@ export default function InvoiceList({
             {/* Mobile Cards */}
             <div className="md:hidden space-y-4">
               {invoices.map((invoice) => (
-                <Card key={invoice.id} className="cursor-pointer hover:shadow-md transition-shadow"
-                      onClick={() => onInvoiceSelect?.(invoice)}>
+                <Card
+                  key={invoice.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => onInvoiceSelect?.(invoice)}
+                >
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           {getStatusIcon(invoice.status)}
-                          <span className="font-mono font-medium">{invoice.number}</span>
+                          <span className="font-mono font-medium">
+                            {invoice.number}
+                          </span>
                         </div>
                         <Badge className={getStatusColor(invoice.status)}>
                           {invoice.status}
                         </Badge>
                       </div>
-                      
+
                       <div>
-                        <p className="text-sm text-gray-600">{invoice.description}</p>
+                        <p className="text-sm text-gray-600">
+                          {invoice.description}
+                        </p>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <Calendar className="h-3 w-3" />

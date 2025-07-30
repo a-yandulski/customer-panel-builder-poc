@@ -712,7 +712,7 @@ export const handlers = [
         number: "INV-2024-001",
         date: "2024-12-01T10:30:00Z",
         dueDate: "2024-12-15T23:59:59Z",
-        amount: 47.00,
+        amount: 47.0,
         currency: "USD",
         status: "paid",
         description: "Domain renewal - example.com",
@@ -730,12 +730,16 @@ export const handlers = [
         number: "INV-2024-002",
         date: "2024-11-15T14:22:00Z",
         dueDate: "2024-12-15T23:59:59Z",
-        amount: 120.00,
+        amount: 120.0,
         currency: "USD",
         status: "pending",
         description: "Hosting plan upgrade",
         lineItems: [
-          { description: "Professional Hosting (12 months)", quantity: 1, unitPrice: 99.99 },
+          {
+            description: "Professional Hosting (12 months)",
+            quantity: 1,
+            unitPrice: 99.99,
+          },
           { description: "Setup fee", quantity: 1, unitPrice: 20.01 },
         ],
         paymentMethod: null,
@@ -752,8 +756,12 @@ export const handlers = [
         status: "overdue",
         description: "SSL certificate renewal",
         lineItems: [
-          { description: "Extended Validation SSL", quantity: 1, unitPrice: 79.99 },
-          { description: "Installation service", quantity: 1, unitPrice: 10.00 },
+          {
+            description: "Extended Validation SSL",
+            quantity: 1,
+            unitPrice: 79.99,
+          },
+          { description: "Installation service", quantity: 1, unitPrice: 10.0 },
         ],
         paymentMethod: null,
         paymentDate: null,
@@ -769,7 +777,11 @@ export const handlers = [
         status: "paid",
         description: "Domain registration - newsite.com",
         lineItems: [
-          { description: "Domain registration (.com)", quantity: 1, unitPrice: 15.99 },
+          {
+            description: "Domain registration (.com)",
+            quantity: 1,
+            unitPrice: 15.99,
+          },
         ],
         paymentMethod: "Mastercard ending in 8888",
         paymentDate: "2024-10-01T17:00:00Z",
@@ -785,8 +797,12 @@ export const handlers = [
         status: "paid",
         description: "Annual hosting package",
         lineItems: [
-          { description: "Business Hosting (12 months)", quantity: 1, unitPrice: 249.99 },
-          { description: "Premium support", quantity: 1, unitPrice: 50.00 },
+          {
+            description: "Business Hosting (12 months)",
+            quantity: 1,
+            unitPrice: 249.99,
+          },
+          { description: "Premium support", quantity: 1, unitPrice: 50.0 },
         ],
         paymentMethod: "Visa ending in 4242",
         paymentDate: "2024-09-12T11:45:00Z",
@@ -843,7 +859,10 @@ export const handlers = [
     const totalCount = filteredInvoices.length;
     const totalPages = Math.ceil(totalCount / limit);
     const startIndex = (page - 1) * limit;
-    const paginatedInvoices = filteredInvoices.slice(startIndex, startIndex + limit);
+    const paginatedInvoices = filteredInvoices.slice(
+      startIndex,
+      startIndex + limit,
+    );
 
     return HttpResponse.json({
       invoices: paginatedInvoices,
@@ -873,10 +892,7 @@ export const handlers = [
 
     // Simulate not found (invoice doesn't exist)
     if (params.invoiceId === "inv_999") {
-      return HttpResponse.json(
-        { error: "Invoice not found" },
-        { status: 404 },
-      );
+      return HttpResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
     // Simulate server error (5% chance)
@@ -894,7 +910,7 @@ export const handlers = [
         number: `INV-2024-${params.invoiceId?.slice(-3)}`,
         date: "2024-12-01T10:30:00Z",
         dueDate: "2024-12-15T23:59:59Z",
-        amount: 47.00,
+        amount: 47.0,
         currency: "USD",
         status: "paid",
         description: "Domain renewal - example.com",
@@ -950,7 +966,10 @@ export const handlers = [
     // Simulate rate limiting for PDF downloads (3% chance)
     if (shouldFail(3)) {
       return HttpResponse.json(
-        { error: "Too many PDF download requests. Please wait before trying again." },
+        {
+          error:
+            "Too many PDF download requests. Please wait before trying again.",
+        },
         { status: 429 },
         { headers: { "Retry-After": "30" } },
       );
@@ -989,7 +1008,10 @@ export const handlers = [
     // Simulate subscription sync issues (6% chance)
     if (shouldFail(6)) {
       return HttpResponse.json(
-        { error: "Subscription data synchronization in progress. Please try again in a few minutes." },
+        {
+          error:
+            "Subscription data synchronization in progress. Please try again in a few minutes.",
+        },
         { status: 503 },
         { headers: { "Retry-After": "180" } },
       );
@@ -1008,7 +1030,12 @@ export const handlers = [
         autoRenewal: true,
         status: "active",
         startDate: "2023-12-15T00:00:00Z",
-        features: ["50GB Storage", "Unlimited Bandwidth", "Email Accounts", "SSL Certificate"],
+        features: [
+          "50GB Storage",
+          "Unlimited Bandwidth",
+          "Email Accounts",
+          "SSL Certificate",
+        ],
         cancellationPolicy: "Cancel anytime with 30 days notice",
       },
       {
@@ -1038,7 +1065,11 @@ export const handlers = [
         autoRenewal: false,
         status: "active",
         startDate: "2024-01-05T00:00:00Z",
-        features: ["EV SSL Certificate", "Green Address Bar", "Warranty Protection"],
+        features: [
+          "EV SSL Certificate",
+          "Green Address Bar",
+          "Warranty Protection",
+        ],
         cancellationPolicy: "Prorated refund available",
       },
     ];
@@ -1050,43 +1081,46 @@ export const handlers = [
   }),
 
   // Update subscription auto-renewal
-  http.patch("/api/subscriptions/:subscriptionId", async ({ params, request }) => {
-    await delay(randomDelay(300, 1000));
+  http.patch(
+    "/api/subscriptions/:subscriptionId",
+    async ({ params, request }) => {
+      await delay(randomDelay(300, 1000));
 
-    const authHeader = request.headers.get("Authorization");
-    if (!authHeader) {
-      return HttpResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
-    }
+      const authHeader = request.headers.get("Authorization");
+      if (!authHeader) {
+        return HttpResponse.json(
+          { error: "Authentication required" },
+          { status: 401 },
+        );
+      }
 
-    const body = await request.json();
+      const body = await request.json();
 
-    // Simulate forbidden action (subscription can't be modified) (5% chance)
-    if (shouldFail(5)) {
-      return HttpResponse.json(
-        { error: "This subscription cannot be modified at this time" },
-        { status: 403 },
-      );
-    }
+      // Simulate forbidden action (subscription can't be modified) (5% chance)
+      if (shouldFail(5)) {
+        return HttpResponse.json(
+          { error: "This subscription cannot be modified at this time" },
+          { status: 403 },
+        );
+      }
 
-    // Simulate server error (3% chance)
-    if (shouldFail(3)) {
-      return HttpResponse.json(
-        { error: "Failed to update subscription" },
-        { status: 500 },
-      );
-    }
+      // Simulate server error (3% chance)
+      if (shouldFail(3)) {
+        return HttpResponse.json(
+          { error: "Failed to update subscription" },
+          { status: 500 },
+        );
+      }
 
-    return HttpResponse.json({
-      subscription: {
-        id: params.subscriptionId,
-        autoRenewal: body.autoRenewal,
-        updatedAt: new Date().toISOString(),
-      },
-    });
-  }),
+      return HttpResponse.json({
+        subscription: {
+          id: params.subscriptionId,
+          autoRenewal: body.autoRenewal,
+          updatedAt: new Date().toISOString(),
+        },
+      });
+    },
+  ),
 
   // Payment methods listing with security errors
   http.get("/api/payment_sources", async ({ request }) => {
@@ -1111,7 +1145,10 @@ export const handlers = [
     // Simulate PCI compliance service unavailable (2% chance)
     if (shouldFail(2)) {
       return HttpResponse.json(
-        { error: "Payment processing service temporarily unavailable for security maintenance" },
+        {
+          error:
+            "Payment processing service temporarily unavailable for security maintenance",
+        },
         { status: 503 },
         { headers: { "Retry-After": "300" } },
       );
@@ -1209,76 +1246,88 @@ export const handlers = [
       );
     }
 
-    return HttpResponse.json({
-      paymentSource: {
-        id: `pm_${Date.now()}`,
-        type: body.type || "visa",
-        last4: body.cardNumber?.slice(-4) || "0000",
-        isDefault: body.setAsDefault || false,
-        addedDate: new Date().toISOString(),
+    return HttpResponse.json(
+      {
+        paymentSource: {
+          id: `pm_${Date.now()}`,
+          type: body.type || "visa",
+          last4: body.cardNumber?.slice(-4) || "0000",
+          isDefault: body.setAsDefault || false,
+          addedDate: new Date().toISOString(),
+        },
       },
-    }, { status: 201 });
+      { status: 201 },
+    );
   }),
 
   // Delete payment method
-  http.delete("/api/payment_sources/:paymentSourceId", async ({ params, request }) => {
-    await delay(randomDelay(300, 800));
+  http.delete(
+    "/api/payment_sources/:paymentSourceId",
+    async ({ params, request }) => {
+      await delay(randomDelay(300, 800));
 
-    const authHeader = request.headers.get("Authorization");
-    if (!authHeader) {
-      return HttpResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
-    }
+      const authHeader = request.headers.get("Authorization");
+      if (!authHeader) {
+        return HttpResponse.json(
+          { error: "Authentication required" },
+          { status: 401 },
+        );
+      }
 
-    // Simulate cannot delete default payment method
-    if (params.paymentSourceId === "pm_001") {
-      return HttpResponse.json(
-        { error: "Cannot delete default payment method. Please set another method as default first." },
-        { status: 409 },
-      );
-    }
+      // Simulate cannot delete default payment method
+      if (params.paymentSourceId === "pm_001") {
+        return HttpResponse.json(
+          {
+            error:
+              "Cannot delete default payment method. Please set another method as default first.",
+          },
+          { status: 409 },
+        );
+      }
 
-    // Simulate server error (5% chance)
-    if (shouldFail(5)) {
-      return HttpResponse.json(
-        { error: "Failed to delete payment method" },
-        { status: 500 },
-      );
-    }
+      // Simulate server error (5% chance)
+      if (shouldFail(5)) {
+        return HttpResponse.json(
+          { error: "Failed to delete payment method" },
+          { status: 500 },
+        );
+      }
 
-    return HttpResponse.json({ deleted: true });
-  }),
+      return HttpResponse.json({ deleted: true });
+    },
+  ),
 
   // Set default payment method
-  http.post("/api/payment_sources/:paymentSourceId/default", async ({ params, request }) => {
-    await delay(randomDelay(200, 600));
+  http.post(
+    "/api/payment_sources/:paymentSourceId/default",
+    async ({ params, request }) => {
+      await delay(randomDelay(200, 600));
 
-    const authHeader = request.headers.get("Authorization");
-    if (!authHeader) {
-      return HttpResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
-    }
+      const authHeader = request.headers.get("Authorization");
+      if (!authHeader) {
+        return HttpResponse.json(
+          { error: "Authentication required" },
+          { status: 401 },
+        );
+      }
 
-    // Simulate server error (3% chance)
-    if (shouldFail(3)) {
-      return HttpResponse.json(
-        { error: "Failed to update default payment method" },
-        { status: 500 },
-      );
-    }
+      // Simulate server error (3% chance)
+      if (shouldFail(3)) {
+        return HttpResponse.json(
+          { error: "Failed to update default payment method" },
+          { status: 500 },
+        );
+      }
 
-    return HttpResponse.json({
-      paymentSource: {
-        id: params.paymentSourceId,
-        isDefault: true,
-        updatedAt: new Date().toISOString(),
-      },
-    });
-  }),
+      return HttpResponse.json({
+        paymentSource: {
+          id: params.paymentSourceId,
+          isDefault: true,
+          updatedAt: new Date().toISOString(),
+        },
+      });
+    },
+  ),
 
   // Billing summary/dashboard
   http.get("/api/billing/summary", async ({ request }) => {
@@ -1301,15 +1350,15 @@ export const handlers = [
     }
 
     return HttpResponse.json({
-      currentBalance: 0.00,
-      accountCredit: 127.50,
+      currentBalance: 0.0,
+      accountCredit: 127.5,
       nextPayment: {
-        amount: 47.00,
+        amount: 47.0,
         dueDate: "2024-12-15T00:00:00Z",
         description: "Web Hosting Pro renewal",
       },
       monthlySpend: {
-        amount: 247.00,
+        amount: 247.0,
         transactionCount: 5,
         period: "2024-12",
       },

@@ -22,18 +22,26 @@ import InvoiceList from "@/components/billing/InvoiceList";
 import InvoiceDetail from "@/components/billing/InvoiceDetail";
 import SubscriptionOverview from "@/components/billing/SubscriptionOverview";
 import PaymentMethodsManager from "@/components/billing/PaymentMethodsManager";
-import { useBillingSummary, useInvoices, type Invoice } from "@/hooks/useBilling";
+import {
+  useBillingSummary,
+  useInvoices,
+  type Invoice,
+} from "@/hooks/useBilling";
 
 export default function Billing() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
 
-  const { summary, loading: summaryLoading, error: summaryError } = useBillingSummary();
+  const {
+    summary,
+    loading: summaryLoading,
+    error: summaryError,
+  } = useBillingSummary();
   const { downloadInvoicePDF } = useInvoices();
 
   const formatCurrency = (amount: number, currency: string = "USD") => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency,
     }).format(amount);
   };
@@ -54,9 +62,12 @@ export default function Billing() {
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Billing & Payments</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Billing & Payments
+            </h1>
             <p className="text-gray-600 mt-1">
-              Manage your billing information, payment methods, and subscriptions
+              Manage your billing information, payment methods, and
+              subscriptions
             </p>
           </div>
         </div>
@@ -92,7 +103,9 @@ export default function Billing() {
                   {formatCurrency(summary.currentBalance)}
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  {summary.currentBalance === 0 ? "No outstanding balance" : "Amount due"}
+                  {summary.currentBalance === 0
+                    ? "No outstanding balance"
+                    : "Amount due"}
                 </p>
               </CardContent>
             </Card>
@@ -109,7 +122,8 @@ export default function Billing() {
                   {formatCurrency(summary.nextPayment.amount)}
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  Due {new Date(summary.nextPayment.dueDate).toLocaleDateString()}
+                  Due{" "}
+                  {new Date(summary.nextPayment.dueDate).toLocaleDateString()}
                 </p>
               </CardContent>
             </Card>
@@ -149,7 +163,11 @@ export default function Billing() {
         )}
 
         {/* Billing Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="invoices">Invoices</TabsTrigger>
@@ -171,7 +189,9 @@ export default function Billing() {
 
               {/* Active Subscriptions */}
               <div>
-                <h3 className="text-lg font-semibold mb-4">Active Subscriptions</h3>
+                <h3 className="text-lg font-semibold mb-4">
+                  Active Subscriptions
+                </h3>
                 <SubscriptionOverview compact={true} />
               </div>
             </div>
@@ -188,7 +208,10 @@ export default function Billing() {
                 <CardContent>
                   <div className="space-y-3">
                     {summary.upcomingCharges.map((charge) => (
-                      <div key={charge.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={charge.id}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div>
                           <p className="font-medium">{charge.service}</p>
                           <p className="text-sm text-gray-600">
@@ -196,7 +219,9 @@ export default function Billing() {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold">{formatCurrency(charge.amount)}</p>
+                          <p className="font-semibold">
+                            {formatCurrency(charge.amount)}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -208,9 +233,7 @@ export default function Billing() {
 
           {/* Invoices Tab */}
           <TabsContent value="invoices" className="space-y-6">
-            <InvoiceList
-              onInvoiceSelect={handleInvoiceSelect}
-            />
+            <InvoiceList onInvoiceSelect={handleInvoiceSelect} />
           </TabsContent>
 
           {/* Invoice Detail Tab */}

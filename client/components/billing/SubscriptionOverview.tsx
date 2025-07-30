@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { 
-  RefreshCw, 
-  AlertCircle, 
-  Settings, 
+import {
+  RefreshCw,
+  AlertCircle,
+  Settings,
   Calendar,
   CreditCard,
   TrendingUp,
@@ -30,7 +30,7 @@ import {
   Shield,
   Globe,
   Mail,
-  Database
+  Database,
 } from "lucide-react";
 import {
   Dialog,
@@ -40,10 +40,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Alert,
-  AlertDescription,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useSubscriptions, type Subscription } from "@/hooks/useBilling";
 
 interface SubscriptionOverviewProps {
@@ -52,23 +49,21 @@ interface SubscriptionOverviewProps {
   compact?: boolean;
 }
 
-export default function SubscriptionOverview({ 
-  onSubscriptionSelect, 
+export default function SubscriptionOverview({
+  onSubscriptionSelect,
   showActions = true,
-  compact = false 
+  compact = false,
 }: SubscriptionOverviewProps) {
-  const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; subscription: Subscription | null }>({
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    subscription: Subscription | null;
+  }>({
     open: false,
     subscription: null,
   });
 
-  const { 
-    subscriptions, 
-    loading, 
-    error, 
-    toggleAutoRenewal,
-    refetch 
-  } = useSubscriptions();
+  const { subscriptions, loading, error, toggleAutoRenewal, refetch } =
+    useSubscriptions();
 
   const handleAutoRenewalToggle = (subscription: Subscription) => {
     setConfirmDialog({ open: true, subscription });
@@ -123,16 +118,16 @@ export default function SubscriptionOverview({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const formatCurrency = (amount: number, currency: string = "USD") => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency,
     }).format(amount);
   };
@@ -165,7 +160,9 @@ export default function SubscriptionOverview({
         {!loading && !error && subscriptions.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             <Settings className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-700 mb-2">No Subscriptions</h3>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              No Subscriptions
+            </h3>
             <p className="text-gray-600">No active subscriptions found.</p>
           </div>
         )}
@@ -173,8 +170,11 @@ export default function SubscriptionOverview({
         {!loading && !error && subscriptions.length > 0 && (
           <div className="space-y-3">
             {subscriptions.slice(0, 3).map((subscription) => (
-              <Card key={subscription.id} className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => onSubscriptionSelect?.(subscription)}>
+              <Card
+                key={subscription.id}
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => onSubscriptionSelect?.(subscription)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -183,12 +183,15 @@ export default function SubscriptionOverview({
                       </div>
                       <div>
                         <p className="font-medium">{subscription.service}</p>
-                        <p className="text-sm text-gray-600">{subscription.plan}</p>
+                        <p className="text-sm text-gray-600">
+                          {subscription.plan}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold">
-                        {formatCurrency(subscription.amount)}/{subscription.billingCycle}
+                        {formatCurrency(subscription.amount)}/
+                        {subscription.billingCycle}
                       </p>
                       <Badge className={getStatusColor(subscription.status)}>
                         {subscription.status}
@@ -208,7 +211,9 @@ export default function SubscriptionOverview({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Active Subscriptions</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Active Subscriptions
+          </h2>
           <p className="text-gray-600 mt-1">
             Manage your service subscriptions and billing cycles
           </p>
@@ -219,7 +224,9 @@ export default function SubscriptionOverview({
           onClick={refetch}
           disabled={loading}
         >
-          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </div>
@@ -242,13 +249,13 @@ export default function SubscriptionOverview({
         <Card>
           <CardContent className="text-center py-12">
             <Settings className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-xl font-medium text-gray-700 mb-2">No Active Subscriptions</h3>
+            <h3 className="text-xl font-medium text-gray-700 mb-2">
+              No Active Subscriptions
+            </h3>
             <p className="text-gray-600 mb-6">
               You don't have any active subscriptions at the moment.
             </p>
-            <Button variant="outline">
-              Browse Services
-            </Button>
+            <Button variant="outline">Browse Services</Button>
           </CardContent>
         </Card>
       )}
@@ -256,12 +263,17 @@ export default function SubscriptionOverview({
       {!loading && !error && subscriptions.length > 0 && (
         <div className="grid gap-6">
           {subscriptions.map((subscription) => {
-            const daysUntilPayment = getDaysUntilNextPayment(subscription.nextPayment);
+            const daysUntilPayment = getDaysUntilNextPayment(
+              subscription.nextPayment,
+            );
             const isUpcoming = daysUntilPayment <= 7 && daysUntilPayment > 0;
             const isOverdue = daysUntilPayment < 0;
 
             return (
-              <Card key={subscription.id} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={subscription.id}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-4">
@@ -273,21 +285,31 @@ export default function SubscriptionOverview({
                           <h3 className="text-xl font-semibold text-gray-900">
                             {subscription.service}
                           </h3>
-                          <Badge className={getStatusColor(subscription.status)}>
+                          <Badge
+                            className={getStatusColor(subscription.status)}
+                          >
                             <div className="flex items-center space-x-1">
                               {getStatusIcon(subscription.status)}
                               <span>{subscription.status}</span>
                             </div>
                           </Badge>
                         </div>
-                        <p className="text-gray-600 mb-4">{subscription.plan}</p>
+                        <p className="text-gray-600 mb-4">
+                          {subscription.plan}
+                        </p>
 
                         {/* Service Features */}
                         <div className="mb-4">
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">Included Features</h4>
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">
+                            Included Features
+                          </h4>
                           <div className="flex flex-wrap gap-2">
                             {subscription.features.map((feature, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="text-xs"
+                              >
                                 {feature}
                               </Badge>
                             ))}
@@ -300,7 +322,8 @@ export default function SubscriptionOverview({
                             <DollarSign className="h-4 w-4 text-green-600" />
                             <span className="text-gray-600">Price:</span>
                             <span className="font-medium">
-                              {formatCurrency(subscription.amount)}/{subscription.billingCycle}
+                              {formatCurrency(subscription.amount)}/
+                              {subscription.billingCycle}
                             </span>
                           </div>
                           <div className="flex items-center space-x-2">
@@ -310,13 +333,19 @@ export default function SubscriptionOverview({
                               {formatDate(subscription.nextPayment)}
                             </span>
                             {isUpcoming && (
-                              <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+                              <Badge
+                                variant="outline"
+                                className="text-yellow-600 border-yellow-600"
+                              >
                                 <Clock className="h-3 w-3 mr-1" />
                                 {daysUntilPayment} days
                               </Badge>
                             )}
                             {isOverdue && (
-                              <Badge variant="outline" className="text-red-600 border-red-600">
+                              <Badge
+                                variant="outline"
+                                className="text-red-600 border-red-600"
+                              >
                                 <AlertTriangle className="h-3 w-3 mr-1" />
                                 Overdue
                               </Badge>
@@ -325,7 +354,9 @@ export default function SubscriptionOverview({
                           <div className="flex items-center space-x-2">
                             <CreditCard className="h-4 w-4 text-purple-600" />
                             <span className="text-gray-600">Payment:</span>
-                            <span className="font-medium">{subscription.paymentMethod}</span>
+                            <span className="font-medium">
+                              {subscription.paymentMethod}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -337,20 +368,27 @@ export default function SubscriptionOverview({
                         <p className="text-2xl font-bold text-gray-900">
                           {formatCurrency(subscription.amount)}
                         </p>
-                        <p className="text-sm text-gray-600">per {subscription.billingCycle}</p>
+                        <p className="text-sm text-gray-600">
+                          per {subscription.billingCycle}
+                        </p>
                       </div>
 
                       {showActions && (
                         <div className="flex flex-col space-y-2">
                           {/* Auto-renewal toggle */}
                           <div className="flex items-center space-x-3">
-                            <Label htmlFor={`auto-renew-${subscription.id}`} className="text-sm">
+                            <Label
+                              htmlFor={`auto-renew-${subscription.id}`}
+                              className="text-sm"
+                            >
                               Auto-renewal:
                             </Label>
                             <Switch
                               id={`auto-renew-${subscription.id}`}
                               checked={subscription.autoRenewal}
-                              onCheckedChange={() => handleAutoRenewalToggle(subscription)}
+                              onCheckedChange={() =>
+                                handleAutoRenewalToggle(subscription)
+                              }
                             />
                           </div>
 
@@ -367,7 +405,11 @@ export default function SubscriptionOverview({
                           </div>
 
                           {subscription.status === "active" && (
-                            <Button variant="outline" size="sm" className="w-full">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full"
+                            >
                               <Pause className="mr-1 h-4 w-4" />
                               Pause
                             </Button>
@@ -381,7 +423,9 @@ export default function SubscriptionOverview({
                   <div className="mt-6 pt-4 border-t border-gray-200">
                     <div className="flex items-center justify-between text-sm text-gray-600">
                       <div className="flex items-center space-x-4">
-                        <span>Started: {formatDate(subscription.startDate)}</span>
+                        <span>
+                          Started: {formatDate(subscription.startDate)}
+                        </span>
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="ghost" size="sm">
@@ -415,33 +459,41 @@ export default function SubscriptionOverview({
       )}
 
       {/* Confirmation Dialog */}
-      <Dialog open={confirmDialog.open} onOpenChange={(open) => 
-        setConfirmDialog({ open, subscription: null })
-      }>
+      <Dialog
+        open={confirmDialog.open}
+        onOpenChange={(open) => setConfirmDialog({ open, subscription: null })}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {confirmDialog.subscription?.autoRenewal ? "Disable" : "Enable"} Auto-Renewal
+              {confirmDialog.subscription?.autoRenewal ? "Disable" : "Enable"}{" "}
+              Auto-Renewal
             </DialogTitle>
             <DialogDescription>
-              {confirmDialog.subscription?.autoRenewal 
+              {confirmDialog.subscription?.autoRenewal
                 ? `Are you sure you want to disable auto-renewal for ${confirmDialog.subscription?.service}? You'll need to manually renew before the next billing cycle.`
-                : `Enable auto-renewal for ${confirmDialog.subscription?.service}? Your payment method will be charged automatically on ${confirmDialog.subscription?.nextPayment}.`
-              }
+                : `Enable auto-renewal for ${confirmDialog.subscription?.service}? Your payment method will be charged automatically on ${confirmDialog.subscription?.nextPayment}.`}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end space-x-2 mt-4">
-            <Button 
-              variant="outline" 
-              onClick={() => setConfirmDialog({ open: false, subscription: null })}
+            <Button
+              variant="outline"
+              onClick={() =>
+                setConfirmDialog({ open: false, subscription: null })
+              }
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={confirmAutoRenewalToggle}
-              variant={confirmDialog.subscription?.autoRenewal ? "destructive" : "default"}
+              variant={
+                confirmDialog.subscription?.autoRenewal
+                  ? "destructive"
+                  : "default"
+              }
             >
-              {confirmDialog.subscription?.autoRenewal ? "Disable" : "Enable"} Auto-Renewal
+              {confirmDialog.subscription?.autoRenewal ? "Disable" : "Enable"}{" "}
+              Auto-Renewal
             </Button>
           </div>
         </DialogContent>

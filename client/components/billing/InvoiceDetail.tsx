@@ -1,18 +1,18 @@
 import React from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  RefreshCw, 
-  AlertCircle, 
-  Receipt, 
+import {
+  RefreshCw,
+  AlertCircle,
+  Receipt,
   Download,
   Printer,
   Mail,
@@ -27,7 +27,7 @@ import {
   Building,
   MapPin,
   User,
-  Hash
+  Hash,
 } from "lucide-react";
 import {
   Dialog,
@@ -37,10 +37,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Alert,
-  AlertDescription,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useInvoiceDetails, type Invoice } from "@/hooks/useBilling";
 import { toast } from "@/hooks/use-toast";
 
@@ -50,10 +47,10 @@ interface InvoiceDetailProps {
   onDownloadPDF?: (invoiceId: string) => Promise<void>;
 }
 
-export default function InvoiceDetail({ 
-  invoiceId, 
+export default function InvoiceDetail({
+  invoiceId,
   onBack,
-  onDownloadPDF 
+  onDownloadPDF,
 }: InvoiceDetailProps) {
   const { invoice, loading, error, refetch } = useInvoiceDetails(invoiceId);
 
@@ -84,29 +81,32 @@ export default function InvoiceDetail({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const formatCurrency = (amount: number, currency: string = "USD") => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency,
     }).format(amount);
   };
 
   const calculateSubtotal = () => {
     if (!invoice?.lineItems) return 0;
-    return invoice.lineItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    return invoice.lineItems.reduce(
+      (sum, item) => sum + item.quantity * item.unitPrice,
+      0,
+    );
   };
 
   const calculateTax = () => {
     const subtotal = calculateSubtotal();
-    const taxItem = invoice?.lineItems.find(item => 
-      item.description.toLowerCase().includes('tax')
+    const taxItem = invoice?.lineItems.find((item) =>
+      item.description.toLowerCase().includes("tax"),
     );
     return taxItem ? taxItem.unitPrice : subtotal * 0.08; // 8% default tax if not specified
   };
@@ -147,8 +147,12 @@ export default function InvoiceDetail({
       <Card>
         <CardContent className="text-center py-12">
           <Receipt className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-xl font-medium text-gray-700 mb-2">Select an Invoice</h3>
-          <p className="text-gray-600">Choose an invoice from the list to view its details.</p>
+          <h3 className="text-xl font-medium text-gray-700 mb-2">
+            Select an Invoice
+          </h3>
+          <p className="text-gray-600">
+            Choose an invoice from the list to view its details.
+          </p>
         </CardContent>
       </Card>
     );
@@ -171,9 +175,7 @@ export default function InvoiceDetail({
         <CardContent className="py-12">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {error || "Invoice not found"}
-            </AlertDescription>
+            <AlertDescription>{error || "Invoice not found"}</AlertDescription>
           </Alert>
           <div className="text-center mt-6">
             <Button variant="outline" onClick={refetch}>
@@ -248,7 +250,9 @@ export default function InvoiceDetail({
                 <Badge className={getStatusColor(invoice.status)} size="lg">
                   <div className="flex items-center space-x-1">
                     {getStatusIcon(invoice.status)}
-                    <span className="font-medium">{invoice.status.toUpperCase()}</span>
+                    <span className="font-medium">
+                      {invoice.status.toUpperCase()}
+                    </span>
                   </div>
                 </Badge>
               </div>
@@ -326,7 +330,10 @@ export default function InvoiceDetail({
                             {formatCurrency(item.unitPrice, invoice.currency)}
                           </td>
                           <td className="px-4 py-3 text-sm text-right font-medium text-gray-900">
-                            {formatCurrency(item.quantity * item.unitPrice, invoice.currency)}
+                            {formatCurrency(
+                              item.quantity * item.unitPrice,
+                              invoice.currency,
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -341,7 +348,10 @@ export default function InvoiceDetail({
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Subtotal:</span>
                         <span className="font-medium">
-                          {formatCurrency(calculateSubtotal(), invoice.currency)}
+                          {formatCurrency(
+                            calculateSubtotal(),
+                            invoice.currency,
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
@@ -353,7 +363,9 @@ export default function InvoiceDetail({
                       <Separator />
                       <div className="flex justify-between text-lg font-bold">
                         <span>Total:</span>
-                        <span>{formatCurrency(invoice.amount, invoice.currency)}</span>
+                        <span>
+                          {formatCurrency(invoice.amount, invoice.currency)}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -386,7 +398,9 @@ export default function InvoiceDetail({
                         <Calendar className="h-4 w-4" />
                         <span>Payment Date</span>
                       </div>
-                      <p className="font-medium">{formatDate(invoice.paymentDate)}</p>
+                      <p className="font-medium">
+                        {formatDate(invoice.paymentDate)}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -418,7 +432,11 @@ export default function InvoiceDetail({
                     <span className="font-medium">Payment Pending</span>
                   </div>
                   <p className="text-sm text-yellow-600">
-                    This invoice is awaiting payment. Please pay by {invoice.dueDate ? formatDate(invoice.dueDate) : 'the due date'} to avoid late fees.
+                    This invoice is awaiting payment. Please pay by{" "}
+                    {invoice.dueDate
+                      ? formatDate(invoice.dueDate)
+                      : "the due date"}{" "}
+                    to avoid late fees.
                   </p>
                 </div>
                 <Button className="w-full">
@@ -445,7 +463,8 @@ export default function InvoiceDetail({
                     <span className="font-medium">Payment Overdue</span>
                   </div>
                   <p className="text-sm text-red-600">
-                    This invoice is past due. Please pay immediately to avoid service disruption and additional fees.
+                    This invoice is past due. Please pay immediately to avoid
+                    service disruption and additional fees.
                   </p>
                 </div>
                 <Button variant="destructive" className="w-full">
@@ -465,19 +484,35 @@ export default function InvoiceDetail({
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full" onClick={handleDownloadPDF}>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleDownloadPDF}
+              >
                 <Download className="mr-2 h-4 w-4" />
                 Download PDF
               </Button>
-              <Button variant="outline" className="w-full" onClick={handlePrint}>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handlePrint}
+              >
                 <Printer className="mr-2 h-4 w-4" />
                 Print Invoice
               </Button>
-              <Button variant="outline" className="w-full" onClick={handleEmailInvoice}>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleEmailInvoice}
+              >
                 <Mail className="mr-2 h-4 w-4" />
                 Email Invoice
               </Button>
-              <Button variant="outline" className="w-full" onClick={copyInvoiceNumber}>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={copyInvoiceNumber}
+              >
                 <Copy className="mr-2 h-4 w-4" />
                 Copy Invoice #
               </Button>
@@ -499,7 +534,9 @@ export default function InvoiceDetail({
                   <div>
                     <p className="font-medium">{invoice.billingAddress.name}</p>
                     {invoice.billingAddress.company && (
-                      <p className="text-gray-600">{invoice.billingAddress.company}</p>
+                      <p className="text-gray-600">
+                        {invoice.billingAddress.company}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -508,7 +545,9 @@ export default function InvoiceDetail({
                   <div>
                     <p>{invoice.billingAddress.street}</p>
                     <p>
-                      {invoice.billingAddress.city}, {invoice.billingAddress.state} {invoice.billingAddress.postalCode}
+                      {invoice.billingAddress.city},{" "}
+                      {invoice.billingAddress.state}{" "}
+                      {invoice.billingAddress.postalCode}
                     </p>
                     <p>{invoice.billingAddress.country}</p>
                   </div>
@@ -540,7 +579,9 @@ export default function InvoiceDetail({
               {invoice.paymentDate && (
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Paid on:</span>
-                  <span className="font-medium">{formatDate(invoice.paymentDate)}</span>
+                  <span className="font-medium">
+                    {formatDate(invoice.paymentDate)}
+                  </span>
                 </div>
               )}
             </CardContent>
