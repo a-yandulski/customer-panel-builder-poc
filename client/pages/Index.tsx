@@ -1,19 +1,21 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Index() {
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    // Check if user is authenticated (this would be replaced with actual auth logic)
-    const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+    // Don't redirect while Auth0 is still loading
+    if (isLoading) return;
 
     if (isAuthenticated) {
       navigate("/dashboard");
     } else {
       navigate("/login");
     }
-  }, [navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
 
   // Show loading while redirecting
   return (
