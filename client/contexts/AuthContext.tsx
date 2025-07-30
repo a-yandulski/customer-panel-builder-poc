@@ -43,12 +43,34 @@ export function Auth0Provider({ children }: AuthProviderProps) {
 function AuthProvider({ children }: AuthProviderProps) {
   const auth0 = useAuth0();
   const [isInitialized, setIsInitialized] = useState(false);
+  const [fakeUser, setFakeUser] = useState<any>(null);
+  const [fakeAuthLoading, setFakeAuthLoading] = useState(true);
+
+  // Check for fake authentication on mount
+  useEffect(() => {
+    const checkFakeAuth = () => {
+      const storedUser = localStorage.getItem('fake_auth_user');
+      const storedToken = localStorage.getItem('fake_auth_token');
+
+      if (storedUser && storedToken) {
+        try {
+          setFakeUser(JSON.parse(storedUser));
+        } catch (error) {
+          localStorage.removeItem('fake_auth_user');
+          localStorage.removeItem('fake_auth_token');
+        }
+      }
+      setFakeAuthLoading(false);
+    };
+
+    checkFakeAuth();
+  }, []);
 
   useEffect(() => {
-    if (!auth0.isLoading) {
+    if (!auth0.isLoading && !fakeAuthLoading) {
       setIsInitialized(true);
     }
-  }, [auth0.isLoading]);
+  }, [auth0.isLoading, fakeAuthLoading]);
 
   const contextValue: AuthContextType = {
     user: auth0.user,
