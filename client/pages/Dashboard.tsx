@@ -1,5 +1,6 @@
 import { useState } from "react";
 import AppShell from "@/components/layout/AppShell";
+import { useAuth } from "@/contexts/AuthContext";
 import MobileOptimizedCard from "@/components/MobileOptimizedCard";
 import {
   Card,
