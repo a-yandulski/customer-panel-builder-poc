@@ -2,6 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { getBasePath } from "@/lib/config";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -36,18 +37,27 @@ export default function ProtectedRoute({
   fallback,
   requiredScopes = [],
 }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading, user, loginWithRedirect } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const navigate = useNavigate();
 
   // Handle redirect to login when not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      const timer = setTimeout(() => {
-        loginWithRedirect();
-      }, 100); // Small delay to ensure component is mounted
+      // Store the current location so we can redirect back after login
+      const currentPath = window.location.pathname;
+      const basePath = getBasePath();
       
-      return () => clearTimeout(timer);
+      // Remove base path from the current path to get the relative route
+      const relativePath = basePath && currentPath.startsWith(basePath) 
+        ? currentPath.substring(basePath.length) 
+        : currentPath;
+      
+      if (relativePath !== '/login') {
+        localStorage.setItem('auth_redirect_path', relativePath);
+        navigate('/login');
+      }
     }
-  }, [isLoading, isAuthenticated, loginWithRedirect]);
+  }, [isLoading, isAuthenticated, navigate]);
 
   // Show loading spinner while checking authentication
   if (isLoading) {

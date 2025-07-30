@@ -79,7 +79,7 @@ export const handlers = [
   // AUTH0 MOCK ENDPOINTS
   // =======================
 
-  // Auth0 authorization endpoint (redirect to login)
+  // Auth0 authorization endpoint (intercept and simulate OAuth flow)
   http.get(
     "https://dev-customer-panel.auth0.com/authorize",
     async ({ request }) => {
@@ -90,18 +90,54 @@ export const handlers = [
       console.log("🔐 Auth0 authorization request intercepted:", {
         redirectUri,
         state,
-        fullUrl: request.url
+        clientId: url.searchParams.get("client_id")
       });
       
-      // In a real browser environment, we need to simulate the redirect differently
-      // Instead of trying to redirect, we'll let Auth0 proceed but mock the token exchange
+      // Simulate successful OAuth flow by redirecting back with authorization code
+      if (redirectUri && state) {
+        const callbackUrl = new URL(redirectUri);
+        callbackUrl.searchParams.set("code", "mock_auth_code_123");
+        callbackUrl.searchParams.set("state", state);
+        
+        console.log("🔐 Simulating OAuth callback redirect to:", callbackUrl.toString());
+        
+        // Use setTimeout to simulate the redirect after a brief delay
+        setTimeout(() => {
+          window.location.href = callbackUrl.toString();
+        }, 1000);
+        
+        // Return a response that simulates Auth0's login page
+        return new HttpResponse(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Demo Auth0 Login</title>
+              <style>
+                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                .login-container { max-width: 400px; margin: 0 auto; }
+                .spinner { animation: spin 1s linear infinite; display: inline-block; }
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+              </style>
+            </head>
+            <body>
+              <div class="login-container">
+                <h2>🔐 Demo Authentication</h2>
+                <div class="spinner">⟳</div>
+                <p>Authenticating with demo credentials...</p>
+                <p><small>This is a simulated Auth0 login for demo purposes</small></p>
+              </div>
+            </body>
+          </html>
+        `, { 
+          status: 200,
+          headers: { 
+            'Content-Type': 'text/html',
+          }
+        });
+      }
       
-      // For now, let's just log and continue with the normal flow
-      // The actual redirect handling will be done by mocking the token exchange
-      console.log("🔐 Allowing Auth0 redirect to proceed...");
-      
-      // Return a response that doesn't interfere with Auth0's redirect
-      return HttpResponse.text("Proceeding with Auth0 login...", { status: 200 });
+      // Fallback if parameters are missing
+      return new HttpResponse("Invalid authorization request", { status: 400 });
     },
   ),
 

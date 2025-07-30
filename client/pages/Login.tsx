@@ -16,7 +16,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const { isAuthenticated, isLoading, loginDemo, error } = useAuth();
+  const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth();
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -30,9 +30,8 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       setIsRedirecting(true);
-      console.log("🔐 Initiating demo login...");
-      await loginDemo();
-      // Navigation will happen automatically via useEffect when isAuthenticated becomes true
+      console.log("🔐 Initiating Auth0 login (will be intercepted by MSW)...");
+      await loginWithRedirect();
     } catch (err) {
       setIsRedirecting(false);
       console.error("Login error:", err);
@@ -97,7 +96,7 @@ export default function Login() {
                 ) : (
                   <>
                     <Shield className="h-4 w-4" />
-                    <span>Sign in (Demo)</span>
+                    <span>Sign in with Auth0 (Demo)</span>
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </>
                 )}
@@ -119,8 +118,8 @@ export default function Login() {
                 <div className="text-sm text-blue-800">
                   <p className="font-medium mb-1">Demo Authentication</p>
                   <p className="text-blue-700">
-                    This uses a simulated Auth0 authentication flow for demonstration purposes.
-                    All requests are mocked locally.
+                    This uses Auth0 SDK with intercepted requests for demonstration purposes.
+                    All Auth0 calls are mocked locally.
                   </p>
                 </div>
               </div>

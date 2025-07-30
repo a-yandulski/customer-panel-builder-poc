@@ -5,13 +5,19 @@ import {
   useState,
   ReactNode,
 } from "react";
-import {
-  useAuth0,
-  Auth0Provider as Auth0ProviderBase,
-  Auth0ProviderOptions,
-} from "@auth0/auth0-react";
-import { User } from "@auth0/auth0-spa-js";
-import { getFullUrl } from "@/lib/config";
+import { useNavigate } from "react-router-dom";
+
+interface User {
+  sub: string;
+  name: string;
+  given_name: string;
+  family_name: string;
+  nickname: string;
+  email: string;
+  email_verified: boolean;
+  picture: string;
+  updated_at: string;
+}
 
 interface AuthContextType {
   user: User | undefined;
@@ -19,7 +25,7 @@ interface AuthContextType {
   isLoading: boolean;
   error: Error | undefined;
   loginWithRedirect: () => Promise<void>;
-  loginDemo: () => Promise<void>; // Add demo login method
+  loginDemo: () => Promise<void>;
   logout: (options?: any) => Promise<void>;
   getAccessTokenSilently: () => Promise<string>;
   getIdTokenClaims: () => Promise<any>;
@@ -50,108 +56,153 @@ const defaultAuthContext: AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
-// Auth0 configuration
-const getRedirectUri = () => {
-  return getFullUrl();
-};
-
-const auth0Config: Auth0ProviderOptions = {
-  domain: import.meta.env.VITE_AUTH0_DOMAIN || "dev-customer-panel.auth0.com",
-  clientId: import.meta.env.VITE_AUTH0_CLIENT_ID || "demo_client_id",
-  authorizationParams: {
-    redirect_uri: getFullUrl(),
-    audience:
-      import.meta.env.VITE_AUTH0_AUDIENCE ||
-      "https://api.customerpanel.example.com",
-    scope:
-      "openid profile email profile:read profile:write domains:read domains:write invoices:read tickets:read tickets:write notifications:read",
-  },
-  cacheLocation: "localstorage" as const,
-  useRefreshTokens: true,
-  // Skip Auth0's initialization in demo mode to avoid real Auth0 calls
-  skipRedirectCallback: false,
-};
-
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export function Auth0Provider({ children }: AuthProviderProps) {
-  return (
-    <Auth0ProviderBase {...auth0Config}>
-      <AuthProvider>{children}</AuthProvider>
-    </Auth0ProviderBase>
-  );
+  return <AuthProvider>{children}</AuthProvider>;
 }
 
 function AuthProvider({ children }: AuthProviderProps) {
-  const auth0 = useAuth0();
-  const [demoUser, setDemoUser] = useState<User | null>(null);
-  const [isDemoMode, setIsDemoMode] = useState(false);
+  const navigate = useNavigate();
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
-  // Demo login function
-  const loginDemo = async () => {
-    console.log("🔐 Demo login initiated...");
-    
-    const mockUser: User = {
-      sub: "demo|123456789",
-      name: "John Doe",
-      given_name: "John",
-      family_name: "Doe",
-      email: "john.doe@example.com",
-      email_verified: true,
-      picture: "https://ui-avatars.com/api/?name=John+Doe&background=035BFF&color=fff",
-      updated_at: new Date().toISOString(),
+  // Check for existing authentication on load
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const storedAuth = localStorage.getItem('mock_auth_state');
+        if (storedAuth) {
+          const authData = JSON.parse(storedAuth);
+          if (authData.isAuthenticated && authData.user) {
+            setUser(authData.user);
+            setIsAuthenticated(true);
+            console.log("🔐 Restored auth state from localStorage");
+          }
+        }
+      } catch (err) {
+        console.error("🔐 Failed to restore auth state:", err);
+        localStorage.removeItem('mock_auth_state');
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    // Simulate async login
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    checkAuth();
+  }, []);
+
+  // Log auth state changes
+  useEffect(() => {
+    console.log("🔐 Auth State:", {
+      isAuthenticated,
+      isLoading,
+      user: user?.email,
+      error: error?.message
+    });
+  }, [isAuthenticated, isLoading, user, error]);
+
+  const loginWithRedirect = async () => {
+    console.log("🔐 Mock Auth0 login initiated...");
+    setIsLoading(true);
+    setError(undefined);
+
+    try {
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const mockUser: User = {
+        sub: "auth0|123456789",
+        name: "John Doe (Demo)",
+        given_name: "John",
+        family_name: "Doe",
+        nickname: "john.doe",
+        email: "john.doe@demo.com",
+        email_verified: true,
+        picture: "https://gravatar.com/avatar/example",
+        updated_at: new Date().toISOString(),
+      };
+
+      setUser(mockUser);
+      setIsAuthenticated(true);
+      
+      // Store auth state
+      localStorage.setItem('mock_auth_state', JSON.stringify({
+        isAuthenticated: true,
+        user: mockUser
+      }));
+
+      console.log("🔐 Mock Auth0 login successful");
+      
+      // Redirect to the stored path or default to dashboard
+      const redirectPath = localStorage.getItem('auth_redirect_path') || '/dashboard';
+      localStorage.removeItem('auth_redirect_path');
+      navigate(redirectPath);
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Login failed');
+      setError(error);
+      console.error("🔐 Mock Auth0 login failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loginDemo = loginWithRedirect; // Same as loginWithRedirect
+
+  const logout = async (options?: any) => {
+    console.log("🔐 Mock Auth0 logout initiated...");
+    setIsAuthenticated(false);
+    setUser(undefined);
+    setError(undefined);
+    localStorage.removeItem('mock_auth_state');
     
-    setDemoUser(mockUser);
-    setIsDemoMode(true);
-    console.log("🔐 Demo login successful:", mockUser.email);
+    const returnUrl = options?.logoutParams?.returnTo || "/login";
+    console.log("🔐 Mock Auth0 logout complete, redirecting to:", returnUrl);
+    navigate(returnUrl.replace(window.location.origin, ''));
   };
 
-  const demoLogout = async () => {
-    setDemoUser(null);
-    setIsDemoMode(false);
-    console.log("🔐 Demo logout successful");
+  const getAccessTokenSilently = async (): Promise<string> => {
+    if (!isAuthenticated) {
+      throw new Error("User is not authenticated");
+    }
+    return `mock_access_token_${Date.now()}`;
   };
 
-  const isUsingDemo = isDemoMode && demoUser;
-  const currentUser = isUsingDemo ? demoUser : auth0.user;
-  const currentIsAuthenticated = isUsingDemo ? !!demoUser : auth0.isAuthenticated;
-  const currentIsLoading = isUsingDemo ? false : auth0.isLoading;
-
-  console.log("🔐 Auth State:", {
-    isDemoMode,
-    demoUser: demoUser?.email,
-    isAuthenticated: currentIsAuthenticated,
-    isLoading: currentIsLoading,
-    user: currentUser?.email,
-    error: auth0.error
-  });
+  const getIdTokenClaims = async (): Promise<any> => {
+    if (!isAuthenticated || !user) {
+      throw new Error("User is not authenticated");
+    }
+    
+    return {
+      __raw: `mock_id_token_${Date.now()}`,
+      name: user.name,
+      given_name: user.given_name,
+      family_name: user.family_name,
+      nickname: user.nickname,
+      email: user.email,
+      email_verified: user.email_verified,
+      picture: user.picture,
+      updated_at: user.updated_at,
+      sub: user.sub,
+      aud: "demo_client_id",
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    };
+  };
 
   const contextValue: AuthContextType = {
-    user: currentUser,
-    isAuthenticated: currentIsAuthenticated,
-    isLoading: currentIsLoading,
-    error: auth0.error,
-    loginWithRedirect: auth0.loginWithRedirect,
+    user,
+    isAuthenticated,
+    isLoading,
+    error,
+    loginWithRedirect,
     loginDemo,
-    logout: isUsingDemo ? demoLogout : auth0.logout,
-    getAccessTokenSilently: async () => {
-      if (isUsingDemo) {
-        return "demo_access_token_" + Date.now();
-      }
-      return auth0.getAccessTokenSilently();
-    },
-    getIdTokenClaims: async () => {
-      if (isUsingDemo) {
-        return demoUser;
-      }
-      return auth0.getIdTokenClaims();
-    },
+    logout,
+    getAccessTokenSilently,
+    getIdTokenClaims,
   };
 
   return (
