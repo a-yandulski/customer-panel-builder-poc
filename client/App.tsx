@@ -14,6 +14,7 @@ import Billing from "./pages/Billing";
 import Support from "./pages/Support";
 import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
+import { setupMSW } from "./mocks/setup";
 
 const queryClient = new QueryClient();
 
