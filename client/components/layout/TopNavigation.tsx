@@ -306,19 +306,30 @@ function MobileNavigation({ user, onItemClick, onLogout }: MobileNavigationProps
       {/* Mobile Footer */}
       <div className="p-6 border-t border-gray-200">
         <div className="flex items-center space-x-4 mb-4">
-          <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-            <User className="h-6 w-6 text-gray-600" />
-          </div>
-          <div>
-            <div className="font-semibold text-gray-900">John Doe</div>
-            <div className="text-sm text-gray-500">john@example.com</div>
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={user?.picture} alt={user?.name || "User"} />
+            <AvatarFallback className="bg-primary text-primary-foreground">
+              {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-gray-900 truncate">
+              {user?.name || "User"}
+            </div>
+            <div className="text-sm text-gray-500 truncate">
+              {user?.email}
+            </div>
           </div>
         </div>
         <Button
           variant="outline"
-          className="w-full justify-center h-12 text-red-600 border-red-200 hover:bg-red-50 font-semibold"
-          onClick={onItemClick}
+          className="w-full justify-center h-12 text-red-600 border-red-200 hover:bg-red-50 font-semibold mobile-touch-target"
+          onClick={() => {
+            onItemClick();
+            onLogout();
+          }}
         >
+          <LogOut className="mr-2 h-5 w-5" />
           Sign Out
         </Button>
       </div>
