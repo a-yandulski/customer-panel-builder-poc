@@ -1,0 +1,448 @@
+import { http, HttpResponse, delay } from 'msw';
+
+// Utility functions for realistic delays and failure simulation
+const randomDelay = (min = 100, max = 800) => Math.floor(Math.random() * (max - min + 1)) + min;
+const shouldFail = (percentage = 20) => Math.random() * 100 < percentage;
+
+// Mock data
+const mockDomains = [
+  { id: '1', name: 'example.com', status: 'active', expiryDate: '2024-12-15' },
+  { id: '2', name: 'mysite.org', status: 'pending', expiryDate: '2025-03-20' },
+  { id: '3', name: 'testdomain.net', status: 'active', expiryDate: '2024-08-10' },
+];
+
+const mockInvoices = [
+  { id: 'INV-001', amount: 99.99, status: 'paid', date: '2024-01-15' },
+  { id: 'INV-002', amount: 149.99, status: 'pending', date: '2024-02-15' },
+];
+
+const mockTickets = [
+  { id: 'TKT-001', subject: 'Domain Transfer Issue', status: 'open', priority: 'high' },
+  { id: 'TKT-002', subject: 'SSL Certificate Problem', status: 'closed', priority: 'medium' },
+];
+
+export const handlers = [
+  // =======================
+  // AUTHENTICATION ENDPOINTS
+  // =======================
+  
+  // Login endpoint with multiple failure scenarios
+  http.post('/api/auth/login', async ({ request }) => {
+    await delay(randomDelay());
+    
+    const body = await request.json() as { email: string; password: string };
+    
+    // Simulate validation errors (400 Bad Request)
+    if (!body.email || !body.password) {
+      return HttpResponse.json(
+        {
+          error: 'Validation failed',
+          details: {
+            email: !body.email ? ['Email is required'] : [],
+            password: !body.password ? ['Password is required'] : [],
+          },
+        },
+        { status: 400 }
+      );
+    }
+    
+    // Simulate invalid credentials (401 Unauthorized)
+    if (body.email === 'invalid@example.com' || body.password === 'wrongpassword') {
+      return HttpResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      );
+    }
+    
+    // Simulate account locked (403 Forbidden)
+    if (body.email === 'locked@example.com') {
+      return HttpResponse.json(
+        { error: 'Account is locked. Please contact support.' },
+        { status: 403 }
+      );
+    }
+    
+    // Simulate server error (500 Internal Server Error)
+    if (shouldFail(10)) {
+      return HttpResponse.json(
+        { error: 'Internal server error. Please try again later.' },
+        { status: 500 }
+      );
+    }
+    
+    // Successful login
+    return HttpResponse.json({
+      token: 'mock-jwt-token',
+      user: { id: '1', email: body.email, name: 'John Doe' },
+    });
+  }),
+  
+  // Token refresh with expiration scenarios
+  http.post('/api/auth/refresh', async ({ request }) => {
+    await delay(randomDelay(50, 200));
+    
+    const authHeader = request.headers.get('Authorization');
+    
+    // Simulate expired token (401 Unauthorized)
+    if (!authHeader || authHeader === 'Bearer expired-token') {
+      return HttpResponse.json(
+        { error: 'Token expired. Please login again.' },
+        { status: 401 }
+      );
+    }
+    
+    return HttpResponse.json({
+      token: 'new-mock-jwt-token',
+      expiresIn: 3600,
+    });
+  }),
+  
+  // =======================
+  // DOMAIN MANAGEMENT
+  // =======================
+  
+  // Get domains with various failure scenarios
+  http.get('/api/domains', async ({ request }) => {
+    await delay(randomDelay());
+    
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    
+    // Simulate unauthorized access (401)
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+    
+    // Simulate rate limiting (429 Too Many Requests)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: 'Rate limit exceeded' },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': '60',
+            'X-RateLimit-Limit': '100',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': String(Date.now() + 60000),
+          },
+        }
+      );
+    }
+    
+    // Simulate network timeout (simulate slow response)
+    if (shouldFail(3)) {
+      await delay(10000); // 10 second delay to trigger timeout
+    }
+    
+    // Simulate intermittent server error
+    if (shouldFail(8)) {
+      return HttpResponse.json(
+        { error: 'Database connection failed' },
+        { status: 500 }
+      );
+    }
+    
+    // Successful response
+    return HttpResponse.json({
+      domains: mockDomains,
+      pagination: {
+        page,
+        totalPages: 2,
+        totalItems: mockDomains.length,
+      },
+    });
+  }),
+  
+  // Get specific domain with 404 scenarios
+  http.get('/api/domains/:id', async ({ params }) => {
+    await delay(randomDelay());
+    
+    const domain = mockDomains.find(d => d.id === params.id);
+    
+    // Simulate domain not found (404)
+    if (!domain || params.id === 'nonexistent') {
+      return HttpResponse.json(
+        { error: 'Domain not found' },
+        { status: 404 }
+      );
+    }
+    
+    return HttpResponse.json({ domain });
+  }),
+  
+  // Update domain with validation errors
+  http.put('/api/domains/:id', async ({ request, params }) => {
+    await delay(randomDelay());
+    
+    const body = await request.json() as any;
+    
+    // Simulate validation errors (400)
+    if (body.name && !/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(body.name)) {
+      return HttpResponse.json(
+        {
+          error: 'Validation failed',
+          details: {
+            name: ['Invalid domain name format'],
+          },
+        },
+        { status: 400 }
+      );
+    }
+    
+    // Simulate insufficient permissions (403)
+    if (params.id === 'restricted-domain') {
+      return HttpResponse.json(
+        { error: 'Insufficient permissions to modify this domain' },
+        { status: 403 }
+      );
+    }
+    
+    const domain = mockDomains.find(d => d.id === params.id);
+    if (!domain) {
+      return HttpResponse.json(
+        { error: 'Domain not found' },
+        { status: 404 }
+      );
+    }
+    
+    return HttpResponse.json({ domain: { ...domain, ...body } });
+  }),
+  
+  // =======================
+  // BILLING ENDPOINTS
+  // =======================
+  
+  // Get invoices with pagination and errors
+  http.get('/api/billing/invoices', async ({ request }) => {
+    await delay(randomDelay());
+    
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    
+    // Simulate intermittent failures
+    if (shouldFail(7)) {
+      return HttpResponse.json(
+        { error: 'Billing service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
+    
+    return HttpResponse.json({
+      invoices: mockInvoices,
+      pagination: { page, totalPages: 1, totalItems: mockInvoices.length },
+    });
+  }),
+  
+  // Payment processing with various scenarios
+  http.post('/api/billing/payments', async ({ request }) => {
+    await delay(randomDelay(500, 1500)); // Longer delay for payment processing
+    
+    const body = await request.json() as any;
+    
+    // Simulate payment validation errors (400)
+    if (!body.amount || body.amount <= 0) {
+      return HttpResponse.json(
+        {
+          error: 'Validation failed',
+          details: {
+            amount: ['Amount must be greater than 0'],
+          },
+        },
+        { status: 400 }
+      );
+    }
+    
+    if (!body.paymentMethod) {
+      return HttpResponse.json(
+        {
+          error: 'Validation failed',
+          details: {
+            paymentMethod: ['Payment method is required'],
+          },
+        },
+        { status: 400 }
+      );
+    }
+    
+    // Simulate payment declined (402 Payment Required)
+    if (body.paymentMethod === 'declined-card') {
+      return HttpResponse.json(
+        { error: 'Payment declined by bank' },
+        { status: 402 }
+      );
+    }
+    
+    // Simulate payment gateway error (502 Bad Gateway)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: 'Payment gateway error' },
+        { status: 502 }
+      );
+    }
+    
+    return HttpResponse.json({
+      paymentId: 'pay_' + Math.random().toString(36).substr(2, 9),
+      status: 'succeeded',
+      amount: body.amount,
+    });
+  }),
+  
+  // =======================
+  // SUPPORT TICKETS
+  // =======================
+  
+  // Get support tickets
+  http.get('/api/support/tickets', async () => {
+    await delay(randomDelay());
+    
+    // Simulate occasional service unavailable
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: 'Support system maintenance in progress' },
+        { status: 503 }
+      );
+    }
+    
+    return HttpResponse.json({ tickets: mockTickets });
+  }),
+  
+  // Create support ticket
+  http.post('/api/support/tickets', async ({ request }) => {
+    await delay(randomDelay());
+    
+    const body = await request.json() as any;
+    
+    // Simulate validation errors
+    if (!body.subject || !body.message) {
+      return HttpResponse.json(
+        {
+          error: 'Validation failed',
+          details: {
+            subject: !body.subject ? ['Subject is required'] : [],
+            message: !body.message ? ['Message is required'] : [],
+          },
+        },
+        { status: 400 }
+      );
+    }
+    
+    // Simulate rate limiting for ticket creation
+    if (shouldFail(10)) {
+      return HttpResponse.json(
+        { error: 'Too many tickets created. Please wait before creating another.' },
+        { 
+          status: 429,
+          headers: { 'Retry-After': '300' },
+        }
+      );
+    }
+    
+    const newTicket = {
+      id: 'TKT-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+      subject: body.subject,
+      status: 'open',
+      priority: body.priority || 'medium',
+      createdAt: new Date().toISOString(),
+    };
+    
+    return HttpResponse.json({ ticket: newTicket }, { status: 201 });
+  }),
+  
+  // =======================
+  // USER ACCOUNT
+  // =======================
+  
+  // Get user profile
+  http.get('/api/user/profile', async ({ request }) => {
+    await delay(randomDelay());
+    
+    const authHeader = request.headers.get('Authorization');
+    
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+    
+    return HttpResponse.json({
+      user: {
+        id: '1',
+        email: 'user@example.com',
+        name: 'John Doe',
+        role: 'customer',
+      },
+    });
+  }),
+  
+  // Update user profile
+  http.put('/api/user/profile', async ({ request }) => {
+    await delay(randomDelay());
+    
+    const body = await request.json() as any;
+    
+    // Simulate email validation error
+    if (body.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+      return HttpResponse.json(
+        {
+          error: 'Validation failed',
+          details: {
+            email: ['Invalid email format'],
+          },
+        },
+        { status: 400 }
+      );
+    }
+    
+    // Simulate conflict for duplicate email
+    if (body.email === 'existing@example.com') {
+      return HttpResponse.json(
+        { error: 'Email already exists' },
+        { status: 409 }
+      );
+    }
+    
+    return HttpResponse.json({
+      user: {
+        id: '1',
+        email: body.email || 'user@example.com',
+        name: body.name || 'John Doe',
+        role: 'customer',
+      },
+    });
+  }),
+  
+  // =======================
+  // NETWORK ERROR SIMULATIONS
+  // =======================
+  
+  // Endpoint specifically for testing network failures
+  http.get('/api/test/network-error', async () => {
+    // Always fail with network error
+    throw new Error('Network Error');
+  }),
+  
+  // Endpoint for testing timeouts
+  http.get('/api/test/timeout', async () => {
+    await delay(30000); // 30 second delay to trigger timeout
+    return HttpResponse.json({ message: 'This should timeout' });
+  }),
+  
+  // Endpoint for testing intermittent failures
+  http.get('/api/test/flaky', async () => {
+    await delay(randomDelay());
+    
+    if (shouldFail(50)) { // 50% failure rate
+      return HttpResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
+    
+    return HttpResponse.json({ message: 'Success!' });
+  }),
+];
