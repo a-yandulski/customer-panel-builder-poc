@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
 import { useAuth } from "@/contexts/AuthContext";
-import { useDashboard, useDashboardPolling } from "@/hooks/useDashboard";
+import { useDashboard } from "@/hooks/useDashboard";
 import { DashboardSkeleton, ServiceCardSkeleton, RenewalTableSkeleton, ActivitySkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { 
   ErrorState, 
