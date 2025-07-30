@@ -26,9 +26,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       setIsRedirecting(true);
-      await loginWithRedirect({
-        appState: { returnTo: "/dashboard" }
-      });
+      await loginWithRedirect();
     } catch (err) {
       setIsRedirecting(false);
       console.error("Login error:", err);
