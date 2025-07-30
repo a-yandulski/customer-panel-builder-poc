@@ -8,7 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   error: Error | undefined;
   loginWithRedirect: () => Promise<void>;
-  logout: (options?: { returnTo?: string }) => void;
+  logout: (options?: any) => Promise<void>;
   getAccessTokenSilently: () => Promise<string>;
   getIdTokenClaims: () => Promise<any>;
 }
