@@ -41,12 +41,15 @@ const App = () => (
   </QueryClientProvider>
 );
 
-const container = document.getElementById("root")!;
-let root = (container as any)._reactRoot;
+// Initialize MSW before rendering the app
+setupMSW().then(() => {
+  const container = document.getElementById("root")!;
+  let root = (container as any)._reactRoot;
 
-if (!root) {
-  root = createRoot(container);
-  (container as any)._reactRoot = root;
-}
+  if (!root) {
+    root = createRoot(container);
+    (container as any)._reactRoot = root;
+  }
 
-root.render(<App />);
+  root.render(<App />);
+});
