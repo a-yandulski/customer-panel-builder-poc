@@ -72,6 +72,26 @@ function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [auth0.isLoading, fakeAuthLoading]);
 
+  const fakeLogout = () => {
+    localStorage.removeItem('fake_auth_user');
+    localStorage.removeItem('fake_auth_token');
+    setFakeUser(null);
+    window.location.href = '/login';
+  };
+
+  const fakeGetAccessToken = async () => {
+    const token = localStorage.getItem('fake_auth_token');
+    if (!token) throw new Error('No fake token available');
+    return token;
+  };
+
+  const fakeGetIdTokenClaims = async () => {
+    return fakeUser;
+  };
+
+  // Use fake auth if fake user exists, otherwise use Auth0
+  const isUsingFakeAuth = !!fakeUser;
+
   const contextValue: AuthContextType = {
     user: auth0.user,
     isAuthenticated: auth0.isAuthenticated,
