@@ -257,6 +257,11 @@ export function useInvoiceDetails(invoiceId: string | null) {
   useEffect(() => {
     if (invoiceId) {
       fetchInvoice();
+    } else {
+      // Clear invoice state when invoiceId becomes null
+      setInvoice(null);
+      setError(null);
+      setLoading(false);
     }
   }, [invoiceId]);
 
