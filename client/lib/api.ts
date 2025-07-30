@@ -29,8 +29,14 @@ class ApiClient {
         const token = await getAccessTokenSilently();
         headers.Authorization = `Bearer ${token}`;
       } catch (error) {
-        console.error("Failed to get access token:", error);
-        throw new Error("Authentication failed");
+        // Try to get fake token as fallback
+        const fakeToken = localStorage.getItem('fake_auth_token');
+        if (fakeToken) {
+          headers.Authorization = `Bearer ${fakeToken}`;
+        } else {
+          console.error("Failed to get access token:", error);
+          throw new Error("Authentication failed");
+        }
       }
     }
 
