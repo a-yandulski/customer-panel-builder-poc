@@ -257,7 +257,7 @@ export function useDNSRecords(domainId: string | null) {
     if (domainId) {
       fetchDNSRecords();
     }
-  }, [domainId, fetchDNSRecords]);
+  }, [domainId]);
 
   return {
     records,
