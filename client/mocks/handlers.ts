@@ -37,7 +37,116 @@ const mockTickets = [
   },
 ];
 
+// Mock user data for Auth0 responses
+const mockAuth0User = {
+  sub: "auth0|123456789",
+  name: "John Doe",
+  given_name: "John",
+  family_name: "Doe",
+  middle_name: "",
+  nickname: "john.doe",
+  preferred_username: "john.doe",
+  profile: "https://example.auth0.com/u/auth0|123456789",
+  picture: "https://gravatar.com/avatar/example",
+  website: "",
+  email: "john.doe@example.com",
+  email_verified: true,
+  gender: "",
+  birthdate: "",
+  zoneinfo: "",
+  locale: "",
+  phone_number: "+1-555-123-4567",
+  phone_number_verified: false,
+  address: {
+    country: "US"
+  },
+  updated_at: new Date().toISOString(),
+  "https://customerpanel.example.com/roles": ["customer"],
+  "https://customerpanel.example.com/permissions": [
+    "profile:read",
+    "profile:write",
+    "domains:read",
+    "domains:write",
+    "invoices:read",
+    "tickets:read",
+    "tickets:write",
+    "notifications:read"
+  ]
+};
+
 export const handlers = [
+  // =======================
+  // AUTH0 MOCK ENDPOINTS
+  // =======================
+
+  // Auth0 userinfo endpoint
+  http.get("https://dev-customer-panel.auth0.com/userinfo", async ({ request }) => {
+    await delay(randomDelay(100, 300));
+
+    const authHeader = request.headers.get("Authorization");
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return HttpResponse.json(
+        { error: "unauthorized", error_description: "Missing or invalid authorization header" },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+
+    // Simulate invalid token
+    if (token === "invalid_token") {
+      return HttpResponse.json(
+        { error: "invalid_token", error_description: "Invalid access token" },
+        { status: 401 }
+      );
+    }
+
+    return HttpResponse.json(mockAuth0User);
+  }),
+
+  // Auth0 token endpoint for refresh
+  http.post("https://dev-customer-panel.auth0.com/oauth/token", async ({ request }) => {
+    await delay(randomDelay(100, 500));
+
+    const body = await request.text();
+    const params = new URLSearchParams(body);
+
+    const grantType = params.get("grant_type");
+    const refreshToken = params.get("refresh_token");
+
+    if (grantType === "refresh_token") {
+      if (!refreshToken || refreshToken === "invalid_refresh_token") {
+        return HttpResponse.json(
+          {
+            error: "invalid_grant",
+            error_description: "Invalid refresh token"
+          },
+          { status: 401 }
+        );
+      }
+
+      return HttpResponse.json({
+        access_token: `mock_access_token_${Date.now()}`,
+        id_token: `mock_id_token_${Date.now()}`,
+        token_type: "Bearer",
+        expires_in: 3600,
+        scope: "openid profile email profile:read profile:write domains:read domains:write invoices:read tickets:read tickets:write notifications:read"
+      });
+    }
+
+    return HttpResponse.json(
+      { error: "unsupported_grant_type" },
+      { status: 400 }
+    );
+  }),
+
+  // Auth0 logout endpoint
+  http.get("https://dev-customer-panel.auth0.com/v2/logout", async () => {
+    await delay(randomDelay(50, 200));
+    return new HttpResponse(null, { status: 302, headers: { Location: "/" } });
+  }),
+
   // =======================
   // AUTHENTICATION ENDPOINTS
   // =======================
