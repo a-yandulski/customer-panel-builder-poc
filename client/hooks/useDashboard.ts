@@ -212,22 +212,27 @@ export function useDashboard(): UseDashboardReturn {
 
 // Hook for real-time updates simulation
 export function useDashboardPolling(intervalMs: number = 30000) {
-  const { refetch } = useDashboard();
+  const { api } = useApi();
   const [isPolling, setIsPolling] = useState(false);
+
+  const pollData = useCallback(async () => {
+    try {
+      // Only refresh summary and activities, not renewals (less frequent)
+      await Promise.all([
+        api.get('/services/summary'),
+        api.get('/dashboard/activity?limit=5')
+      ]);
+    } catch (error) {
+      console.error('Polling error:', error);
+    }
+  }, [api]);
 
   useEffect(() => {
     if (!isPolling) return;
 
-    const interval = setInterval(() => {
-      // Only refresh summary and activities, not renewals (less frequent)
-      Promise.all([
-        refetch.summary(),
-        refetch.activities({ limit: 5 })
-      ]);
-    }, intervalMs);
-
+    const interval = setInterval(pollData, intervalMs);
     return () => clearInterval(interval);
-  }, [isPolling, intervalMs, refetch]);
+  }, [isPolling, intervalMs, pollData]);
 
   const startPolling = useCallback(() => setIsPolling(true), []);
   const stopPolling = useCallback(() => setIsPolling(false), []);
