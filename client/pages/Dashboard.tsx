@@ -59,7 +59,16 @@ export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data, loading, error, refetch, isRefreshing } = useDashboard();
-  const { isPolling, startPolling, stopPolling } = useDashboardPolling();
+
+  // Create a stable polling function
+  const pollData = useCallback(() => {
+    Promise.all([
+      refetch.summary(),
+      refetch.activities({ limit: 5 })
+    ]).catch(console.error);
+  }, [refetch.summary, refetch.activities]);
+
+  const { isPolling, startPolling, stopPolling } = useDashboardPolling(pollData);
   
   // Local state
   const [showPromoBanner, setShowPromoBanner] = useState(true);
