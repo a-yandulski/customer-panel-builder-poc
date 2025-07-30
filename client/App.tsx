@@ -96,8 +96,16 @@ const App = () => (
   </Auth0Provider>
 );
 
-// Initialize MSW before rendering the app
-setupMSW().then(() => {
+// Initialize MSW and render the app
+const initializeApp = async () => {
+  // Always try to setup MSW for demo purposes
+  try {
+    await setupMSW();
+  } catch (error) {
+    console.warn("MSW initialization failed, continuing without mocking:", error);
+  }
+
+  // Render the app regardless of MSW status
   const container = document.getElementById("root")!;
   let root = (container as any)._reactRoot;
 
@@ -107,4 +115,7 @@ setupMSW().then(() => {
   }
 
   root.render(<App />);
-});
+};
+
+// Start the app
+initializeApp();

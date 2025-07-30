@@ -1,19 +1,34 @@
 import { worker } from "./browser";
 import { shouldEnableMSW } from "./config";
+import { getBasePath } from "@/lib/config";
 import "./test-utils"; // Import test utilities for global access
 
 // Initialize MSW
 export const setupMSW = async (): Promise<void> => {
   if (!shouldEnableMSW()) {
     console.log("🚫 MSW disabled");
-    return;
+    return Promise.resolve();
+  }
+
+  // Only attempt to start MSW in browser environment
+  if (typeof window === "undefined") {
+    console.log("🚫 MSW disabled - not in browser environment");
+    return Promise.resolve();
   }
 
   try {
+    const basePath = getBasePath();
+    const serviceWorkerUrl = `${basePath}/mockServiceWorker.js`;
+    
+    console.log("🔧 MSW Configuration:");
+    console.log(`  Base Path: "${basePath}"`);
+    console.log(`  Service Worker URL: "${serviceWorkerUrl}"`);
+    console.log(`  Full URL: ${window.location.origin}${serviceWorkerUrl}`);
+    
     await worker.start({
       onUnhandledRequest: "warn", // Warn about unhandled requests
       serviceWorker: {
-        url: "/mockServiceWorker.js",
+        url: serviceWorkerUrl,
       },
     });
 
@@ -29,6 +44,8 @@ export const setupMSW = async (): Promise<void> => {
     console.log("  • /api/test/flaky (50% failure rate)");
   } catch (error) {
     console.error("❌ Failed to start MSW:", error);
+    // Don't throw the error, just log it and continue
+    return Promise.resolve();
   }
 };
 

@@ -1,7 +1,7 @@
 // MSW Configuration
 export const MSW_CONFIG = {
-  // Enable/disable MSW
-  enabled: import.meta.env.DEV || import.meta.env.VITE_ENABLE_MSW === "true",
+  // Enable/disable MSW - always enabled for demo
+  enabled: true,
 
   // Default delays for responses (in milliseconds)
   delays: {
@@ -64,19 +64,8 @@ export const MSW_CONFIG = {
 
 // Utility function to check if MSW should be enabled
 export const shouldEnableMSW = (): boolean => {
-  // Enable in development by default
-  if (import.meta.env.DEV) return true;
-
-  // Enable if explicitly set via environment variable
-  if (import.meta.env.VITE_ENABLE_MSW === "true") return true;
-
-  // Enable if URL contains msw=true parameter (for testing in production-like environments)
-  if (typeof window !== "undefined") {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get("msw") === "true";
-  }
-
-  return false;
+  // Always enable MSW for demo purposes
+  return true;
 };
 
 // Utility to get random delay within configured range
