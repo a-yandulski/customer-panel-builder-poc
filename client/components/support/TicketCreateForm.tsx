@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useRef } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,24 +17,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Alert,
-  AlertDescription,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Upload, 
-  X, 
-  Paperclip, 
+import {
+  Upload,
+  X,
+  Paperclip,
   FileText,
   Image,
   AlertCircle,
   CheckCircle,
   Loader2,
   Plus,
-  Send
+  Send,
 } from "lucide-react";
-import { useTickets, useFileUpload, type CreateTicketData } from "@/hooks/useSupport";
+import {
+  useTickets,
+  useFileUpload,
+  type CreateTicketData,
+} from "@/hooks/useSupport";
 import { toast } from "@/hooks/use-toast";
 
 interface TicketCreateFormProps {
@@ -51,29 +52,50 @@ const CATEGORIES = [
 ];
 
 const PRIORITIES = [
-  { value: "low", label: "Low", description: "General questions, minor issues" },
-  { value: "normal", label: "Normal", description: "Standard support requests" },
-  { value: "high", label: "High", description: "Important issues affecting operations" },
-  { value: "urgent", label: "Urgent", description: "Critical issues requiring immediate attention" },
+  {
+    value: "low",
+    label: "Low",
+    description: "General questions, minor issues",
+  },
+  {
+    value: "normal",
+    label: "Normal",
+    description: "Standard support requests",
+  },
+  {
+    value: "high",
+    label: "High",
+    description: "Important issues affecting operations",
+  },
+  {
+    value: "urgent",
+    label: "Urgent",
+    description: "Critical issues requiring immediate attention",
+  },
 ];
 
-export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCreateFormProps) {
+export default function TicketCreateForm({
+  onTicketCreated,
+  onCancel,
+}: TicketCreateFormProps) {
   const { createTicket } = useTickets();
   const { validateFiles, formatFileSize } = useFileUpload();
-  
+
   const [formData, setFormData] = useState({
     subject: "",
     message: "",
     category: "",
     priority: "normal",
   });
-  
+
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string[]>
+  >({});
   const [submitProgress, setSubmitProgress] = useState(0);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounterRef = useRef(0);
 
@@ -116,43 +138,49 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
     return Object.keys(errors).length === 0;
   }, [formData, attachments, validateFiles]);
 
-  const handleInputChange = useCallback((field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear validation error for this field
-    if (validationErrors[field]) {
-      setValidationErrors(prev => {
+  const handleInputChange = useCallback(
+    (field: string, value: string) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+
+      // Clear validation error for this field
+      if (validationErrors[field]) {
+        setValidationErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[field];
+          return newErrors;
+        });
+      }
+    },
+    [validationErrors],
+  );
+
+  const handleFileSelect = useCallback(
+    (files: FileList | null) => {
+      if (!files) return;
+
+      const newFiles = Array.from(files);
+      const allFiles = [...attachments, ...newFiles];
+
+      // Validate combined file list
+      const errors = validateFiles(allFiles);
+      if (errors.length > 0) {
+        setValidationErrors((prev) => ({ ...prev, attachments: errors }));
+        return;
+      }
+
+      setAttachments(allFiles);
+      setValidationErrors((prev) => {
         const newErrors = { ...prev };
-        delete newErrors[field];
+        delete newErrors.attachments;
         return newErrors;
       });
-    }
-  }, [validationErrors]);
-
-  const handleFileSelect = useCallback((files: FileList | null) => {
-    if (!files) return;
-
-    const newFiles = Array.from(files);
-    const allFiles = [...attachments, ...newFiles];
-
-    // Validate combined file list
-    const errors = validateFiles(allFiles);
-    if (errors.length > 0) {
-      setValidationErrors(prev => ({ ...prev, attachments: errors }));
-      return;
-    }
-
-    setAttachments(allFiles);
-    setValidationErrors(prev => {
-      const newErrors = { ...prev };
-      delete newErrors.attachments;
-      return newErrors;
-    });
-  }, [attachments, validateFiles]);
+    },
+    [attachments, validateFiles],
+  );
 
   const removeAttachment = useCallback((index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
-    setValidationErrors(prev => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+    setValidationErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors.attachments;
       return newErrors;
@@ -182,91 +210,96 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
     e.stopPropagation();
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(false);
-    dragCounterRef.current = 0;
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragOver(false);
+      dragCounterRef.current = 0;
 
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileSelect(e.dataTransfer.files);
-    }
-  }, [handleFileSelect]);
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFileSelect(e.dataTransfer.files);
+      }
+    },
+    [handleFileSelect],
+  );
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    if (!validateForm()) {
-      toast({
-        title: "Validation Error",
-        description: "Please correct the errors below and try again",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitProgress(0);
-
-    try {
-      // Simulate progress updates
-      const progressInterval = setInterval(() => {
-        setSubmitProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return prev + 10;
+      if (!validateForm()) {
+        toast({
+          title: "Validation Error",
+          description: "Please correct the errors below and try again",
+          variant: "destructive",
         });
-      }, 200);
+        return;
+      }
 
-      const ticketData: CreateTicketData = {
-        subject: formData.subject.trim(),
-        message: formData.message.trim(),
-        category: formData.category,
-        priority: formData.priority,
-        attachments: attachments.length > 0 ? attachments : undefined,
-      };
-
-      const newTicket = await createTicket(ticketData);
-      
-      clearInterval(progressInterval);
-      setSubmitProgress(100);
-
-      // Reset form
-      setFormData({
-        subject: "",
-        message: "",
-        category: "",
-        priority: "normal",
-      });
-      setAttachments([]);
-      setValidationErrors({});
-
-      onTicketCreated?.(newTicket);
-
-      toast({
-        title: "Ticket Created",
-        description: `Your support ticket ${newTicket.id} has been created successfully`,
-      });
-
-    } catch (error) {
-      console.error("Error creating ticket:", error);
-    } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(true);
       setSubmitProgress(0);
-    }
-  }, [formData, attachments, validateForm, createTicket, onTicketCreated]);
+
+      try {
+        // Simulate progress updates
+        const progressInterval = setInterval(() => {
+          setSubmitProgress((prev) => {
+            if (prev >= 90) {
+              clearInterval(progressInterval);
+              return prev;
+            }
+            return prev + 10;
+          });
+        }, 200);
+
+        const ticketData: CreateTicketData = {
+          subject: formData.subject.trim(),
+          message: formData.message.trim(),
+          category: formData.category,
+          priority: formData.priority,
+          attachments: attachments.length > 0 ? attachments : undefined,
+        };
+
+        const newTicket = await createTicket(ticketData);
+
+        clearInterval(progressInterval);
+        setSubmitProgress(100);
+
+        // Reset form
+        setFormData({
+          subject: "",
+          message: "",
+          category: "",
+          priority: "normal",
+        });
+        setAttachments([]);
+        setValidationErrors({});
+
+        onTicketCreated?.(newTicket);
+
+        toast({
+          title: "Ticket Created",
+          description: `Your support ticket ${newTicket.id} has been created successfully`,
+        });
+      } catch (error) {
+        console.error("Error creating ticket:", error);
+      } finally {
+        setIsSubmitting(false);
+        setSubmitProgress(0);
+      }
+    },
+    [formData, attachments, validateForm, createTicket, onTicketCreated],
+  );
 
   const getFileIcon = (file: File) => {
-    if (file.type.startsWith('image/')) {
+    if (file.type.startsWith("image/")) {
       return <Image className="h-4 w-4" />;
     }
     return <FileText className="h-4 w-4" />;
   };
 
-  const getRemainingCharacters = (field: 'subject' | 'message') => {
-    const maxLength = field === 'subject' ? 200 : 5000;
+  const getRemainingCharacters = (field: "subject" | "message") => {
+    const maxLength = field === "subject" ? 200 : 5000;
     const currentLength = formData[field].length;
     return maxLength - currentLength;
   };
@@ -279,7 +312,8 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
           Create Support Ticket
         </CardTitle>
         <CardDescription>
-          Describe your issue and we'll help you resolve it as quickly as possible
+          Describe your issue and we'll help you resolve it as quickly as
+          possible
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -290,8 +324,13 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
               <Label htmlFor="category" className="text-sm font-medium">
                 Category *
               </Label>
-              <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
-                <SelectTrigger className={validationErrors.category ? "border-red-500" : ""}>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => handleInputChange("category", value)}
+              >
+                <SelectTrigger
+                  className={validationErrors.category ? "border-red-500" : ""}
+                >
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -303,7 +342,9 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
                 </SelectContent>
               </Select>
               {validationErrors.category && (
-                <p className="text-sm text-red-600">{validationErrors.category[0]}</p>
+                <p className="text-sm text-red-600">
+                  {validationErrors.category[0]}
+                </p>
               )}
             </div>
 
@@ -311,8 +352,13 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
               <Label htmlFor="priority" className="text-sm font-medium">
                 Priority *
               </Label>
-              <Select value={formData.priority} onValueChange={(value) => handleInputChange("priority", value)}>
-                <SelectTrigger className={validationErrors.priority ? "border-red-500" : ""}>
+              <Select
+                value={formData.priority}
+                onValueChange={(value) => handleInputChange("priority", value)}
+              >
+                <SelectTrigger
+                  className={validationErrors.priority ? "border-red-500" : ""}
+                >
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -320,14 +366,18 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
                     <SelectItem key={priority.value} value={priority.value}>
                       <div>
                         <div className="font-medium">{priority.label}</div>
-                        <div className="text-xs text-gray-500">{priority.description}</div>
+                        <div className="text-xs text-gray-500">
+                          {priority.description}
+                        </div>
                       </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {validationErrors.priority && (
-                <p className="text-sm text-red-600">{validationErrors.priority[0]}</p>
+                <p className="text-sm text-red-600">
+                  {validationErrors.priority[0]}
+                </p>
               )}
             </div>
           </div>
@@ -347,12 +397,16 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
             />
             <div className="flex justify-between">
               {validationErrors.subject ? (
-                <p className="text-sm text-red-600">{validationErrors.subject[0]}</p>
+                <p className="text-sm text-red-600">
+                  {validationErrors.subject[0]}
+                </p>
               ) : (
                 <div />
               )}
-              <p className={`text-xs ${getRemainingCharacters('subject') < 20 ? 'text-orange-600' : 'text-gray-500'}`}>
-                {getRemainingCharacters('subject')} characters remaining
+              <p
+                className={`text-xs ${getRemainingCharacters("subject") < 20 ? "text-orange-600" : "text-gray-500"}`}
+              >
+                {getRemainingCharacters("subject")} characters remaining
               </p>
             </div>
           </div>
@@ -373,12 +427,16 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
             />
             <div className="flex justify-between">
               {validationErrors.message ? (
-                <p className="text-sm text-red-600">{validationErrors.message[0]}</p>
+                <p className="text-sm text-red-600">
+                  {validationErrors.message[0]}
+                </p>
               ) : (
                 <div />
               )}
-              <p className={`text-xs ${getRemainingCharacters('message') < 100 ? 'text-orange-600' : 'text-gray-500'}`}>
-                {getRemainingCharacters('message')} characters remaining
+              <p
+                className={`text-xs ${getRemainingCharacters("message") < 100 ? "text-orange-600" : "text-gray-500"}`}
+              >
+                {getRemainingCharacters("message")} characters remaining
               </p>
             </div>
           </div>
@@ -390,8 +448,8 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
             </Label>
             <div
               className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                isDragOver 
-                  ? "border-primary bg-primary/5" 
+                isDragOver
+                  ? "border-primary bg-primary/5"
                   : validationErrors.attachments
                     ? "border-red-300 bg-red-50"
                     : "border-gray-300 hover:border-primary/50"
@@ -401,9 +459,13 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
               onDragOver={handleDragOver}
               onDrop={handleDrop}
             >
-              <Upload className={`h-8 w-8 mx-auto mb-2 ${isDragOver ? 'text-primary' : 'text-gray-400'}`} />
+              <Upload
+                className={`h-8 w-8 mx-auto mb-2 ${isDragOver ? "text-primary" : "text-gray-400"}`}
+              />
               <p className="text-sm text-gray-600 mb-2">
-                {isDragOver ? "Drop files here" : "Drop files here or click to upload"}
+                {isDragOver
+                  ? "Drop files here"
+                  : "Drop files here or click to upload"}
               </p>
               <input
                 ref={fileInputRef}
@@ -422,7 +484,8 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
                 Choose Files
               </Button>
               <p className="text-xs text-gray-500 mt-2">
-                Maximum 5 files, 5MB each. Supported: Images, PDF, DOC, XLS, TXT, CSV
+                Maximum 5 files, 5MB each. Supported: Images, PDF, DOC, XLS,
+                TXT, CSV
               </p>
             </div>
 
@@ -451,9 +514,7 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="text-gray-500">
-                        {getFileIcon(file)}
-                      </div>
+                      <div className="text-gray-500">{getFileIcon(file)}</div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">
                           {file.name}
@@ -483,7 +544,9 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-gray-600">Creating ticket...</span>
+                <span className="text-sm text-gray-600">
+                  Creating ticket...
+                </span>
               </div>
               <Progress value={submitProgress} className="w-full" />
             </div>
@@ -503,7 +566,9 @@ export default function TicketCreateForm({ onTicketCreated, onCancel }: TicketCr
             )}
             <Button
               type="submit"
-              disabled={isSubmitting || Object.keys(validationErrors).length > 0}
+              disabled={
+                isSubmitting || Object.keys(validationErrors).length > 0
+              }
               className="min-w-[120px]"
             >
               {isSubmitting ? (

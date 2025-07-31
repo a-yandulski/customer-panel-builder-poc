@@ -7,7 +7,13 @@ import TwoFactorAuth from "@/components/account/TwoFactorAuth";
 import { useSecurity } from "@/hooks/useProfile";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   User,
   Shield,
@@ -144,7 +150,8 @@ export default function Account() {
           <div>
             <h1 className="h1 text-gray-900">Account & Security</h1>
             <p className="body text-gray-600 mt-1">
-              Manage your profile information, security settings, and privacy preferences
+              Manage your profile information, security settings, and privacy
+              preferences
             </p>
           </div>
           <div className="flex items-center space-x-3">
@@ -153,13 +160,13 @@ export default function Account() {
               Account Verified
             </Badge>
             {!securityLoading && security?.securityScore && (
-              <Badge 
+              <Badge
                 className={`${
-                  security.securityScore >= 80 
-                    ? 'bg-green-100 text-green-800 border-green-200'
+                  security.securityScore >= 80
+                    ? "bg-green-100 text-green-800 border-green-200"
                     : security.securityScore >= 60
-                      ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                      : 'bg-red-100 text-red-800 border-red-200'
+                      ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                      : "bg-red-100 text-red-800 border-red-200"
                 }`}
               >
                 Security: {security.securityScore}%
@@ -171,19 +178,31 @@ export default function Account() {
         {/* Account Tabs */}
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="profile" className="flex items-center space-x-2">
+            <TabsTrigger
+              value="profile"
+              className="flex items-center space-x-2"
+            >
               <User className="h-4 w-4" />
               <span>Profile</span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="flex items-center space-x-2">
+            <TabsTrigger
+              value="security"
+              className="flex items-center space-x-2"
+            >
               <Shield className="h-4 w-4" />
               <span>Security</span>
             </TabsTrigger>
-            <TabsTrigger value="activity" className="flex items-center space-x-2">
+            <TabsTrigger
+              value="activity"
+              className="flex items-center space-x-2"
+            >
               <Activity className="h-4 w-4" />
               <span>Activity</span>
             </TabsTrigger>
-            <TabsTrigger value="privacy" className="flex items-center space-x-2">
+            <TabsTrigger
+              value="privacy"
+              className="flex items-center space-x-2"
+            >
               <Bell className="h-4 w-4" />
               <span>Privacy</span>
             </TabsTrigger>
@@ -216,29 +235,44 @@ export default function Account() {
                         <Shield className="h-5 w-5 text-gray-600" />
                         <span className="font-medium">Password Strength</span>
                       </div>
-                      <p className={`text-lg font-semibold ${
-                        security.passwordStrength === 'strong' ? 'text-green-600' : 
-                        security.passwordStrength === 'medium' ? 'text-yellow-600' : 'text-red-600'
-                      }`}>
-                        {security.passwordStrength?.charAt(0).toUpperCase() + security.passwordStrength?.slice(1)}
+                      <p
+                        className={`text-lg font-semibold ${
+                          security.passwordStrength === "strong"
+                            ? "text-green-600"
+                            : security.passwordStrength === "medium"
+                              ? "text-yellow-600"
+                              : "text-red-600"
+                        }`}
+                      >
+                        {security.passwordStrength?.charAt(0).toUpperCase() +
+                          security.passwordStrength?.slice(1)}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Last changed: {new Date(security.passwordLastChanged).toLocaleDateString()}
+                        Last changed:{" "}
+                        {new Date(
+                          security.passwordLastChanged,
+                        ).toLocaleDateString()}
                       </p>
                     </div>
-                    
+
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center space-x-2 mb-2">
                         <CheckCircle className="h-5 w-5 text-gray-600" />
                         <span className="font-medium">2FA Status</span>
                       </div>
-                      <p className={`text-lg font-semibold ${
-                        security.twoFactorEnabled ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {security.twoFactorEnabled ? 'Enabled' : 'Disabled'}
+                      <p
+                        className={`text-lg font-semibold ${
+                          security.twoFactorEnabled
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {security.twoFactorEnabled ? "Enabled" : "Disabled"}
                       </p>
                       <p className="text-sm text-gray-600">
-                        {security.twoFactorEnabled ? 'Enhanced security' : 'Recommended'}
+                        {security.twoFactorEnabled
+                          ? "Enhanced security"
+                          : "Recommended"}
                       </p>
                     </div>
 
@@ -258,10 +292,15 @@ export default function Account() {
                         <AlertTriangle className="h-5 w-5 text-gray-600" />
                         <span className="font-medium">Security Score</span>
                       </div>
-                      <p className={`text-lg font-semibold ${
-                        security.securityScore >= 80 ? 'text-green-600' : 
-                        security.securityScore >= 60 ? 'text-yellow-600' : 'text-red-600'
-                      }`}>
+                      <p
+                        className={`text-lg font-semibold ${
+                          security.securityScore >= 80
+                            ? "text-green-600"
+                            : security.securityScore >= 60
+                              ? "text-yellow-600"
+                              : "text-red-600"
+                        }`}
+                      >
                         {security.securityScore}%
                       </p>
                       <p className="text-sm text-gray-600">Overall security</p>
@@ -272,10 +311,14 @@ export default function Account() {
                     <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                       <div className="flex items-center space-x-2">
                         <AlertTriangle className="h-5 w-5 text-red-600" />
-                        <span className="font-medium text-red-900">Suspicious Activity Detected</span>
+                        <span className="font-medium text-red-900">
+                          Suspicious Activity Detected
+                        </span>
                       </div>
                       <p className="text-sm text-red-700 mt-1">
-                        We've detected unusual activity on your account. Please review your recent activity and consider changing your password.
+                        We've detected unusual activity on your account. Please
+                        review your recent activity and consider changing your
+                        password.
                       </p>
                     </div>
                   )}
@@ -296,7 +339,8 @@ export default function Account() {
                   Security Activity Log
                 </CardTitle>
                 <CardDescription className="body-sm">
-                  Monitor login attempts and security-related activities on your account
+                  Monitor login attempts and security-related activities on your
+                  account
                 </CardDescription>
               </CardHeader>
               <CardContent>

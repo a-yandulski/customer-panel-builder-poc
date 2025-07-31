@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,13 +24,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
-  RefreshCw, 
-  Filter, 
-  Search, 
-  AlertCircle, 
-  MessageCircle, 
-  SortAsc, 
+import {
+  RefreshCw,
+  Filter,
+  Search,
+  AlertCircle,
+  MessageCircle,
+  SortAsc,
   SortDesc,
   ChevronLeft,
   ChevronRight,
@@ -43,7 +43,7 @@ import {
   CheckCircle,
   AlertTriangle,
   Pause,
-  Plus
+  Plus,
 } from "lucide-react";
 import { useTickets, type Ticket } from "@/hooks/useSupport";
 import { toast } from "@/hooks/use-toast";
@@ -63,25 +63,19 @@ const SORT_OPTIONS = [
   { value: "priority", label: "Priority" },
 ];
 
-export default function TicketList({ 
-  onTicketSelect, 
+export default function TicketList({
+  onTicketSelect,
   onCreateTicket,
   showActions = true,
-  compact = false 
+  compact = false,
 }: TicketListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("created");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const { 
-    tickets, 
-    loading, 
-    error, 
-    pagination, 
-    fetchTickets, 
-    refetch 
-  } = useTickets();
+  const { tickets, loading, error, pagination, fetchTickets, refetch } =
+    useTickets();
 
   // Handle filter changes
   const handleSearch = (search: string) => {
@@ -155,12 +149,12 @@ export default function TicketList({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -173,13 +167,13 @@ export default function TicketList({
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
     if (diffDays > 0) {
-      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+      return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
     } else if (diffHours > 0) {
-      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
     } else if (diffMinutes > 0) {
-      return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
+      return `${diffMinutes} minute${diffMinutes > 1 ? "s" : ""} ago`;
     } else {
-      return 'Just now';
+      return "Just now";
     }
   };
 
@@ -203,7 +197,9 @@ export default function TicketList({
         {!loading && !error && tickets.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-700 mb-2">No Support Tickets</h3>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              No Support Tickets
+            </h3>
             <p className="text-gray-600">No tickets found.</p>
           </div>
         )}
@@ -211,8 +207,11 @@ export default function TicketList({
         {!loading && !error && tickets.length > 0 && (
           <div className="space-y-3">
             {tickets.slice(0, 5).map((ticket) => (
-              <Card key={ticket.id} className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => onTicketSelect?.(ticket)}>
+              <Card
+                key={ticket.id}
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => onTicketSelect?.(ticket)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -224,7 +223,7 @@ export default function TicketList({
                     </div>
                     <div className="text-right">
                       <Badge className={getStatusColor(ticket.status)}>
-                        {ticket.status.replace('_', ' ')}
+                        {ticket.status.replace("_", " ")}
                       </Badge>
                       <p className="text-xs text-gray-500 mt-1">
                         {getTimeAgo(ticket.updated)}
@@ -257,7 +256,9 @@ export default function TicketList({
             onClick={handleRefresh}
             disabled={loading}
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
           {onCreateTicket && (
@@ -289,19 +290,25 @@ export default function TicketList({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {STATUS_FILTERS.map(status => (
+                  {STATUS_FILTERS.map((status) => (
                     <SelectItem key={status} value={status}>
-                      {status === "all" ? "All Status" : status.replace('_', ' ').charAt(0).toUpperCase() + status.replace('_', ' ').slice(1)}
+                      {status === "all"
+                        ? "All Status"
+                        : status.replace("_", " ").charAt(0).toUpperCase() +
+                          status.replace("_", " ").slice(1)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={sortBy} onValueChange={(value) => handleSort(value)}>
+              <Select
+                value={sortBy}
+                onValueChange={(value) => handleSort(value)}
+              >
                 <SelectTrigger className="w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {SORT_OPTIONS.map(option => (
+                  {SORT_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -334,15 +341,16 @@ export default function TicketList({
             <div className="text-center py-12 text-gray-500">
               <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-400" />
               <h3 className="text-xl font-medium text-gray-700 mb-2">
-                {searchTerm || statusFilter !== "all" ? "No Matching Tickets" : "No Support Tickets"}
+                {searchTerm || statusFilter !== "all"
+                  ? "No Matching Tickets"
+                  : "No Support Tickets"}
               </h3>
               <p className="text-gray-600 mb-6">
-                {searchTerm || statusFilter !== "all" 
+                {searchTerm || statusFilter !== "all"
                   ? "Try adjusting your search or filter criteria."
-                  : "You haven't created any support tickets yet."
-                }
+                  : "You haven't created any support tickets yet."}
               </p>
-              {(searchTerm || statusFilter !== "all") ? (
+              {searchTerm || statusFilter !== "all" ? (
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -367,9 +375,12 @@ export default function TicketList({
               {/* Results summary */}
               <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
                 <span>
-                  Showing {((pagination.page - 1) * pagination.limit) + 1} to{" "}
-                  {Math.min(pagination.page * pagination.limit, pagination.totalCount)} of{" "}
-                  {pagination.totalCount} tickets
+                  Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+                  {Math.min(
+                    pagination.page * pagination.limit,
+                    pagination.totalCount,
+                  )}{" "}
+                  of {pagination.totalCount} tickets
                 </span>
                 {(searchTerm || statusFilter !== "all") && (
                   <Button
@@ -391,59 +402,69 @@ export default function TicketList({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead 
+                      <TableHead
                         className="cursor-pointer hover:bg-gray-50"
                         onClick={() => handleSort("subject")}
                       >
                         <div className="flex items-center">
                           Subject
-                          {sortBy === "subject" && (
-                            sortOrder === "asc" ? 
-                              <SortAsc className="ml-1 h-4 w-4" /> : 
+                          {sortBy === "subject" &&
+                            (sortOrder === "asc" ? (
+                              <SortAsc className="ml-1 h-4 w-4" />
+                            ) : (
                               <SortDesc className="ml-1 h-4 w-4" />
-                          )}
+                            ))}
                         </div>
                       </TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Priority</TableHead>
                       <TableHead>Category</TableHead>
-                      <TableHead 
+                      <TableHead
                         className="cursor-pointer hover:bg-gray-50"
                         onClick={() => handleSort("created")}
                       >
                         <div className="flex items-center">
                           Created
-                          {sortBy === "created" && (
-                            sortOrder === "asc" ? 
-                              <SortAsc className="ml-1 h-4 w-4" /> : 
+                          {sortBy === "created" &&
+                            (sortOrder === "asc" ? (
+                              <SortAsc className="ml-1 h-4 w-4" />
+                            ) : (
                               <SortDesc className="ml-1 h-4 w-4" />
-                          )}
+                            ))}
                         </div>
                       </TableHead>
-                      <TableHead 
+                      <TableHead
                         className="cursor-pointer hover:bg-gray-50"
                         onClick={() => handleSort("updated")}
                       >
                         <div className="flex items-center">
                           Last Updated
-                          {sortBy === "updated" && (
-                            sortOrder === "asc" ? 
-                              <SortAsc className="ml-1 h-4 w-4" /> : 
+                          {sortBy === "updated" &&
+                            (sortOrder === "asc" ? (
+                              <SortAsc className="ml-1 h-4 w-4" />
+                            ) : (
                               <SortDesc className="ml-1 h-4 w-4" />
-                          )}
+                            ))}
                         </div>
                       </TableHead>
-                      {showActions && <TableHead className="text-right">Actions</TableHead>}
+                      {showActions && (
+                        <TableHead className="text-right">Actions</TableHead>
+                      )}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {tickets.map((ticket) => (
-                      <TableRow key={ticket.id} className="cursor-pointer hover:bg-gray-50"
-                                onClick={() => onTicketSelect?.(ticket)}>
+                      <TableRow
+                        key={ticket.id}
+                        className="cursor-pointer hover:bg-gray-50"
+                        onClick={() => onTicketSelect?.(ticket)}
+                      >
                         <TableCell>
                           <div className="space-y-1">
                             <div className="flex items-center space-x-2">
-                              <p className="font-medium truncate max-w-xs">{ticket.subject}</p>
+                              <p className="font-medium truncate max-w-xs">
+                                {ticket.subject}
+                              </p>
                               {ticket.hasAttachments && (
                                 <Paperclip className="h-3 w-3 text-gray-400" />
                               )}
@@ -463,17 +484,22 @@ export default function TicketList({
                           <Badge className={getStatusColor(ticket.status)}>
                             <div className="flex items-center space-x-1">
                               {getStatusIcon(ticket.status)}
-                              <span>{ticket.status.replace('_', ' ')}</span>
+                              <span>{ticket.status.replace("_", " ")}</span>
                             </div>
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className={getPriorityColor(ticket.priority)}>
+                          <Badge
+                            variant="outline"
+                            className={getPriorityColor(ticket.priority)}
+                          >
                             {ticket.priority}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm capitalize">{ticket.category}</span>
+                          <span className="text-sm capitalize">
+                            {ticket.category}
+                          </span>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
@@ -513,33 +539,49 @@ export default function TicketList({
               {/* Mobile Cards */}
               <div className="md:hidden space-y-4">
                 {tickets.map((ticket) => (
-                  <Card key={ticket.id} className="cursor-pointer hover:shadow-md transition-shadow"
-                        onClick={() => onTicketSelect?.(ticket)}>
+                  <Card
+                    key={ticket.id}
+                    className="cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => onTicketSelect?.(ticket)}
+                  >
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start space-x-2">
                             {getStatusIcon(ticket.status)}
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm truncate">{ticket.subject}</p>
-                              <p className="text-xs text-gray-600">#{ticket.id}</p>
+                              <p className="font-medium text-sm truncate">
+                                {ticket.subject}
+                              </p>
+                              <p className="text-xs text-gray-600">
+                                #{ticket.id}
+                              </p>
                             </div>
                           </div>
                           <div className="flex flex-col items-end space-y-1">
-                            <Badge className={getStatusColor(ticket.status)} size="sm">
-                              {ticket.status.replace('_', ' ')}
+                            <Badge
+                              className={getStatusColor(ticket.status)}
+                              size="sm"
+                            >
+                              {ticket.status.replace("_", " ")}
                             </Badge>
-                            <Badge variant="outline" className={getPriorityColor(ticket.priority)} size="sm">
+                            <Badge
+                              variant="outline"
+                              className={getPriorityColor(ticket.priority)}
+                              size="sm"
+                            >
                               {ticket.priority}
                             </Badge>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between text-xs text-gray-500">
                           <div className="flex items-center space-x-4">
                             <div className="flex items-center space-x-1">
                               <Tag className="h-3 w-3" />
-                              <span className="capitalize">{ticket.category}</span>
+                              <span className="capitalize">
+                                {ticket.category}
+                              </span>
                             </div>
                             {ticket.messageCount && (
                               <div className="flex items-center space-x-1">

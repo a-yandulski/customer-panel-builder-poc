@@ -355,7 +355,9 @@ export const handlers = [
     } else {
       const billing = body.billing;
       if (!billing.street || billing.street.trim().length < 5) {
-        errors["billing.street"] = ["Street address must be at least 5 characters"];
+        errors["billing.street"] = [
+          "Street address must be at least 5 characters",
+        ];
       }
       if (!billing.city || billing.city.trim().length < 2) {
         errors["billing.city"] = ["City is required"];
@@ -375,7 +377,9 @@ export const handlers = [
     if (body.legal && !body.sameAsBilling) {
       const legal = body.legal;
       if (!legal.street || legal.street.trim().length < 5) {
-        errors["legal.street"] = ["Street address must be at least 5 characters"];
+        errors["legal.street"] = [
+          "Street address must be at least 5 characters",
+        ];
       }
       if (!legal.city || legal.city.trim().length < 2) {
         errors["legal.city"] = ["City is required"];
@@ -401,7 +405,10 @@ export const handlers = [
     // Simulate address verification failure (5% chance)
     if (shouldFail(5)) {
       return HttpResponse.json(
-        { error: "Address verification failed. Please check the address details." },
+        {
+          error:
+            "Address verification failed. Please check the address details.",
+        },
         { status: 422 },
       );
     }
@@ -452,16 +459,28 @@ export const handlers = [
         errors.newPassword = ["Password must be at least 8 characters long"];
       }
       if (!/(?=.*[a-z])/.test(body.newPassword)) {
-        errors.newPassword = [...(errors.newPassword || []), "Password must contain at least one lowercase letter"];
+        errors.newPassword = [
+          ...(errors.newPassword || []),
+          "Password must contain at least one lowercase letter",
+        ];
       }
       if (!/(?=.*[A-Z])/.test(body.newPassword)) {
-        errors.newPassword = [...(errors.newPassword || []), "Password must contain at least one uppercase letter"];
+        errors.newPassword = [
+          ...(errors.newPassword || []),
+          "Password must contain at least one uppercase letter",
+        ];
       }
       if (!/(?=.*\d)/.test(body.newPassword)) {
-        errors.newPassword = [...(errors.newPassword || []), "Password must contain at least one number"];
+        errors.newPassword = [
+          ...(errors.newPassword || []),
+          "Password must contain at least one number",
+        ];
       }
       if (!/(?=.*[!@#$%^&*])/.test(body.newPassword)) {
-        errors.newPassword = [...(errors.newPassword || []), "Password must contain at least one special character"];
+        errors.newPassword = [
+          ...(errors.newPassword || []),
+          "Password must contain at least one special character",
+        ];
       }
     }
 
@@ -497,7 +516,10 @@ export const handlers = [
     // Simulate security policy violation (3% chance)
     if (shouldFail(3)) {
       return HttpResponse.json(
-        { error: "Password change blocked due to security policy. Please contact support." },
+        {
+          error:
+            "Password change blocked due to security policy. Please contact support.",
+        },
         { status: 403 },
       );
     }
@@ -560,11 +582,21 @@ export const handlers = [
     return HttpResponse.json({
       twoFactorEnabled: enabled,
       secretKey: enabled ? "JBSWY3DPEHPK3PXP" : null,
-      qrCodeUrl: enabled ? "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/CustomerPanel:john.doe@example.com?secret=JBSWY3DPEHPK3PXP&issuer=CustomerPanel" : null,
-      backupCodes: enabled ? [
-        "1A2B3C4D", "5E6F7G8H", "9I0J1K2L", "3M4N5O6P",
-        "7Q8R9S0T", "1U2V3W4X", "5Y6Z7A8B", "9C0D1E2F"
-      ] : null,
+      qrCodeUrl: enabled
+        ? "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/CustomerPanel:john.doe@example.com?secret=JBSWY3DPEHPK3PXP&issuer=CustomerPanel"
+        : null,
+      backupCodes: enabled
+        ? [
+            "1A2B3C4D",
+            "5E6F7G8H",
+            "9I0J1K2L",
+            "3M4N5O6P",
+            "7Q8R9S0T",
+            "1U2V3W4X",
+            "5Y6Z7A8B",
+            "9C0D1E2F",
+          ]
+        : null,
       updatedAt: new Date().toISOString(),
     });
   }),
@@ -642,7 +674,7 @@ export const handlers = [
     }
 
     const newBackupCodes = Array.from({ length: 8 }, () =>
-      Math.random().toString(36).substring(2, 10).toUpperCase()
+      Math.random().toString(36).substring(2, 10).toUpperCase(),
     );
 
     return HttpResponse.json({
@@ -1952,7 +1984,8 @@ export const handlers = [
         messageCount: 3,
         hasAttachments: false,
         tags: ["domain-transfer", "urgent"],
-        firstMessage: "I'm having trouble transferring my domain example.com to your service...",
+        firstMessage:
+          "I'm having trouble transferring my domain example.com to your service...",
       },
       {
         id: "TKT-2024-002",
@@ -1967,7 +2000,8 @@ export const handlers = [
         messageCount: 2,
         hasAttachments: true,
         tags: ["email", "server-migration"],
-        firstMessage: "After the recent server migration, my email accounts aren't working...",
+        firstMessage:
+          "After the recent server migration, my email accounts aren't working...",
       },
       {
         id: "TKT-2024-003",
@@ -1982,7 +2016,8 @@ export const handlers = [
         messageCount: 2,
         hasAttachments: false,
         tags: ["ssl", "completed"],
-        firstMessage: "I need help installing an SSL certificate on my website...",
+        firstMessage:
+          "I need help installing an SSL certificate on my website...",
       },
       {
         id: "TKT-2024-004",
@@ -2012,7 +2047,8 @@ export const handlers = [
         messageCount: 1,
         hasAttachments: false,
         tags: ["performance", "hosting"],
-        firstMessage: "My website has been loading very slowly since the hosting upgrade...",
+        firstMessage:
+          "My website has been loading very slowly since the hosting upgrade...",
       },
     ];
 
@@ -2071,7 +2107,10 @@ export const handlers = [
     const totalCount = filteredTickets.length;
     const totalPages = Math.ceil(totalCount / limit);
     const startIndex = (page - 1) * limit;
-    const paginatedTickets = filteredTickets.slice(startIndex, startIndex + limit);
+    const paginatedTickets = filteredTickets.slice(
+      startIndex,
+      startIndex + limit,
+    );
 
     return HttpResponse.json({
       tickets: paginatedTickets,
@@ -2140,7 +2179,8 @@ export const handlers = [
             id: "msg_001",
             author: "John Doe",
             authorType: "customer",
-            message: "I'm having trouble transferring my domain example.com to your service. I initiated the transfer 3 days ago but it's still showing as pending. Can you please help?",
+            message:
+              "I'm having trouble transferring my domain example.com to your service. I initiated the transfer 3 days ago but it's still showing as pending. Can you please help?",
             timestamp: "2024-12-10T09:15:00Z",
             attachments: [],
           },
@@ -2148,7 +2188,8 @@ export const handlers = [
             id: "msg_002",
             author: "Sarah Johnson",
             authorType: "agent",
-            message: "Hi John, I've reviewed your domain transfer request. The transfer is currently awaiting authorization from your previous registrar. I've expedited the process and you should receive an authorization email within the next few hours. Please check your email and approve the transfer.",
+            message:
+              "Hi John, I've reviewed your domain transfer request. The transfer is currently awaiting authorization from your previous registrar. I've expedited the process and you should receive an authorization email within the next few hours. Please check your email and approve the transfer.",
             timestamp: "2024-12-10T11:30:00Z",
             attachments: [],
           },
@@ -2156,7 +2197,8 @@ export const handlers = [
             id: "msg_003",
             author: "John Doe",
             authorType: "customer",
-            message: "Thanks Sarah! I received the email and approved the transfer. How long should I expect it to take now?",
+            message:
+              "Thanks Sarah! I received the email and approved the transfer. How long should I expect it to take now?",
             timestamp: "2024-12-10T14:45:00Z",
             attachments: [],
           },
@@ -2177,7 +2219,8 @@ export const handlers = [
             id: "msg_001",
             author: "Jane Smith",
             authorType: "customer",
-            message: "After the recent server migration, my email accounts aren't working. I can't send or receive emails through Outlook. I've tried re-configuring the settings but nothing seems to work.",
+            message:
+              "After the recent server migration, my email accounts aren't working. I can't send or receive emails through Outlook. I've tried re-configuring the settings but nothing seems to work.",
             timestamp: "2024-12-08T15:20:00Z",
             attachments: [
               {
@@ -2193,7 +2236,8 @@ export const handlers = [
             id: "msg_002",
             author: "Mike Chen",
             authorType: "agent",
-            message: "Hi Jane, I can see the migration has affected your email configuration. The server settings have changed. Please update your Outlook with these new settings: IMAP Server: mail.newserver.com, Port: 993, Security: SSL/TLS. I'll send you a detailed configuration guide.",
+            message:
+              "Hi Jane, I can see the migration has affected your email configuration. The server settings have changed. Please update your Outlook with these new settings: IMAP Server: mail.newserver.com, Port: 993, Security: SSL/TLS. I'll send you a detailed configuration guide.",
             timestamp: "2024-12-09T10:45:00Z",
             attachments: [
               {
@@ -2286,8 +2330,13 @@ export const handlers = [
 
       const maxFileSize = 5 * 1024 * 1024; // 5MB
       const allowedTypes = [
-        "image/jpeg", "image/png", "image/gif", "image/webp",
-        "application/pdf", "text/plain", "application/msword",
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "application/pdf",
+        "text/plain",
+        "application/msword",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "application/vnd.ms-excel",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -2295,10 +2344,16 @@ export const handlers = [
 
       for (const file of files) {
         if (file.size > maxFileSize) {
-          errors.attachments = [...(errors.attachments || []), `File ${file.name} exceeds 5MB limit`];
+          errors.attachments = [
+            ...(errors.attachments || []),
+            `File ${file.name} exceeds 5MB limit`,
+          ];
         }
         if (!allowedTypes.includes(file.type)) {
-          errors.attachments = [...(errors.attachments || []), `File type ${file.type} not allowed`];
+          errors.attachments = [
+            ...(errors.attachments || []),
+            `File type ${file.type} not allowed`,
+          ];
         }
       }
 
@@ -2321,7 +2376,10 @@ export const handlers = [
       // Simulate file processing failures (3% chance)
       if (shouldFail(3)) {
         return HttpResponse.json(
-          { error: "File processing failed. Please try again or reduce file sizes." },
+          {
+            error:
+              "File processing failed. Please try again or reduce file sizes.",
+          },
           { status: 507 },
         );
       }
@@ -2329,7 +2387,10 @@ export const handlers = [
       // Simulate rate limiting for ticket creation (5% chance)
       if (shouldFail(5)) {
         return HttpResponse.json(
-          { error: "Too many tickets created recently. Please wait before creating another." },
+          {
+            error:
+              "Too many tickets created recently. Please wait before creating another.",
+          },
           {
             status: 429,
             headers: { "Retry-After": "300" },
@@ -2427,7 +2488,10 @@ export const handlers = [
       // Simulate rate limiting for replies (8% chance)
       if (shouldFail(8)) {
         return HttpResponse.json(
-          { error: "Too many replies sent recently. Please wait before sending another." },
+          {
+            error:
+              "Too many replies sent recently. Please wait before sending another.",
+          },
           {
             status: 429,
             headers: { "Retry-After": "60" },
@@ -2486,10 +2550,7 @@ export const handlers = [
 
     // Simulate ticket not found
     if (params.ticketId === "TKT-999") {
-      return HttpResponse.json(
-        { error: "Ticket not found" },
-        { status: 404 },
-      );
+      return HttpResponse.json({ error: "Ticket not found" }, { status: 404 });
     }
 
     // Simulate forbidden action (3% chance)
@@ -2975,7 +3036,8 @@ export const handlers = [
       {
         id: "notif_001",
         title: "Domain renewal reminder",
-        message: "Your domain example.com will expire in 30 days. Click to renew now.",
+        message:
+          "Your domain example.com will expire in 30 days. Click to renew now.",
         type: "warning",
         category: "domain",
         priority: "high",
@@ -2990,7 +3052,8 @@ export const handlers = [
       {
         id: "notif_002",
         title: "New support ticket reply",
-        message: "Our support team replied to your ticket: 'Domain Transfer Issue'",
+        message:
+          "Our support team replied to your ticket: 'Domain Transfer Issue'",
         type: "info",
         category: "support",
         priority: "medium",
@@ -3005,7 +3068,8 @@ export const handlers = [
       {
         id: "notif_003",
         title: "Payment successful",
-        message: "Your payment of $47.00 for hosting renewal has been processed successfully.",
+        message:
+          "Your payment of $47.00 for hosting renewal has been processed successfully.",
         type: "success",
         category: "billing",
         priority: "low",
@@ -3013,7 +3077,7 @@ export const handlers = [
         timestamp: "2024-12-11T16:22:00Z",
         actionUrl: "/billing/invoices/inv_001",
         metadata: {
-          amount: 47.00,
+          amount: 47.0,
           currency: "USD",
           invoiceId: "inv_001",
         },
@@ -3021,7 +3085,8 @@ export const handlers = [
       {
         id: "notif_004",
         title: "Security alert",
-        message: "New login detected from New York, NY. If this wasn't you, please secure your account.",
+        message:
+          "New login detected from New York, NY. If this wasn't you, please secure your account.",
         type: "error",
         category: "security",
         priority: "high",
@@ -3037,7 +3102,8 @@ export const handlers = [
       {
         id: "notif_005",
         title: "SSL certificate installed",
-        message: "Your SSL certificate for example.com has been successfully installed and activated.",
+        message:
+          "Your SSL certificate for example.com has been successfully installed and activated.",
         type: "success",
         category: "technical",
         priority: "low",
@@ -3052,7 +3118,8 @@ export const handlers = [
       {
         id: "notif_006",
         title: "Maintenance scheduled",
-        message: "Server maintenance scheduled for Dec 15, 2024 from 2:00 AM - 4:00 AM EST.",
+        message:
+          "Server maintenance scheduled for Dec 15, 2024 from 2:00 AM - 4:00 AM EST.",
         type: "warning",
         category: "system",
         priority: "medium",
@@ -3083,15 +3150,19 @@ export const handlers = [
     }
 
     // Sort by timestamp (newest first)
-    filteredNotifications.sort((a, b) =>
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    filteredNotifications.sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     );
 
     // Paginate results
     const totalCount = filteredNotifications.length;
     const totalPages = Math.ceil(totalCount / limit);
     const startIndex = (page - 1) * limit;
-    const paginatedNotifications = filteredNotifications.slice(startIndex, startIndex + limit);
+    const paginatedNotifications = filteredNotifications.slice(
+      startIndex,
+      startIndex + limit,
+    );
 
     return HttpResponse.json({
       notifications: paginatedNotifications,
@@ -3103,77 +3174,83 @@ export const handlers = [
         hasNext: page < totalPages,
         hasPrev: page > 1,
       },
-      unreadCount: notificationsData.filter(n => !n.isRead).length,
+      unreadCount: notificationsData.filter((n) => !n.isRead).length,
     });
   }),
 
   // Mark notification as read
-  http.patch("/api/notifications/:notificationId/read", async ({ params, request }) => {
-    await delay(randomDelay(100, 400));
+  http.patch(
+    "/api/notifications/:notificationId/read",
+    async ({ params, request }) => {
+      await delay(randomDelay(100, 400));
 
-    const authHeader = request.headers.get("Authorization");
-    if (!authHeader) {
-      return HttpResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
-    }
+      const authHeader = request.headers.get("Authorization");
+      if (!authHeader) {
+        return HttpResponse.json(
+          { error: "Authentication required" },
+          { status: 401 },
+        );
+      }
 
-    // Simulate notification not found
-    if (params.notificationId === "notif_999") {
-      return HttpResponse.json(
-        { error: "Notification not found" },
-        { status: 404 },
-      );
-    }
+      // Simulate notification not found
+      if (params.notificationId === "notif_999") {
+        return HttpResponse.json(
+          { error: "Notification not found" },
+          { status: 404 },
+        );
+      }
 
-    // Simulate server error (3% chance)
-    if (shouldFail(3)) {
-      return HttpResponse.json(
-        { error: "Failed to update notification status" },
-        { status: 500 },
-      );
-    }
+      // Simulate server error (3% chance)
+      if (shouldFail(3)) {
+        return HttpResponse.json(
+          { error: "Failed to update notification status" },
+          { status: 500 },
+        );
+      }
 
-    return HttpResponse.json({
-      notification: {
-        id: params.notificationId,
-        isRead: true,
-        updatedAt: new Date().toISOString(),
-      },
-      unreadCount: Math.max(0, Math.floor(Math.random() * 5)), // Random remaining count
-    });
-  }),
+      return HttpResponse.json({
+        notification: {
+          id: params.notificationId,
+          isRead: true,
+          updatedAt: new Date().toISOString(),
+        },
+        unreadCount: Math.max(0, Math.floor(Math.random() * 5)), // Random remaining count
+      });
+    },
+  ),
 
   // Mark notification as unread
-  http.patch("/api/notifications/:notificationId/unread", async ({ params, request }) => {
-    await delay(randomDelay(100, 400));
+  http.patch(
+    "/api/notifications/:notificationId/unread",
+    async ({ params, request }) => {
+      await delay(randomDelay(100, 400));
 
-    const authHeader = request.headers.get("Authorization");
-    if (!authHeader) {
-      return HttpResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
-    }
+      const authHeader = request.headers.get("Authorization");
+      if (!authHeader) {
+        return HttpResponse.json(
+          { error: "Authentication required" },
+          { status: 401 },
+        );
+      }
 
-    // Simulate server error (3% chance)
-    if (shouldFail(3)) {
-      return HttpResponse.json(
-        { error: "Failed to update notification status" },
-        { status: 500 },
-      );
-    }
+      // Simulate server error (3% chance)
+      if (shouldFail(3)) {
+        return HttpResponse.json(
+          { error: "Failed to update notification status" },
+          { status: 500 },
+        );
+      }
 
-    return HttpResponse.json({
-      notification: {
-        id: params.notificationId,
-        isRead: false,
-        updatedAt: new Date().toISOString(),
-      },
-      unreadCount: Math.floor(Math.random() * 8) + 1,
-    });
-  }),
+      return HttpResponse.json({
+        notification: {
+          id: params.notificationId,
+          isRead: false,
+          updatedAt: new Date().toISOString(),
+        },
+        unreadCount: Math.floor(Math.random() * 8) + 1,
+      });
+    },
+  ),
 
   // Mark all notifications as read
   http.post("/api/notifications/mark-all-read", async ({ request }) => {
@@ -3203,38 +3280,41 @@ export const handlers = [
   }),
 
   // Delete notification
-  http.delete("/api/notifications/:notificationId", async ({ params, request }) => {
-    await delay(randomDelay(200, 600));
+  http.delete(
+    "/api/notifications/:notificationId",
+    async ({ params, request }) => {
+      await delay(randomDelay(200, 600));
 
-    const authHeader = request.headers.get("Authorization");
-    if (!authHeader) {
-      return HttpResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
-    }
+      const authHeader = request.headers.get("Authorization");
+      if (!authHeader) {
+        return HttpResponse.json(
+          { error: "Authentication required" },
+          { status: 401 },
+        );
+      }
 
-    // Simulate notification not found
-    if (params.notificationId === "notif_999") {
-      return HttpResponse.json(
-        { error: "Notification not found" },
-        { status: 404 },
-      );
-    }
+      // Simulate notification not found
+      if (params.notificationId === "notif_999") {
+        return HttpResponse.json(
+          { error: "Notification not found" },
+          { status: 404 },
+        );
+      }
 
-    // Simulate server error (3% chance)
-    if (shouldFail(3)) {
-      return HttpResponse.json(
-        { error: "Failed to delete notification" },
-        { status: 500 },
-      );
-    }
+      // Simulate server error (3% chance)
+      if (shouldFail(3)) {
+        return HttpResponse.json(
+          { error: "Failed to delete notification" },
+          { status: 500 },
+        );
+      }
 
-    return HttpResponse.json({
-      success: true,
-      unreadCount: Math.max(0, Math.floor(Math.random() * 5)),
-    });
-  }),
+      return HttpResponse.json({
+        success: true,
+        unreadCount: Math.max(0, Math.floor(Math.random() * 5)),
+      });
+    },
+  ),
 
   // Get notification preferences
   http.get("/api/notifications/preferences", async ({ request }) => {

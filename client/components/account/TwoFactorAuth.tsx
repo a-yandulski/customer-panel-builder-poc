@@ -1,24 +1,37 @@
-import { useState } from 'react';
-import { useTwoFactor } from '@/hooks/useProfile';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { 
-  Shield, 
-  QrCode, 
-  Key, 
-  Copy, 
-  Download, 
-  CheckCircle, 
+import { useState } from "react";
+import { useTwoFactor } from "@/hooks/useProfile";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Shield,
+  QrCode,
+  Key,
+  Copy,
+  Download,
+  CheckCircle,
   AlertTriangle,
   Eye,
   EyeOff,
-  Smartphone
-} from 'lucide-react';
+  Smartphone,
+} from "lucide-react";
 
 interface TwoFactorStatusProps {
   enabled: boolean;
@@ -27,7 +40,7 @@ interface TwoFactorStatusProps {
 
 function TwoFactorStatus({ enabled, onToggle }: TwoFactorStatusProps) {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,12 +54,12 @@ function TwoFactorStatus({ enabled, onToggle }: TwoFactorStatusProps) {
 
   const handleConfirm = async () => {
     if (!password.trim()) return;
-    
+
     try {
       setIsLoading(true);
       await onToggle(!enabled, password);
       setShowPasswordDialog(false);
-      setPassword('');
+      setPassword("");
     } catch (error) {
       // Error handling is done in the hook
     } finally {
@@ -58,17 +71,19 @@ function TwoFactorStatus({ enabled, onToggle }: TwoFactorStatusProps) {
     <>
       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
         <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-full ${enabled ? 'bg-green-100' : 'bg-gray-200'}`}>
-            <Shield className={`h-5 w-5 ${enabled ? 'text-green-600' : 'text-gray-500'}`} />
+          <div
+            className={`p-2 rounded-full ${enabled ? "bg-green-100" : "bg-gray-200"}`}
+          >
+            <Shield
+              className={`h-5 w-5 ${enabled ? "text-green-600" : "text-gray-500"}`}
+            />
           </div>
           <div>
-            <h4 className="font-semibold text-gray-900">
-              Authenticator App
-            </h4>
+            <h4 className="font-semibold text-gray-900">Authenticator App</h4>
             <p className="body-sm text-gray-600">
               {enabled
-                ? 'Two-factor authentication is enabled'
-                : 'Use an authenticator app for secure login'}
+                ? "Two-factor authentication is enabled"
+                : "Use an authenticator app for secure login"}
             </p>
           </div>
         </div>
@@ -82,7 +97,11 @@ function TwoFactorStatus({ enabled, onToggle }: TwoFactorStatusProps) {
           <Switch
             checked={enabled}
             onCheckedChange={handleToggle}
-            aria-label={enabled ? 'Disable two-factor authentication' : 'Enable two-factor authentication'}
+            aria-label={
+              enabled
+                ? "Disable two-factor authentication"
+                : "Enable two-factor authentication"
+            }
           />
         </div>
       </div>
@@ -91,13 +110,14 @@ function TwoFactorStatus({ enabled, onToggle }: TwoFactorStatusProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {enabled ? 'Disable Two-Factor Authentication' : 'Enable Two-Factor Authentication'}
+              {enabled
+                ? "Disable Two-Factor Authentication"
+                : "Enable Two-Factor Authentication"}
             </DialogTitle>
             <DialogDescription>
-              {enabled 
-                ? 'Enter your password to disable two-factor authentication. This will reduce your account security.'
-                : 'Enter your password to enable two-factor authentication and enhance your account security.'
-              }
+              {enabled
+                ? "Enter your password to disable two-factor authentication. This will reduce your account security."
+                : "Enter your password to enable two-factor authentication and enhance your account security."}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -118,7 +138,11 @@ function TwoFactorStatus({ enabled, onToggle }: TwoFactorStatusProps) {
                   className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -132,7 +156,8 @@ function TwoFactorStatus({ enabled, onToggle }: TwoFactorStatusProps) {
                   </span>
                 </div>
                 <p className="text-sm text-blue-700 mt-1">
-                  Google Authenticator, Authy, Microsoft Authenticator, or any TOTP-compatible app.
+                  Google Authenticator, Authy, Microsoft Authenticator, or any
+                  TOTP-compatible app.
                 </p>
               </div>
             )}
@@ -142,7 +167,7 @@ function TwoFactorStatus({ enabled, onToggle }: TwoFactorStatusProps) {
                 variant="outline"
                 onClick={() => {
                   setShowPasswordDialog(false);
-                  setPassword('');
+                  setPassword("");
                 }}
                 disabled={isLoading}
                 className="flex-1"
@@ -152,9 +177,13 @@ function TwoFactorStatus({ enabled, onToggle }: TwoFactorStatusProps) {
               <Button
                 onClick={handleConfirm}
                 disabled={!password.trim() || isLoading}
-                className={`flex-1 ${enabled ? 'bg-red-600 hover:bg-red-700' : 'bg-primary hover:bg-primary/90'}`}
+                className={`flex-1 ${enabled ? "bg-red-600 hover:bg-red-700" : "bg-primary hover:bg-primary/90"}`}
               >
-                {isLoading ? 'Processing...' : enabled ? 'Disable 2FA' : 'Enable 2FA'}
+                {isLoading
+                  ? "Processing..."
+                  : enabled
+                    ? "Disable 2FA"
+                    : "Enable 2FA"}
               </Button>
             </div>
           </div>
@@ -171,17 +200,17 @@ interface QRCodeSetupProps {
 }
 
 function QRCodeSetup({ secretKey, qrCodeUrl, onVerify }: QRCodeSetupProps) {
-  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationCode, setVerificationCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
 
   const handleVerify = async () => {
     if (verificationCode.length !== 6) return;
-    
+
     try {
       setIsVerifying(true);
       await onVerify(verificationCode);
-      setVerificationCode('');
+      setVerificationCode("");
     } catch (error) {
       // Error handling is done in the hook
     } finally {
@@ -206,7 +235,8 @@ function QRCodeSetup({ secretKey, qrCodeUrl, onVerify }: QRCodeSetupProps) {
           <DialogHeader>
             <DialogTitle>Setup Authenticator App</DialogTitle>
             <DialogDescription>
-              Scan the QR code with your authenticator app or enter the secret key manually.
+              Scan the QR code with your authenticator app or enter the secret
+              key manually.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -223,16 +253,14 @@ function QRCodeSetup({ secretKey, qrCodeUrl, onVerify }: QRCodeSetupProps) {
 
             {/* Manual Entry */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Or enter this code manually:</Label>
+              <Label className="text-sm font-medium">
+                Or enter this code manually:
+              </Label>
               <div className="flex items-center space-x-2">
                 <code className="flex-1 bg-gray-100 px-3 py-2 rounded text-sm font-mono">
                   {secretKey}
                 </code>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={copySecretKey}
-                >
+                <Button variant="outline" size="sm" onClick={copySecretKey}>
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -240,12 +268,18 @@ function QRCodeSetup({ secretKey, qrCodeUrl, onVerify }: QRCodeSetupProps) {
 
             {/* Verification */}
             <div className="space-y-2">
-              <Label htmlFor="verification-code">Enter verification code from your app:</Label>
+              <Label htmlFor="verification-code">
+                Enter verification code from your app:
+              </Label>
               <div className="flex space-x-2">
                 <Input
                   id="verification-code"
                   value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onChange={(e) =>
+                    setVerificationCode(
+                      e.target.value.replace(/\D/g, "").slice(0, 6),
+                    )
+                  }
                   placeholder="123456"
                   className="text-center font-mono text-lg"
                   maxLength={6}
@@ -254,7 +288,7 @@ function QRCodeSetup({ secretKey, qrCodeUrl, onVerify }: QRCodeSetupProps) {
                   onClick={handleVerify}
                   disabled={verificationCode.length !== 6 || isVerifying}
                 >
-                  {isVerifying ? 'Verifying...' : 'Verify'}
+                  {isVerifying ? "Verifying..." : "Verify"}
                 </Button>
               </div>
             </div>
@@ -272,18 +306,18 @@ interface BackupCodesProps {
 
 function BackupCodes({ codes, onGenerate }: BackupCodesProps) {
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerate = async () => {
     if (!password.trim()) return;
-    
+
     try {
       setIsGenerating(true);
       await onGenerate(password);
       setShowGenerateDialog(false);
-      setPassword('');
+      setPassword("");
     } catch (error) {
       // Error handling is done in the hook
     } finally {
@@ -297,13 +331,13 @@ function BackupCodes({ codes, onGenerate }: BackupCodesProps) {
 
   const downloadCodes = () => {
     if (!codes) return;
-    
-    const content = codes.join('\n');
-    const blob = new Blob([content], { type: 'text/plain' });
+
+    const content = codes.join("\n");
+    const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'backup-codes.txt';
+    a.download = "backup-codes.txt";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -322,7 +356,8 @@ function BackupCodes({ codes, onGenerate }: BackupCodesProps) {
             <DialogHeader>
               <DialogTitle>Generate New Backup Codes</DialogTitle>
               <DialogDescription>
-                This will invalidate any existing backup codes. Enter your password to generate new codes.
+                This will invalidate any existing backup codes. Enter your
+                password to generate new codes.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -343,7 +378,11 @@ function BackupCodes({ codes, onGenerate }: BackupCodesProps) {
                     className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>
@@ -353,7 +392,7 @@ function BackupCodes({ codes, onGenerate }: BackupCodesProps) {
                   variant="outline"
                   onClick={() => {
                     setShowGenerateDialog(false);
-                    setPassword('');
+                    setPassword("");
                   }}
                   disabled={isGenerating}
                   className="flex-1"
@@ -365,7 +404,7 @@ function BackupCodes({ codes, onGenerate }: BackupCodesProps) {
                   disabled={!password.trim() || isGenerating}
                   className="flex-1"
                 >
-                  {isGenerating ? 'Generating...' : 'Generate Codes'}
+                  {isGenerating ? "Generating..." : "Generate Codes"}
                 </Button>
               </div>
             </div>
@@ -381,7 +420,8 @@ function BackupCodes({ codes, onGenerate }: BackupCodesProps) {
               Backup Codes
             </CardTitle>
             <CardDescription className="body-sm text-yellow-700">
-              Save these codes in a secure location. Each code can only be used once.
+              Save these codes in a secure location. Each code can only be used
+              once.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -403,9 +443,9 @@ function BackupCodes({ codes, onGenerate }: BackupCodesProps) {
                 </div>
               ))}
             </div>
-            <Button 
-              variant="outline" 
-              className="w-full" 
+            <Button
+              variant="outline"
+              className="w-full"
               onClick={downloadCodes}
             >
               <Download className="mr-2 h-4 w-4" />
@@ -419,7 +459,13 @@ function BackupCodes({ codes, onGenerate }: BackupCodesProps) {
 }
 
 export default function TwoFactorAuth() {
-  const { isLoading, twoFactorData, toggleTwoFactor, verifyTwoFactor, generateBackupCodes } = useTwoFactor();
+  const {
+    isLoading,
+    twoFactorData,
+    toggleTwoFactor,
+    verifyTwoFactor,
+    generateBackupCodes,
+  } = useTwoFactor();
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
   const handleToggle = async (enabled: boolean, password: string) => {
@@ -440,10 +486,7 @@ export default function TwoFactorAuth() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <TwoFactorStatus 
-          enabled={twoFactorEnabled} 
-          onToggle={handleToggle} 
-        />
+        <TwoFactorStatus enabled={twoFactorEnabled} onToggle={handleToggle} />
 
         {twoFactorData?.twoFactorEnabled && (
           <div className="space-y-4">
@@ -462,7 +505,7 @@ export default function TwoFactorAuth() {
               />
             )}
 
-            <BackupCodes 
+            <BackupCodes
               codes={twoFactorData.backupCodes}
               onGenerate={generateBackupCodes}
             />
@@ -478,8 +521,9 @@ export default function TwoFactorAuth() {
               </span>
             </div>
             <p className="body-sm text-yellow-700 mt-1">
-              Enable two-factor authentication to significantly improve your account security. 
-              This adds an extra layer of protection even if your password is compromised.
+              Enable two-factor authentication to significantly improve your
+              account security. This adds an extra layer of protection even if
+              your password is compromised.
             </p>
           </div>
         )}
@@ -489,12 +533,18 @@ export default function TwoFactorAuth() {
           <div className="flex items-start space-x-3">
             <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
             <div>
-              <h4 className="font-medium text-blue-900">How Two-Factor Authentication Works</h4>
+              <h4 className="font-medium text-blue-900">
+                How Two-Factor Authentication Works
+              </h4>
               <ul className="text-sm text-blue-700 mt-2 space-y-1">
                 <li>• Download an authenticator app on your phone</li>
                 <li>• Scan the QR code or enter the secret key</li>
-                <li>• Use the generated codes along with your password to login</li>
-                <li>• Keep backup codes in a safe place for emergency access</li>
+                <li>
+                  • Use the generated codes along with your password to login
+                </li>
+                <li>
+                  • Keep backup codes in a safe place for emergency access
+                </li>
               </ul>
             </div>
           </div>

@@ -1,79 +1,91 @@
-import { useState } from 'react';
-import { useAddress, AddressFormData } from '@/hooks/useProfile';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LoadingOverlay } from '@/components/ui/loading-states';
-import { MapPin, Building, CheckCircle, Save, Edit } from 'lucide-react';
+import { useState } from "react";
+import { useAddress, AddressFormData } from "@/hooks/useProfile";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { LoadingOverlay } from "@/components/ui/loading-states";
+import { MapPin, Building, CheckCircle, Save, Edit } from "lucide-react";
 
 // Mock country and state data (you might want to fetch this from an API)
 const COUNTRIES = [
-  { value: 'United States', label: 'United States' },
-  { value: 'Canada', label: 'Canada' },
-  { value: 'United Kingdom', label: 'United Kingdom' },
-  { value: 'Australia', label: 'Australia' },
-  { value: 'Germany', label: 'Germany' },
-  { value: 'France', label: 'France' },
+  { value: "United States", label: "United States" },
+  { value: "Canada", label: "Canada" },
+  { value: "United Kingdom", label: "United Kingdom" },
+  { value: "Australia", label: "Australia" },
+  { value: "Germany", label: "Germany" },
+  { value: "France", label: "France" },
 ];
 
 const US_STATES = [
-  { value: 'AL', label: 'Alabama' },
-  { value: 'AK', label: 'Alaska' },
-  { value: 'AZ', label: 'Arizona' },
-  { value: 'AR', label: 'Arkansas' },
-  { value: 'CA', label: 'California' },
-  { value: 'CO', label: 'Colorado' },
-  { value: 'CT', label: 'Connecticut' },
-  { value: 'DE', label: 'Delaware' },
-  { value: 'FL', label: 'Florida' },
-  { value: 'GA', label: 'Georgia' },
-  { value: 'HI', label: 'Hawaii' },
-  { value: 'ID', label: 'Idaho' },
-  { value: 'IL', label: 'Illinois' },
-  { value: 'IN', label: 'Indiana' },
-  { value: 'IA', label: 'Iowa' },
-  { value: 'KS', label: 'Kansas' },
-  { value: 'KY', label: 'Kentucky' },
-  { value: 'LA', label: 'Louisiana' },
-  { value: 'ME', label: 'Maine' },
-  { value: 'MD', label: 'Maryland' },
-  { value: 'MA', label: 'Massachusetts' },
-  { value: 'MI', label: 'Michigan' },
-  { value: 'MN', label: 'Minnesota' },
-  { value: 'MS', label: 'Mississippi' },
-  { value: 'MO', label: 'Missouri' },
-  { value: 'MT', label: 'Montana' },
-  { value: 'NE', label: 'Nebraska' },
-  { value: 'NV', label: 'Nevada' },
-  { value: 'NH', label: 'New Hampshire' },
-  { value: 'NJ', label: 'New Jersey' },
-  { value: 'NM', label: 'New Mexico' },
-  { value: 'NY', label: 'New York' },
-  { value: 'NC', label: 'North Carolina' },
-  { value: 'ND', label: 'North Dakota' },
-  { value: 'OH', label: 'Ohio' },
-  { value: 'OK', label: 'Oklahoma' },
-  { value: 'OR', label: 'Oregon' },
-  { value: 'PA', label: 'Pennsylvania' },
-  { value: 'RI', label: 'Rhode Island' },
-  { value: 'SC', label: 'South Carolina' },
-  { value: 'SD', label: 'South Dakota' },
-  { value: 'TN', label: 'Tennessee' },
-  { value: 'TX', label: 'Texas' },
-  { value: 'UT', label: 'Utah' },
-  { value: 'VT', label: 'Vermont' },
-  { value: 'VA', label: 'Virginia' },
-  { value: 'WA', label: 'Washington' },
-  { value: 'WV', label: 'West Virginia' },
-  { value: 'WI', label: 'Wisconsin' },
-  { value: 'WY', label: 'Wyoming' },
+  { value: "AL", label: "Alabama" },
+  { value: "AK", label: "Alaska" },
+  { value: "AZ", label: "Arizona" },
+  { value: "AR", label: "Arkansas" },
+  { value: "CA", label: "California" },
+  { value: "CO", label: "Colorado" },
+  { value: "CT", label: "Connecticut" },
+  { value: "DE", label: "Delaware" },
+  { value: "FL", label: "Florida" },
+  { value: "GA", label: "Georgia" },
+  { value: "HI", label: "Hawaii" },
+  { value: "ID", label: "Idaho" },
+  { value: "IL", label: "Illinois" },
+  { value: "IN", label: "Indiana" },
+  { value: "IA", label: "Iowa" },
+  { value: "KS", label: "Kansas" },
+  { value: "KY", label: "Kentucky" },
+  { value: "LA", label: "Louisiana" },
+  { value: "ME", label: "Maine" },
+  { value: "MD", label: "Maryland" },
+  { value: "MA", label: "Massachusetts" },
+  { value: "MI", label: "Michigan" },
+  { value: "MN", label: "Minnesota" },
+  { value: "MS", label: "Mississippi" },
+  { value: "MO", label: "Missouri" },
+  { value: "MT", label: "Montana" },
+  { value: "NE", label: "Nebraska" },
+  { value: "NV", label: "Nevada" },
+  { value: "NH", label: "New Hampshire" },
+  { value: "NJ", label: "New Jersey" },
+  { value: "NM", label: "New Mexico" },
+  { value: "NY", label: "New York" },
+  { value: "NC", label: "North Carolina" },
+  { value: "ND", label: "North Dakota" },
+  { value: "OH", label: "Ohio" },
+  { value: "OK", label: "Oklahoma" },
+  { value: "OR", label: "Oregon" },
+  { value: "PA", label: "Pennsylvania" },
+  { value: "RI", label: "Rhode Island" },
+  { value: "SC", label: "South Carolina" },
+  { value: "SD", label: "South Dakota" },
+  { value: "TN", label: "Tennessee" },
+  { value: "TX", label: "Texas" },
+  { value: "UT", label: "Utah" },
+  { value: "VT", label: "Vermont" },
+  { value: "VA", label: "Virginia" },
+  { value: "WA", label: "Washington" },
+  { value: "WV", label: "West Virginia" },
+  { value: "WI", label: "Wisconsin" },
+  { value: "WY", label: "Wyoming" },
 ];
 
 interface AddressFieldsProps {
-  prefix: 'billing' | 'legal';
+  prefix: "billing" | "legal";
   form: any;
   disabled?: boolean;
 }
@@ -92,12 +104,18 @@ function AddressFields({ prefix, form, disabled }: AddressFieldsProps) {
           id={`${prefix}-street`}
           {...form.register(`${prefix}.street`)}
           disabled={disabled}
-          className={errors.street ? 'border-red-500' : ''}
+          className={errors.street ? "border-red-500" : ""}
           placeholder="Enter street address"
-          aria-describedby={errors.street ? `${prefix}-street-error` : undefined}
+          aria-describedby={
+            errors.street ? `${prefix}-street-error` : undefined
+          }
         />
         {errors.street && (
-          <p id={`${prefix}-street-error`} className="text-sm text-red-600" role="alert">
+          <p
+            id={`${prefix}-street-error`}
+            className="text-sm text-red-600"
+            role="alert"
+          >
             {errors.street.message}
           </p>
         )}
@@ -113,12 +131,16 @@ function AddressFields({ prefix, form, disabled }: AddressFieldsProps) {
             id={`${prefix}-city`}
             {...form.register(`${prefix}.city`)}
             disabled={disabled}
-            className={errors.city ? 'border-red-500' : ''}
+            className={errors.city ? "border-red-500" : ""}
             placeholder="Enter city"
             aria-describedby={errors.city ? `${prefix}-city-error` : undefined}
           />
           {errors.city && (
-            <p id={`${prefix}-city-error`} className="text-sm text-red-600" role="alert">
+            <p
+              id={`${prefix}-city-error`}
+              className="text-sm text-red-600"
+              role="alert"
+            >
               {errors.city.message}
             </p>
           )}
@@ -132,7 +154,10 @@ function AddressFields({ prefix, form, disabled }: AddressFieldsProps) {
             onValueChange={(value) => form.setValue(`${prefix}.state`, value)}
             disabled={disabled}
           >
-            <SelectTrigger id={`${prefix}-state`} className={errors.state ? 'border-red-500' : ''}>
+            <SelectTrigger
+              id={`${prefix}-state`}
+              className={errors.state ? "border-red-500" : ""}
+            >
               <SelectValue placeholder="Select state" />
             </SelectTrigger>
             <SelectContent>
@@ -154,25 +179,37 @@ function AddressFields({ prefix, form, disabled }: AddressFieldsProps) {
       {/* Postal Code and Country */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
-          <Label className="body-sm font-semibold" htmlFor={`${prefix}-postalCode`}>
+          <Label
+            className="body-sm font-semibold"
+            htmlFor={`${prefix}-postalCode`}
+          >
             ZIP/Postal Code *
           </Label>
           <Input
             id={`${prefix}-postalCode`}
             {...form.register(`${prefix}.postalCode`)}
             disabled={disabled}
-            className={errors.postalCode ? 'border-red-500' : ''}
+            className={errors.postalCode ? "border-red-500" : ""}
             placeholder="Enter postal code"
-            aria-describedby={errors.postalCode ? `${prefix}-postalCode-error` : undefined}
+            aria-describedby={
+              errors.postalCode ? `${prefix}-postalCode-error` : undefined
+            }
           />
           {errors.postalCode && (
-            <p id={`${prefix}-postalCode-error`} className="text-sm text-red-600" role="alert">
+            <p
+              id={`${prefix}-postalCode-error`}
+              className="text-sm text-red-600"
+              role="alert"
+            >
               {errors.postalCode.message}
             </p>
           )}
         </div>
         <div className="space-y-2">
-          <Label className="body-sm font-semibold" htmlFor={`${prefix}-country`}>
+          <Label
+            className="body-sm font-semibold"
+            htmlFor={`${prefix}-country`}
+          >
             Country *
           </Label>
           <Select
@@ -180,7 +217,10 @@ function AddressFields({ prefix, form, disabled }: AddressFieldsProps) {
             onValueChange={(value) => form.setValue(`${prefix}.country`, value)}
             disabled={disabled}
           >
-            <SelectTrigger id={`${prefix}-country`} className={errors.country ? 'border-red-500' : ''}>
+            <SelectTrigger
+              id={`${prefix}-country`}
+              className={errors.country ? "border-red-500" : ""}
+            >
               <SelectValue placeholder="Select country" />
             </SelectTrigger>
             <SelectContent>
@@ -220,7 +260,7 @@ export default function AddressForm() {
     setIsEditing(false);
   };
 
-  const sameAsBilling = form.watch('sameAsBilling');
+  const sameAsBilling = form.watch("sameAsBilling");
 
   if (isLoading) {
     return (
@@ -253,8 +293,12 @@ export default function AddressForm() {
       {/* Header with Edit Button */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Address Management</h3>
-          <p className="text-sm text-gray-600">Manage your billing and legal addresses</p>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Address Management
+          </h3>
+          <p className="text-sm text-gray-600">
+            Manage your billing and legal addresses
+          </p>
         </div>
         <Button
           variant="outline"
@@ -280,12 +324,18 @@ export default function AddressForm() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <AddressFields prefix="billing" form={form} disabled={!isEditing} />
-              
+              <AddressFields
+                prefix="billing"
+                form={form}
+                disabled={!isEditing}
+              />
+
               {addresses?.billing?.verified && (
                 <div className="flex items-center space-x-2 pt-2">
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="body-sm text-green-600">Address verified</span>
+                  <span className="body-sm text-green-600">
+                    Address verified
+                  </span>
                 </div>
               )}
             </CardContent>
@@ -308,8 +358,8 @@ export default function AddressForm() {
                 <Checkbox
                   id="same-as-billing"
                   checked={sameAsBilling}
-                  onCheckedChange={(checked) => 
-                    form.setValue('sameAsBilling', checked as boolean)
+                  onCheckedChange={(checked) =>
+                    form.setValue("sameAsBilling", checked as boolean)
                   }
                   disabled={!isEditing}
                 />
@@ -320,7 +370,11 @@ export default function AddressForm() {
 
               {/* Legal Address Fields - Only show if not same as billing */}
               {!sameAsBilling && (
-                <AddressFields prefix="legal" form={form} disabled={!isEditing} />
+                <AddressFields
+                  prefix="legal"
+                  form={form}
+                  disabled={!isEditing}
+                />
               )}
 
               {sameAsBilling && (
@@ -334,7 +388,9 @@ export default function AddressForm() {
               {addresses?.legal?.verified && !sameAsBilling && (
                 <div className="flex items-center space-x-2 pt-2">
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="body-sm text-green-600">Address verified</span>
+                  <span className="body-sm text-green-600">
+                    Address verified
+                  </span>
                 </div>
               )}
             </CardContent>
@@ -348,10 +404,12 @@ export default function AddressForm() {
               <Button
                 type="submit"
                 className="bg-primary hover:bg-primary/90"
-                disabled={form.formState.isSubmitting || !form.formState.isDirty}
+                disabled={
+                  form.formState.isSubmitting || !form.formState.isDirty
+                }
               >
                 <Save className="mr-2 h-4 w-4" />
-                {form.formState.isSubmitting ? 'Saving...' : 'Save Addresses'}
+                {form.formState.isSubmitting ? "Saving..." : "Save Addresses"}
               </Button>
               <Button
                 type="button"
@@ -374,8 +432,9 @@ export default function AddressForm() {
             <div>
               <h4 className="font-medium text-blue-900">Address Validation</h4>
               <p className="text-sm text-blue-700 mt-1">
-                We automatically validate addresses to ensure accurate billing and shipping. 
-                Verified addresses help prevent delivery issues and payment processing delays.
+                We automatically validate addresses to ensure accurate billing
+                and shipping. Verified addresses help prevent delivery issues
+                and payment processing delays.
               </p>
             </div>
           </div>

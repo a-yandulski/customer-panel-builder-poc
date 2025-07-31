@@ -1,57 +1,77 @@
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useToast } from '@/components/ui/toast';
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useToast } from "@/components/ui/toast";
 
 // Validation schemas
 const profileSchema = z.object({
-  name: z.string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(100, 'Name must be less than 100 characters'),
-  email: z.string()
-    .email('Please enter a valid email address'),
-  phone: z.string()
-    .regex(/^\+?[\d\s\-\(\)]+$/, 'Please enter a valid phone number')
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be less than 100 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  phone: z
+    .string()
+    .regex(/^\+?[\d\s\-\(\)]+$/, "Please enter a valid phone number")
     .optional()
-    .or(z.literal('')),
-  company: z.string()
-    .max(100, 'Company name must be less than 100 characters')
+    .or(z.literal("")),
+  company: z
+    .string()
+    .max(100, "Company name must be less than 100 characters")
     .optional()
-    .or(z.literal('')),
+    .or(z.literal("")),
 });
 
 const addressSchema = z.object({
   billing: z.object({
-    street: z.string().min(5, 'Street address must be at least 5 characters'),
-    city: z.string().min(2, 'City is required'),
-    state: z.string().min(2, 'State/Province is required'),
-    postalCode: z.string().regex(/^[\w\s\-]{3,10}$/, 'Valid postal code is required'),
-    country: z.string().min(1, 'Country is required'),
+    street: z.string().min(5, "Street address must be at least 5 characters"),
+    city: z.string().min(2, "City is required"),
+    state: z.string().min(2, "State/Province is required"),
+    postalCode: z
+      .string()
+      .regex(/^[\w\s\-]{3,10}$/, "Valid postal code is required"),
+    country: z.string().min(1, "Country is required"),
   }),
-  legal: z.object({
-    street: z.string().min(5, 'Street address must be at least 5 characters'),
-    city: z.string().min(2, 'City is required'),
-    state: z.string().min(2, 'State/Province is required'),
-    postalCode: z.string().regex(/^[\w\s\-]{3,10}$/, 'Valid postal code is required'),
-    country: z.string().min(1, 'Country is required'),
-  }).optional(),
+  legal: z
+    .object({
+      street: z.string().min(5, "Street address must be at least 5 characters"),
+      city: z.string().min(2, "City is required"),
+      state: z.string().min(2, "State/Province is required"),
+      postalCode: z
+        .string()
+        .regex(/^[\w\s\-]{3,10}$/, "Valid postal code is required"),
+      country: z.string().min(1, "Country is required"),
+    })
+    .optional(),
   sameAsBilling: z.boolean(),
 });
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/(?=.*[a-z])/, 'Password must contain at least one lowercase letter')
-    .regex(/(?=.*[A-Z])/, 'Password must contain at least one uppercase letter')
-    .regex(/(?=.*\d)/, 'Password must contain at least one number')
-    .regex(/(?=.*[!@#$%^&*])/, 'Password must contain at least one special character'),
-  confirmPassword: z.string(),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(
+        /(?=.*[a-z])/,
+        "Password must contain at least one lowercase letter",
+      )
+      .regex(
+        /(?=.*[A-Z])/,
+        "Password must contain at least one uppercase letter",
+      )
+      .regex(/(?=.*\d)/, "Password must contain at least one number")
+      .regex(
+        /(?=.*[!@#$%^&*])/,
+        "Password must contain at least one special character",
+      ),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
 export type AddressFormData = z.infer<typeof addressSchema>;
@@ -59,7 +79,7 @@ export type PasswordFormData = z.infer<typeof passwordSchema>;
 
 // Mock token function (replace with actual auth)
 const getAuthToken = () => {
-  return localStorage.getItem('fake_auth_token') || 'mock-token';
+  return localStorage.getItem("fake_auth_token") || "mock-token";
 };
 
 // Profile management hook
@@ -72,10 +92,10 @@ export function useProfile() {
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      phone: '',
-      company: '',
+      name: "",
+      email: "",
+      phone: "",
+      company: "",
     },
   });
 
@@ -84,32 +104,33 @@ export function useProfile() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/user/profile', {
+      const response = await fetch("/api/user/profile", {
         headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch profile');
+        throw new Error(errorData.error || "Failed to fetch profile");
       }
 
       const data = await response.json();
       setProfile(data.profile);
-      
+
       // Update form with fetched data
       form.reset({
-        name: data.profile.name || '',
-        email: data.profile.email || '',
-        phone: data.profile.phone || '',
-        company: data.profile.company || '',
+        name: data.profile.name || "",
+        email: data.profile.email || "",
+        phone: data.profile.phone || "",
+        company: data.profile.company || "",
       });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load profile';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load profile";
       setError(errorMessage);
-      toast.error(errorMessage, { title: 'Profile Error' });
+      toast.error(errorMessage, { title: "Profile Error" });
     } finally {
       setIsLoading(false);
     }
@@ -119,18 +140,18 @@ export function useProfile() {
     try {
       setError(null);
 
-      const response = await fetch('/api/user/profile', {
-        method: 'PUT',
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
         headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         if (errorData.details) {
           // Handle field-specific validation errors
           Object.entries(errorData.details).forEach(([field, messages]) => {
@@ -138,19 +159,22 @@ export function useProfile() {
               message: (messages as string[])[0],
             });
           });
-          throw new Error('Please fix the validation errors');
+          throw new Error("Please fix the validation errors");
         }
-        
-        throw new Error(errorData.error || 'Failed to update profile');
+
+        throw new Error(errorData.error || "Failed to update profile");
       }
 
       const result = await response.json();
       setProfile(result.profile);
-      
-      toast.success('Profile updated successfully!', { title: 'Changes Saved' });
+
+      toast.success("Profile updated successfully!", {
+        title: "Changes Saved",
+      });
       return result.profile;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update profile';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to update profile";
       setError(errorMessage);
       throw err;
     }
@@ -181,18 +205,18 @@ export function useAddress() {
     resolver: zodResolver(addressSchema),
     defaultValues: {
       billing: {
-        street: '',
-        city: '',
-        state: '',
-        postalCode: '',
-        country: '',
+        street: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "",
       },
       legal: {
-        street: '',
-        city: '',
-        state: '',
-        postalCode: '',
-        country: '',
+        street: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "",
       },
       sameAsBilling: true,
     },
@@ -203,21 +227,21 @@ export function useAddress() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/user/address', {
+      const response = await fetch("/api/user/address", {
         headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch addresses');
+        throw new Error(errorData.error || "Failed to fetch addresses");
       }
 
       const data = await response.json();
       setAddresses(data.addresses);
-      
+
       // Update form with fetched data
       form.reset({
         billing: data.addresses.billing,
@@ -225,9 +249,10 @@ export function useAddress() {
         sameAsBilling: data.addresses.sameAsBilling,
       });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load addresses';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load addresses";
       setError(errorMessage);
-      toast.error(errorMessage, { title: 'Address Error' });
+      toast.error(errorMessage, { title: "Address Error" });
     } finally {
       setIsLoading(false);
     }
@@ -237,18 +262,18 @@ export function useAddress() {
     try {
       setError(null);
 
-      const response = await fetch('/api/user/address', {
-        method: 'PUT',
+      const response = await fetch("/api/user/address", {
+        method: "PUT",
         headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         if (errorData.details) {
           // Handle field-specific validation errors
           Object.entries(errorData.details).forEach(([field, messages]) => {
@@ -256,19 +281,22 @@ export function useAddress() {
               message: (messages as string[])[0],
             });
           });
-          throw new Error('Please fix the validation errors');
+          throw new Error("Please fix the validation errors");
         }
-        
-        throw new Error(errorData.error || 'Failed to update addresses');
+
+        throw new Error(errorData.error || "Failed to update addresses");
       }
 
       const result = await response.json();
       setAddresses(result.addresses);
-      
-      toast.success('Addresses updated successfully!', { title: 'Changes Saved' });
+
+      toast.success("Addresses updated successfully!", {
+        title: "Changes Saved",
+      });
       return result.addresses;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update addresses';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to update addresses";
       setError(errorMessage);
       throw err;
     }
@@ -297,9 +325,9 @@ export function usePasswordChange() {
   const form = useForm<PasswordFormData>({
     resolver: zodResolver(passwordSchema),
     defaultValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     },
   });
 
@@ -308,18 +336,18 @@ export function usePasswordChange() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/user/password', {
-        method: 'POST',
+      const response = await fetch("/api/user/password", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         if (errorData.details) {
           // Handle field-specific validation errors
           Object.entries(errorData.details).forEach(([field, messages]) => {
@@ -327,21 +355,24 @@ export function usePasswordChange() {
               message: (messages as string[])[0],
             });
           });
-          throw new Error('Please fix the validation errors');
+          throw new Error("Please fix the validation errors");
         }
-        
-        throw new Error(errorData.error || 'Failed to change password');
+
+        throw new Error(errorData.error || "Failed to change password");
       }
 
       const result = await response.json();
-      
+
       // Reset form on success
       form.reset();
-      
-      toast.success('Password changed successfully!', { title: 'Security Updated' });
+
+      toast.success("Password changed successfully!", {
+        title: "Security Updated",
+      });
       return result;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to change password';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to change password";
       setError(errorMessage);
       throw err;
     } finally {
@@ -360,17 +391,17 @@ export function usePasswordChange() {
   };
 
   const getStrengthLabel = (strength: number) => {
-    if (strength < 25) return 'Weak';
-    if (strength < 50) return 'Fair';
-    if (strength < 75) return 'Good';
-    return 'Strong';
+    if (strength < 25) return "Weak";
+    if (strength < 50) return "Fair";
+    if (strength < 75) return "Good";
+    return "Strong";
   };
 
   const getStrengthColor = (strength: number) => {
-    if (strength < 25) return 'bg-red-500';
-    if (strength < 50) return 'bg-yellow-500';
-    if (strength < 75) return 'bg-orange-500';
-    return 'bg-green-500';
+    if (strength < 25) return "bg-red-500";
+    if (strength < 50) return "bg-yellow-500";
+    if (strength < 75) return "bg-orange-500";
+    return "bg-green-500";
   };
 
   return {
@@ -396,33 +427,38 @@ export function useTwoFactor() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/user/2fa/toggle', {
-        method: 'POST',
+      const response = await fetch("/api/user/2fa/toggle", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ enabled, currentPassword }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to toggle two-factor authentication');
+        throw new Error(
+          errorData.error || "Failed to toggle two-factor authentication",
+        );
       }
 
       const result = await response.json();
       setTwoFactorData(result);
-      
+
       toast.success(
-        enabled 
-          ? 'Two-factor authentication enabled successfully!' 
-          : 'Two-factor authentication disabled successfully!',
-        { title: 'Security Updated' }
+        enabled
+          ? "Two-factor authentication enabled successfully!"
+          : "Two-factor authentication disabled successfully!",
+        { title: "Security Updated" },
       );
-      
+
       return result;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update two-factor authentication';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to update two-factor authentication";
       setError(errorMessage);
       throw err;
     } finally {
@@ -435,25 +471,28 @@ export function useTwoFactor() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/user/2fa/verify', {
-        method: 'POST',
+      const response = await fetch("/api/user/2fa/verify", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ code }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to verify code');
+        throw new Error(errorData.error || "Failed to verify code");
       }
 
       const result = await response.json();
-      toast.success('Two-factor authentication verified successfully!', { title: 'Verification Complete' });
+      toast.success("Two-factor authentication verified successfully!", {
+        title: "Verification Complete",
+      });
       return result;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to verify code';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to verify code";
       setError(errorMessage);
       throw err;
     } finally {
@@ -466,25 +505,28 @@ export function useTwoFactor() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/user/2fa/backup-codes', {
-        method: 'POST',
+      const response = await fetch("/api/user/2fa/backup-codes", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ currentPassword }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate backup codes');
+        throw new Error(errorData.error || "Failed to generate backup codes");
       }
 
       const result = await response.json();
-      toast.success('New backup codes generated successfully!', { title: 'Backup Codes Updated' });
+      toast.success("New backup codes generated successfully!", {
+        title: "Backup Codes Updated",
+      });
       return result;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate backup codes';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to generate backup codes";
       setError(errorMessage);
       throw err;
     } finally {
@@ -514,24 +556,29 @@ export function useSecurity() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/user/security', {
+      const response = await fetch("/api/user/security", {
         headers: {
-          'Authorization': `Bearer ${getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch security information');
+        throw new Error(
+          errorData.error || "Failed to fetch security information",
+        );
       }
 
       const data = await response.json();
       setSecurity(data.security);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load security information';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to load security information";
       setError(errorMessage);
-      toast.error(errorMessage, { title: 'Security Error' });
+      toast.error(errorMessage, { title: "Security Error" });
     } finally {
       setIsLoading(false);
     }

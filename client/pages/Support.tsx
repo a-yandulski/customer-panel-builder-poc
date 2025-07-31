@@ -28,8 +28,6 @@ import TicketCreateForm from "@/components/support/TicketCreateForm";
 import TicketConversation from "@/components/support/TicketConversation";
 import { type Ticket } from "@/hooks/useSupport";
 
-
-
 type KnowledgeArticle = {
   id: string;
   title: string;
@@ -43,7 +41,9 @@ type KnowledgeArticle = {
 export default function Support() {
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
-  const [activeView, setActiveView] = useState<"list" | "create" | "conversation">("list");
+  const [activeView, setActiveView] = useState<
+    "list" | "create" | "conversation"
+  >("list");
 
   const handleTicketSelect = (ticket: Ticket) => {
     setSelectedTicket(ticket);
@@ -137,7 +137,9 @@ export default function Support() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Create Support Ticket</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Create Support Ticket
+              </h1>
               <p className="text-gray-600 mt-1">
                 Get help with your services by creating a support ticket
               </p>
@@ -165,7 +167,8 @@ export default function Support() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Support Center</h1>
             <p className="text-gray-600 mt-1">
-              Get help with your services, manage support tickets, and browse our knowledge base
+              Get help with your services, manage support tickets, and browse
+              our knowledge base
             </p>
           </div>
           <Button onClick={handleCreateTicket}>
@@ -175,7 +178,11 @@ export default function Support() {
         </div>
 
         {/* Support Navigation */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="tickets">My Tickets</TabsTrigger>
@@ -199,7 +206,10 @@ export default function Support() {
               <div>
                 <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
                 <div className="space-y-3">
-                  <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={handleCreateTicket}>
+                  <Card
+                    className="cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={handleCreateTicket}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-3">
                         <div className="p-2 bg-primary/10 rounded-lg">
@@ -207,12 +217,17 @@ export default function Support() {
                         </div>
                         <div>
                           <p className="font-medium">Create New Ticket</p>
-                          <p className="text-sm text-gray-600">Get help with your services</p>
+                          <p className="text-sm text-gray-600">
+                            Get help with your services
+                          </p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab("knowledge")}>
+                  <Card
+                    className="cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => setActiveTab("knowledge")}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-3">
                         <div className="p-2 bg-blue-100 rounded-lg">
@@ -220,7 +235,9 @@ export default function Support() {
                         </div>
                         <div>
                           <p className="font-medium">Browse Knowledge Base</p>
-                          <p className="text-sm text-gray-600">Find answers to common questions</p>
+                          <p className="text-sm text-gray-600">
+                            Find answers to common questions
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -352,7 +369,9 @@ export default function Support() {
             <Card className="bg-primary/5 border-primary/20">
               <CardContent className="pt-8 pb-8 text-center">
                 <AlertCircle className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Still need help?</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Still need help?
+                </h3>
                 <p className="text-gray-600 mb-6">
                   Can't find what you're looking for? Our support team is here
                   to help you with any questions.

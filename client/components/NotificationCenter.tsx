@@ -1,15 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useNotifications } from '@/contexts/NotificationContext';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useNotifications } from "@/contexts/NotificationContext";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   Bell,
   BellRing,
@@ -27,7 +27,7 @@ import {
   MoreHorizontal,
   Clock,
   Filter,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface NotificationItemProps {
   notification: any;
@@ -37,24 +37,24 @@ interface NotificationItemProps {
   onNavigate: (url: string) => void;
 }
 
-function NotificationItem({ 
-  notification, 
-  onMarkAsRead, 
-  onMarkAsUnread, 
-  onDelete, 
-  onNavigate 
+function NotificationItem({
+  notification,
+  onMarkAsRead,
+  onMarkAsUnread,
+  onDelete,
+  onNavigate,
 }: NotificationItemProps) {
   const [showActions, setShowActions] = useState(false);
 
   const getIcon = () => {
     switch (notification.type) {
-      case 'success':
+      case "success":
         return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'error':
+      case "error":
         return <AlertCircle className="h-4 w-4 text-red-600" />;
-      case 'warning':
+      case "warning":
         return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
-      case 'info':
+      case "info":
       default:
         return <Info className="h-4 w-4 text-blue-600" />;
     }
@@ -68,7 +68,7 @@ function NotificationItem({
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffMins < 1) return 'Just now';
+    if (diffMins < 1) return "Just now";
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;
@@ -77,13 +77,13 @@ function NotificationItem({
 
   const getPriorityColor = () => {
     switch (notification.priority) {
-      case 'high':
-        return 'border-l-red-500';
-      case 'medium':
-        return 'border-l-yellow-500';
-      case 'low':
+      case "high":
+        return "border-l-red-500";
+      case "medium":
+        return "border-l-yellow-500";
+      case "low":
       default:
-        return 'border-l-blue-500';
+        return "border-l-blue-500";
     }
   };
 
@@ -101,7 +101,7 @@ function NotificationItem({
       className={`
         relative p-4 border-l-2 hover:bg-gray-50 transition-colors cursor-pointer
         ${getPriorityColor()}
-        ${!notification.isRead ? 'bg-blue-50/30' : 'bg-white'}
+        ${!notification.isRead ? "bg-blue-50/30" : "bg-white"}
       `}
       onClick={handleClick}
       onMouseEnter={() => setShowActions(true)}
@@ -109,7 +109,7 @@ function NotificationItem({
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           handleClick();
         }
@@ -117,39 +117,42 @@ function NotificationItem({
       aria-label={`Notification: ${notification.title}`}
     >
       <div className="flex items-start space-x-3">
-        <div className="flex-shrink-0 mt-1">
-          {getIcon()}
-        </div>
-        
+        <div className="flex-shrink-0 mt-1">{getIcon()}</div>
+
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
-              <h4 className={`text-sm font-medium truncate ${
-                !notification.isRead ? 'text-gray-900' : 'text-gray-700'
-              }`}>
+              <h4
+                className={`text-sm font-medium truncate ${
+                  !notification.isRead ? "text-gray-900" : "text-gray-700"
+                }`}
+              >
                 {notification.title}
               </h4>
               <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                 {notification.message}
               </p>
-              
+
               <div className="flex items-center space-x-2 mt-2">
                 <span className="text-xs text-gray-500 flex items-center">
                   <Clock className="h-3 w-3 mr-1" />
                   {getTimeAgo(notification.timestamp)}
                 </span>
-                
+
                 {notification.category && (
-                  <Badge 
-                    variant="secondary" 
+                  <Badge
+                    variant="secondary"
                     className="text-xs px-2 py-0.5 h-5"
                   >
                     {notification.category}
                   </Badge>
                 )}
-                
+
                 {!notification.isRead && (
-                  <div className="w-2 h-2 bg-blue-600 rounded-full" aria-label="Unread" />
+                  <div
+                    className="w-2 h-2 bg-blue-600 rounded-full"
+                    aria-label="Unread"
+                  />
                 )}
               </div>
             </div>
@@ -162,16 +165,18 @@ function NotificationItem({
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    notification.isRead 
+                    notification.isRead
                       ? onMarkAsUnread(notification.id)
                       : onMarkAsRead(notification.id);
                   }}
                   className="h-6 w-6 p-0"
-                  aria-label={notification.isRead ? 'Mark as unread' : 'Mark as read'}
+                  aria-label={
+                    notification.isRead ? "Mark as unread" : "Mark as read"
+                  }
                 >
                   <MailCheck className="h-3 w-3" />
                 </Button>
-                
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -196,7 +201,7 @@ function NotificationItem({
 export default function NotificationCenter() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'unread'>('all');
+  const [filter, setFilter] = useState<"all" | "unread">("all");
   const {
     notifications,
     unreadCount,
@@ -225,9 +230,10 @@ export default function NotificationCenter() {
     setIsOpen(false);
   };
 
-  const filteredNotifications = filter === 'unread' 
-    ? notifications.filter(n => !n.isRead)
-    : notifications;
+  const filteredNotifications =
+    filter === "unread"
+      ? notifications.filter((n) => !n.isRead)
+      : notifications;
 
   const handleMarkAllAsRead = () => {
     markAllAsRead();
@@ -250,34 +256,34 @@ export default function NotificationCenter() {
           ref={bellRef}
           variant="ghost"
           size="sm"
-          className={`relative h-10 w-10 p-0 ${isAnimating ? 'animate-bounce' : ''}`}
-          aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+          className={`relative h-10 w-10 p-0 ${isAnimating ? "animate-bounce" : ""}`}
+          aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         >
           {unreadCount > 0 ? (
             <BellRing className="h-5 w-5 text-gray-700" />
           ) : (
             <Bell className="h-5 w-5 text-gray-700" />
           )}
-          
+
           {/* Unread count badge */}
           {unreadCount > 0 && (
-            <Badge 
+            <Badge
               className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-600 text-white text-xs p-0 flex items-center justify-center border-2 border-white"
               aria-hidden="true"
             >
-              {unreadCount > 99 ? '99+' : unreadCount}
+              {unreadCount > 99 ? "99+" : unreadCount}
             </Badge>
           )}
-          
+
           {/* Connection status indicator */}
           {!isConnected && (
             <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-red-500 border border-white" />
           )}
         </Button>
       </DropdownMenuTrigger>
-      
-      <DropdownMenuContent 
-        align="end" 
+
+      <DropdownMenuContent
+        align="end"
         className="w-96 p-0 max-h-[80vh] overflow-hidden"
         sideOffset={8}
       >
@@ -291,7 +297,7 @@ export default function NotificationCenter() {
               </Badge>
             )}
           </div>
-          
+
           <div className="flex items-center space-x-1">
             {/* Connection status */}
             <Button
@@ -299,7 +305,7 @@ export default function NotificationCenter() {
               size="sm"
               onClick={reconnect}
               className="h-8 w-8 p-0"
-              aria-label={isConnected ? 'Connected' : 'Reconnect'}
+              aria-label={isConnected ? "Connected" : "Reconnect"}
             >
               {isConnected ? (
                 <Wifi className="h-4 w-4 text-green-600" />
@@ -307,18 +313,20 @@ export default function NotificationCenter() {
                 <WifiOff className="h-4 w-4 text-red-600" />
               )}
             </Button>
-            
+
             {/* Filter toggle */}
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setFilter(filter === 'all' ? 'unread' : 'all')}
+              onClick={() => setFilter(filter === "all" ? "unread" : "all")}
               className="h-8 w-8 p-0"
-              aria-label={`Show ${filter === 'all' ? 'unread only' : 'all notifications'}`}
+              aria-label={`Show ${filter === "all" ? "unread only" : "all notifications"}`}
             >
-              <Filter className={`h-4 w-4 ${filter === 'unread' ? 'text-blue-600' : 'text-gray-600'}`} />
+              <Filter
+                className={`h-4 w-4 ${filter === "unread" ? "text-blue-600" : "text-gray-600"}`}
+              />
             </Button>
-            
+
             {/* More actions */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -343,12 +351,12 @@ export default function NotificationCenter() {
                     <MailCheck className="mr-2 h-4 w-4" />
                     Mark all as read
                   </Button>
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      navigate('/account?tab=privacy');
+                      navigate("/account?tab=privacy");
                       setIsOpen(false);
                     }}
                     className="w-full justify-start h-8"
@@ -356,7 +364,7 @@ export default function NotificationCenter() {
                     <Settings className="mr-2 h-4 w-4" />
                     Preferences
                   </Button>
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
@@ -364,7 +372,9 @@ export default function NotificationCenter() {
                     disabled={isLoading}
                     className="w-full justify-start h-8"
                   >
-                    <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                    <RefreshCw
+                      className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+                    />
                     Refresh
                   </Button>
                 </div>
@@ -412,7 +422,7 @@ export default function NotificationCenter() {
         )}
 
         {/* Filter info */}
-        {filter === 'unread' && (
+        {filter === "unread" && (
           <div className="bg-blue-50 border-b border-blue-200 p-2">
             <div className="flex items-center justify-between">
               <span className="text-xs text-blue-800">
@@ -421,7 +431,7 @@ export default function NotificationCenter() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setFilter('all')}
+                onClick={() => setFilter("all")}
                 className="h-6 px-2 text-xs text-blue-600 hover:bg-blue-100"
               >
                 Show all
@@ -441,13 +451,14 @@ export default function NotificationCenter() {
             <div className="p-8 text-center">
               <Bell className="h-8 w-8 mx-auto text-gray-300 mb-3" />
               <h4 className="font-medium text-gray-900 mb-1">
-                {filter === 'unread' ? 'No unread notifications' : 'No notifications'}
+                {filter === "unread"
+                  ? "No unread notifications"
+                  : "No notifications"}
               </h4>
               <p className="text-sm text-gray-600">
-                {filter === 'unread' 
-                  ? 'You\'re all caught up!'
-                  : 'We\'ll notify you when something happens.'
-                }
+                {filter === "unread"
+                  ? "You're all caught up!"
+                  : "We'll notify you when something happens."}
               </p>
             </div>
           ) : (
@@ -473,7 +484,7 @@ export default function NotificationCenter() {
               variant="ghost"
               size="sm"
               onClick={() => {
-                navigate('/notifications');
+                navigate("/notifications");
                 setIsOpen(false);
               }}
               className="w-full justify-center h-8 text-sm"

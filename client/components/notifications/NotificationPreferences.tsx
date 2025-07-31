@@ -1,13 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { useNotifications } from '@/contexts/NotificationContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState, useEffect } from "react";
+import { useNotifications } from "@/contexts/NotificationContext";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Bell,
   Mail,
@@ -28,7 +40,7 @@ import {
   Sun,
   Clock,
   Calendar,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface NotificationCategory {
   id: string;
@@ -44,75 +56,77 @@ interface NotificationCategory {
 
 const NOTIFICATION_CATEGORIES: NotificationCategory[] = [
   {
-    id: 'security',
-    name: 'Security Alerts',
-    description: 'Login attempts, password changes, suspicious activity',
+    id: "security",
+    name: "Security Alerts",
+    description: "Login attempts, password changes, suspicious activity",
     icon: <Shield className="h-5 w-5 text-red-600" />,
     channels: { email: true, push: true, sms: true },
   },
   {
-    id: 'billing',
-    name: 'Billing & Payments',
-    description: 'Invoices, payment confirmations, billing issues',
+    id: "billing",
+    name: "Billing & Payments",
+    description: "Invoices, payment confirmations, billing issues",
     icon: <CreditCard className="h-5 w-5 text-green-600" />,
     channels: { email: true, push: true, sms: false },
   },
   {
-    id: 'support',
-    name: 'Support Tickets',
-    description: 'Ticket updates, agent responses, resolution notices',
+    id: "support",
+    name: "Support Tickets",
+    description: "Ticket updates, agent responses, resolution notices",
     icon: <Headphones className="h-5 w-5 text-blue-600" />,
     channels: { email: true, push: false, sms: false },
   },
   {
-    id: 'domain',
-    name: 'Domain Management',
-    description: 'Domain renewals, DNS changes, transfer updates',
+    id: "domain",
+    name: "Domain Management",
+    description: "Domain renewals, DNS changes, transfer updates",
     icon: <Globe className="h-5 w-5 text-purple-600" />,
     channels: { email: true, push: true, sms: false },
   },
   {
-    id: 'system',
-    name: 'System Notifications',
-    description: 'Maintenance alerts, service updates, outages',
+    id: "system",
+    name: "System Notifications",
+    description: "Maintenance alerts, service updates, outages",
     icon: <Server className="h-5 w-5 text-orange-600" />,
     channels: { email: true, push: true, sms: false },
   },
   {
-    id: 'marketing',
-    name: 'Marketing & Promotions',
-    description: 'Product updates, special offers, newsletters',
+    id: "marketing",
+    name: "Marketing & Promotions",
+    description: "Product updates, special offers, newsletters",
     icon: <MessageSquare className="h-5 w-5 text-pink-600" />,
     channels: { email: false, push: false, sms: false },
   },
 ];
 
 const QUIET_HOURS_PRESETS = [
-  { label: 'Never', value: 'never' },
-  { label: 'Evenings (6 PM - 8 AM)', value: 'evening' },
-  { label: 'Nights (10 PM - 7 AM)', value: 'night' },
-  { label: 'Weekends', value: 'weekend' },
-  { label: 'Custom', value: 'custom' },
+  { label: "Never", value: "never" },
+  { label: "Evenings (6 PM - 8 AM)", value: "evening" },
+  { label: "Nights (10 PM - 7 AM)", value: "night" },
+  { label: "Weekends", value: "weekend" },
+  { label: "Custom", value: "custom" },
 ];
 
 export default function NotificationPreferences() {
   const { preferences, updatePreferences } = useNotifications();
-  const [localPreferences, setLocalPreferences] = useState<NotificationCategory[]>(NOTIFICATION_CATEGORIES);
+  const [localPreferences, setLocalPreferences] = useState<
+    NotificationCategory[]
+  >(NOTIFICATION_CATEGORIES);
   const [isLoading, setIsLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  
+
   // Advanced settings
-  const [emailDigest, setEmailDigest] = useState('daily');
-  const [quietHours, setQuietHours] = useState('night');
+  const [emailDigest, setEmailDigest] = useState("daily");
+  const [quietHours, setQuietHours] = useState("night");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [browserNotifications, setBrowserNotifications] = useState(true);
   const [groupSimilar, setGroupSimilar] = useState(true);
-  const [maxNotifications, setMaxNotifications] = useState('50');
+  const [maxNotifications, setMaxNotifications] = useState("50");
 
   // Load preferences from context
   useEffect(() => {
     if (preferences) {
-      const updatedCategories = NOTIFICATION_CATEGORIES.map(category => ({
+      const updatedCategories = NOTIFICATION_CATEGORIES.map((category) => ({
         ...category,
         channels: {
           email: preferences.email?.[category.id] ?? category.channels.email,
@@ -124,13 +138,20 @@ export default function NotificationPreferences() {
     }
   }, [preferences]);
 
-  const handleChannelToggle = (categoryId: string, channel: 'email' | 'push' | 'sms', enabled: boolean) => {
-    setLocalPreferences(prev => 
-      prev.map(category => 
-        category.id === categoryId 
-          ? { ...category, channels: { ...category.channels, [channel]: enabled } }
-          : category
-      )
+  const handleChannelToggle = (
+    categoryId: string,
+    channel: "email" | "push" | "sms",
+    enabled: boolean,
+  ) => {
+    setLocalPreferences((prev) =>
+      prev.map((category) =>
+        category.id === categoryId
+          ? {
+              ...category,
+              channels: { ...category.channels, [channel]: enabled },
+            }
+          : category,
+      ),
     );
     setHasChanges(true);
   };
@@ -144,7 +165,7 @@ export default function NotificationPreferences() {
         sms: {},
       };
 
-      localPreferences.forEach(category => {
+      localPreferences.forEach((category) => {
         preferencesData.email[category.id] = category.channels.email;
         preferencesData.push[category.id] = category.channels.push;
         preferencesData.sms[category.id] = category.channels.sms;
@@ -153,42 +174,44 @@ export default function NotificationPreferences() {
       await updatePreferences(preferencesData);
       setHasChanges(false);
     } catch (error) {
-      console.error('Failed to save preferences:', error);
+      console.error("Failed to save preferences:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleEnableAll = (channel: 'email' | 'push' | 'sms') => {
-    setLocalPreferences(prev => 
-      prev.map(category => ({ 
-        ...category, 
-        channels: { ...category.channels, [channel]: true } 
-      }))
+  const handleEnableAll = (channel: "email" | "push" | "sms") => {
+    setLocalPreferences((prev) =>
+      prev.map((category) => ({
+        ...category,
+        channels: { ...category.channels, [channel]: true },
+      })),
     );
     setHasChanges(true);
   };
 
-  const handleDisableAll = (channel: 'email' | 'push' | 'sms') => {
-    setLocalPreferences(prev => 
-      prev.map(category => ({ 
-        ...category, 
-        channels: { ...category.channels, [channel]: false } 
-      }))
+  const handleDisableAll = (channel: "email" | "push" | "sms") => {
+    setLocalPreferences((prev) =>
+      prev.map((category) => ({
+        ...category,
+        channels: { ...category.channels, [channel]: false },
+      })),
     );
     setHasChanges(true);
   };
 
-  const getChannelStats = (channel: 'email' | 'push' | 'sms') => {
-    const enabled = localPreferences.filter(cat => cat.channels[channel]).length;
+  const getChannelStats = (channel: "email" | "push" | "sms") => {
+    const enabled = localPreferences.filter(
+      (cat) => cat.channels[channel],
+    ).length;
     const total = localPreferences.length;
     return { enabled, total };
   };
 
   const requestNotificationPermission = async () => {
-    if ('Notification' in window && Notification.permission === 'default') {
+    if ("Notification" in window && Notification.permission === "default") {
       const permission = await Notification.requestPermission();
-      setBrowserNotifications(permission === 'granted');
+      setBrowserNotifications(permission === "granted");
     }
   };
 
@@ -205,29 +228,32 @@ export default function NotificationPreferences() {
             Choose how and when you want to receive notifications
           </p>
         </div>
-        
+
         {hasChanges && (
-          <Button 
+          <Button
             onClick={handleSavePreferences}
             disabled={isLoading}
             className="bg-primary hover:bg-primary/90"
           >
             <Save className="mr-2 h-4 w-4" />
-            {isLoading ? 'Saving...' : 'Save Changes'}
+            {isLoading ? "Saving..." : "Save Changes"}
           </Button>
         )}
       </div>
 
       {/* Browser Notifications Permission */}
-      {'Notification' in window && Notification.permission !== 'granted' && (
+      {"Notification" in window && Notification.permission !== "granted" && (
         <Card className="border-yellow-200 bg-yellow-50">
           <CardContent className="p-4">
             <div className="flex items-start space-x-3">
               <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
               <div className="flex-1">
-                <h4 className="font-medium text-yellow-900">Enable Browser Notifications</h4>
+                <h4 className="font-medium text-yellow-900">
+                  Enable Browser Notifications
+                </h4>
                 <p className="text-sm text-yellow-800 mt-1">
-                  Allow browser notifications to receive real-time updates even when this page isn't open.
+                  Allow browser notifications to receive real-time updates even
+                  when this page isn't open.
                 </p>
                 <Button
                   size="sm"
@@ -261,7 +287,9 @@ export default function NotificationPreferences() {
                 )}
                 <div>
                   <Label className="font-medium">Sound Notifications</Label>
-                  <p className="text-xs text-gray-600">Play sound for new notifications</p>
+                  <p className="text-xs text-gray-600">
+                    Play sound for new notifications
+                  </p>
                 </div>
               </div>
               <Switch
@@ -269,28 +297,32 @@ export default function NotificationPreferences() {
                 onCheckedChange={setSoundEnabled}
               />
             </div>
-            
+
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
                 <Smartphone className="h-5 w-5 text-blue-600" />
                 <div>
                   <Label className="font-medium">Browser Notifications</Label>
-                  <p className="text-xs text-gray-600">Show desktop notifications</p>
+                  <p className="text-xs text-gray-600">
+                    Show desktop notifications
+                  </p>
                 </div>
               </div>
               <Switch
                 checked={browserNotifications}
                 onCheckedChange={setBrowserNotifications}
-                disabled={Notification.permission === 'denied'}
+                disabled={Notification.permission === "denied"}
               />
             </div>
-            
+
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
                 <Settings className="h-5 w-5 text-purple-600" />
                 <div>
                   <Label className="font-medium">Group Similar</Label>
-                  <p className="text-xs text-gray-600">Group related notifications together</p>
+                  <p className="text-xs text-gray-600">
+                    Group related notifications together
+                  </p>
                 </div>
               </div>
               <Switch
@@ -298,13 +330,15 @@ export default function NotificationPreferences() {
                 onCheckedChange={setGroupSimilar}
               />
             </div>
-            
+
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
                 <Moon className="h-5 w-5 text-indigo-600" />
                 <div>
                   <Label className="font-medium">Quiet Hours</Label>
-                  <p className="text-xs text-gray-600">Reduce notifications during set hours</p>
+                  <p className="text-xs text-gray-600">
+                    Reduce notifications during set hours
+                  </p>
                 </div>
               </div>
               <Select value={quietHours} onValueChange={setQuietHours}>
@@ -312,7 +346,7 @@ export default function NotificationPreferences() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {QUIET_HOURS_PRESETS.map(preset => (
+                  {QUIET_HOURS_PRESETS.map((preset) => (
                     <SelectItem key={preset.value} value={preset.value}>
                       {preset.label}
                     </SelectItem>
@@ -327,11 +361,11 @@ export default function NotificationPreferences() {
       {/* Channel Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { key: 'email', label: 'Email', icon: Mail, color: 'blue' },
-          { key: 'push', label: 'Push', icon: Bell, color: 'green' },
-          { key: 'sms', label: 'SMS', icon: MessageSquare, color: 'purple' },
+          { key: "email", label: "Email", icon: Mail, color: "blue" },
+          { key: "push", label: "Push", icon: Bell, color: "green" },
+          { key: "sms", label: "SMS", icon: MessageSquare, color: "purple" },
         ].map(({ key, label, icon: Icon, color }) => {
-          const stats = getChannelStats(key as 'email' | 'push' | 'sms');
+          const stats = getChannelStats(key as "email" | "push" | "sms");
           return (
             <Card key={key}>
               <CardContent className="p-4">
@@ -344,12 +378,14 @@ export default function NotificationPreferences() {
                     {stats.enabled}/{stats.total}
                   </Badge>
                 </div>
-                
+
                 <div className="flex space-x-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleEnableAll(key as 'email' | 'push' | 'sms')}
+                    onClick={() =>
+                      handleEnableAll(key as "email" | "push" | "sms")
+                    }
                     className="flex-1 h-8 text-xs"
                   >
                     Enable All
@@ -357,7 +393,9 @@ export default function NotificationPreferences() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleDisableAll(key as 'email' | 'push' | 'sms')}
+                    onClick={() =>
+                      handleDisableAll(key as "email" | "push" | "sms")
+                    }
                     className="flex-1 h-8 text-xs"
                   >
                     Disable All
@@ -389,37 +427,50 @@ export default function NotificationPreferences() {
 
             {/* Category Rows */}
             {localPreferences.map((category) => (
-              <div key={category.id} className="grid grid-cols-12 gap-4 py-3 border-b border-gray-100 last:border-b-0">
+              <div
+                key={category.id}
+                className="grid grid-cols-12 gap-4 py-3 border-b border-gray-100 last:border-b-0"
+              >
                 <div className="col-span-6">
                   <div className="flex items-start space-x-3">
                     {category.icon}
                     <div>
-                      <h4 className="font-medium text-gray-900">{category.name}</h4>
-                      <p className="text-sm text-gray-600">{category.description}</p>
+                      <h4 className="font-medium text-gray-900">
+                        {category.name}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        {category.description}
+                      </p>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="col-span-2 flex justify-center">
                   <Switch
                     checked={category.channels.email}
-                    onCheckedChange={(checked) => handleChannelToggle(category.id, 'email', checked)}
+                    onCheckedChange={(checked) =>
+                      handleChannelToggle(category.id, "email", checked)
+                    }
                     aria-label={`Email notifications for ${category.name}`}
                   />
                 </div>
-                
+
                 <div className="col-span-2 flex justify-center">
                   <Switch
                     checked={category.channels.push}
-                    onCheckedChange={(checked) => handleChannelToggle(category.id, 'push', checked)}
+                    onCheckedChange={(checked) =>
+                      handleChannelToggle(category.id, "push", checked)
+                    }
                     aria-label={`Push notifications for ${category.name}`}
                   />
                 </div>
-                
+
                 <div className="col-span-2 flex justify-center">
                   <Switch
                     checked={category.channels.sms}
-                    onCheckedChange={(checked) => handleChannelToggle(category.id, 'sms', checked)}
+                    onCheckedChange={(checked) =>
+                      handleChannelToggle(category.id, "sms", checked)
+                    }
                     aria-label={`SMS notifications for ${category.name}`}
                   />
                 </div>
@@ -457,10 +508,13 @@ export default function NotificationPreferences() {
                 How often to receive email summaries of your notifications
               </p>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="max-notifications">Maximum Notifications</Label>
-              <Select value={maxNotifications} onValueChange={setMaxNotifications}>
+              <Select
+                value={maxNotifications}
+                onValueChange={setMaxNotifications}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -482,7 +536,7 @@ export default function NotificationPreferences() {
 
           <div className="space-y-3">
             <h4 className="font-medium text-gray-900">Custom Quiet Hours</h4>
-            {quietHours === 'custom' && (
+            {quietHours === "custom" && (
               <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                 <div className="space-y-2">
                   <Label>Start Time</Label>
@@ -503,12 +557,21 @@ export default function NotificationPreferences() {
                 <div className="col-span-2 space-y-2">
                   <Label>Days</Label>
                   <div className="flex space-x-2">
-                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                      <label key={day} className="flex items-center space-x-1">
-                        <input type="checkbox" className="rounded" defaultChecked />
-                        <span className="text-xs">{day}</span>
-                      </label>
-                    ))}
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                      (day) => (
+                        <label
+                          key={day}
+                          className="flex items-center space-x-1"
+                        >
+                          <input
+                            type="checkbox"
+                            className="rounded"
+                            defaultChecked
+                          />
+                          <span className="text-xs">{day}</span>
+                        </label>
+                      ),
+                    )}
                   </div>
                 </div>
               </div>
@@ -520,7 +583,7 @@ export default function NotificationPreferences() {
       {/* Save Button */}
       {hasChanges && (
         <div className="flex justify-end">
-          <Button 
+          <Button
             onClick={handleSavePreferences}
             disabled={isLoading}
             className="bg-primary hover:bg-primary/90"
@@ -530,7 +593,7 @@ export default function NotificationPreferences() {
             ) : (
               <Save className="mr-2 h-4 w-4" />
             )}
-            {isLoading ? 'Saving...' : 'Save All Changes'}
+            {isLoading ? "Saving..." : "Save All Changes"}
           </Button>
         </div>
       )}

@@ -1,44 +1,54 @@
-import { useSecurity } from '@/hooks/useProfile';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { 
-  Shield, 
-  CheckCircle, 
-  AlertTriangle, 
-  Clock, 
+import { useSecurity } from "@/hooks/useProfile";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Shield,
+  CheckCircle,
+  AlertTriangle,
+  Clock,
   Monitor,
   Key,
-  Activity
-} from 'lucide-react';
+  Activity,
+} from "lucide-react";
 
 interface SecurityMetricProps {
   icon: React.ReactNode;
   label: string;
   value: string | number;
   description: string;
-  status: 'good' | 'warning' | 'danger';
+  status: "good" | "warning" | "danger";
 }
 
-function SecurityMetric({ icon, label, value, description, status }: SecurityMetricProps) {
+function SecurityMetric({
+  icon,
+  label,
+  value,
+  description,
+  status,
+}: SecurityMetricProps) {
   const statusColors = {
-    good: 'text-green-600',
-    warning: 'text-yellow-600',
-    danger: 'text-red-600',
+    good: "text-green-600",
+    warning: "text-yellow-600",
+    danger: "text-red-600",
   };
 
   const bgColors = {
-    good: 'bg-green-50 border-green-200',
-    warning: 'bg-yellow-50 border-yellow-200', 
-    danger: 'bg-red-50 border-red-200',
+    good: "bg-green-50 border-green-200",
+    warning: "bg-yellow-50 border-yellow-200",
+    danger: "bg-red-50 border-red-200",
   };
 
   return (
     <div className={`p-4 rounded-lg border ${bgColors[status]}`}>
       <div className="flex items-center space-x-3 mb-2">
-        <div className="p-2 bg-white rounded-full">
-          {icon}
-        </div>
+        <div className="p-2 bg-white rounded-full">{icon}</div>
         <div className="flex-1">
           <h4 className="font-medium text-gray-900">{label}</h4>
           <p className={`text-lg font-semibold ${statusColors[status]}`}>
@@ -55,15 +65,21 @@ interface SecurityRecommendationProps {
   title: string;
   description: string;
   action: string;
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
   onAction?: () => void;
 }
 
-function SecurityRecommendation({ title, description, action, priority, onAction }: SecurityRecommendationProps) {
+function SecurityRecommendation({
+  title,
+  description,
+  action,
+  priority,
+  onAction,
+}: SecurityRecommendationProps) {
   const priorityColors = {
-    high: 'border-red-200 bg-red-50',
-    medium: 'border-yellow-200 bg-yellow-50',
-    low: 'border-blue-200 bg-blue-50',
+    high: "border-red-200 bg-red-50",
+    medium: "border-yellow-200 bg-yellow-50",
+    low: "border-blue-200 bg-blue-50",
   };
 
   const priorityIcons = {
@@ -135,7 +151,9 @@ export default function SecurityStatus() {
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center space-x-2">
               <AlertTriangle className="h-5 w-5 text-red-600" />
-              <span className="font-medium text-red-900">Unable to load security status</span>
+              <span className="font-medium text-red-900">
+                Unable to load security status
+              </span>
             </div>
             <p className="text-sm text-red-700 mt-1">{error}</p>
           </div>
@@ -150,9 +168,12 @@ export default function SecurityStatus() {
 
   const getPasswordStatus = (strength: string) => {
     switch (strength) {
-      case 'strong': return 'good';
-      case 'medium': return 'warning';
-      default: return 'danger';
+      case "strong":
+        return "good";
+      case "medium":
+        return "warning";
+      default:
+        return "danger";
     }
   };
 
@@ -160,40 +181,44 @@ export default function SecurityStatus() {
 
   if (!security.twoFactorEnabled) {
     recommendations.push({
-      title: 'Enable Two-Factor Authentication',
-      description: 'Add an extra layer of security to your account with 2FA.',
-      action: 'Set up 2FA',
-      priority: 'high' as const,
+      title: "Enable Two-Factor Authentication",
+      description: "Add an extra layer of security to your account with 2FA.",
+      action: "Set up 2FA",
+      priority: "high" as const,
     });
   }
 
-  if (security.passwordStrength !== 'strong') {
+  if (security.passwordStrength !== "strong") {
     recommendations.push({
-      title: 'Strengthen Your Password',
-      description: 'Your current password could be stronger. Consider updating it.',
-      action: 'Change password',
-      priority: 'medium' as const,
+      title: "Strengthen Your Password",
+      description:
+        "Your current password could be stronger. Consider updating it.",
+      action: "Change password",
+      priority: "medium" as const,
     });
   }
 
   if (security.loginSessions > 5) {
     recommendations.push({
-      title: 'Review Active Sessions',
-      description: 'You have many active login sessions. Review and remove any you don\'t recognize.',
-      action: 'Manage sessions',
-      priority: 'medium' as const,
+      title: "Review Active Sessions",
+      description:
+        "You have many active login sessions. Review and remove any you don't recognize.",
+      action: "Manage sessions",
+      priority: "medium" as const,
     });
   }
 
   const lastPasswordChange = new Date(security.passwordLastChanged);
-  const daysSincePasswordChange = Math.floor((Date.now() - lastPasswordChange.getTime()) / (1000 * 60 * 60 * 24));
-  
+  const daysSincePasswordChange = Math.floor(
+    (Date.now() - lastPasswordChange.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
   if (daysSincePasswordChange > 90) {
     recommendations.push({
-      title: 'Password is Getting Old',
+      title: "Password is Getting Old",
       description: `Your password hasn't been changed in ${daysSincePasswordChange} days. Consider updating it regularly.`,
-      action: 'Update password',
-      priority: 'low' as const,
+      action: "Update password",
+      priority: "low" as const,
     });
   }
 
@@ -210,13 +235,13 @@ export default function SecurityStatus() {
               Your account security overview and recommendations
             </CardDescription>
           </div>
-          <Badge 
+          <Badge
             className={`${
-              security.securityScore >= 80 
-                ? 'bg-green-100 text-green-800 border-green-200'
+              security.securityScore >= 80
+                ? "bg-green-100 text-green-800 border-green-200"
                 : security.securityScore >= 60
-                  ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                  : 'bg-red-100 text-red-800 border-red-200'
+                  ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                  : "bg-red-100 text-red-800 border-red-200"
             }`}
           >
             <Shield className="mr-1 h-3 w-3" />
@@ -228,11 +253,15 @@ export default function SecurityStatus() {
         {/* Security Score Progress */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700">Overall Security Score</span>
-            <span className="text-sm text-gray-600">{security.securityScore}/100</span>
+            <span className="text-sm font-medium text-gray-700">
+              Overall Security Score
+            </span>
+            <span className="text-sm text-gray-600">
+              {security.securityScore}/100
+            </span>
           </div>
-          <Progress 
-            value={security.securityScore} 
+          <Progress
+            value={security.securityScore}
             className="h-3"
             aria-label={`Security score: ${security.securityScore} out of 100`}
           />
@@ -243,40 +272,53 @@ export default function SecurityStatus() {
           <SecurityMetric
             icon={<Key className="h-5 w-5 text-gray-600" />}
             label="Password Strength"
-            value={security.passwordStrength?.charAt(0).toUpperCase() + security.passwordStrength?.slice(1)}
+            value={
+              security.passwordStrength?.charAt(0).toUpperCase() +
+              security.passwordStrength?.slice(1)
+            }
             description={`Last changed: ${lastPasswordChange.toLocaleDateString()}`}
             status={getPasswordStatus(security.passwordStrength)}
           />
-          
+
           <SecurityMetric
             icon={<Shield className="h-5 w-5 text-gray-600" />}
             label="Two-Factor Auth"
-            value={security.twoFactorEnabled ? 'Enabled' : 'Disabled'}
-            description={security.twoFactorEnabled ? 'Extra layer of protection' : 'Recommended for security'}
-            status={security.twoFactorEnabled ? 'good' : 'danger'}
+            value={security.twoFactorEnabled ? "Enabled" : "Disabled"}
+            description={
+              security.twoFactorEnabled
+                ? "Extra layer of protection"
+                : "Recommended for security"
+            }
+            status={security.twoFactorEnabled ? "good" : "danger"}
           />
-          
+
           <SecurityMetric
             icon={<Monitor className="h-5 w-5 text-gray-600" />}
             label="Active Sessions"
             value={security.loginSessions}
-            description={`Last login: ${security.lastLoginFrom || 'Unknown'}`}
-            status={security.loginSessions > 5 ? 'warning' : 'good'}
+            description={`Last login: ${security.lastLoginFrom || "Unknown"}`}
+            status={security.loginSessions > 5 ? "warning" : "good"}
           />
-          
+
           <SecurityMetric
             icon={<Activity className="h-5 w-5 text-gray-600" />}
             label="Suspicious Activity"
-            value={security.suspiciousActivity ? 'Detected' : 'None'}
-            description={security.suspiciousActivity ? 'Review recent activity' : 'No threats detected'}
-            status={security.suspiciousActivity ? 'danger' : 'good'}
+            value={security.suspiciousActivity ? "Detected" : "None"}
+            description={
+              security.suspiciousActivity
+                ? "Review recent activity"
+                : "No threats detected"
+            }
+            status={security.suspiciousActivity ? "danger" : "good"}
           />
         </div>
 
         {/* Security Recommendations */}
         {recommendations.length > 0 && (
           <div className="space-y-4">
-            <h4 className="font-medium text-gray-900">Security Recommendations</h4>
+            <h4 className="font-medium text-gray-900">
+              Security Recommendations
+            </h4>
             <div className="space-y-3">
               {recommendations.map((rec, index) => (
                 <SecurityRecommendation
@@ -296,7 +338,9 @@ export default function SecurityStatus() {
           <div className="flex items-start space-x-3">
             <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />
             <div>
-              <h4 className="font-medium text-blue-900">Security Best Practices</h4>
+              <h4 className="font-medium text-blue-900">
+                Security Best Practices
+              </h4>
               <ul className="text-sm text-blue-700 mt-2 space-y-1" role="list">
                 <li>• Use unique, strong passwords for all accounts</li>
                 <li>• Enable two-factor authentication whenever possible</li>

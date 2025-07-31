@@ -1,12 +1,27 @@
-import { useState } from 'react';
-import { useProfile, ProfileFormData } from '@/hooks/useProfile';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { LoadingOverlay } from '@/components/ui/loading-states';
-import { User, Mail, Phone, Building, Edit, Save, Camera, CheckCircle } from 'lucide-react';
+import { useState } from "react";
+import { useProfile, ProfileFormData } from "@/hooks/useProfile";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { LoadingOverlay } from "@/components/ui/loading-states";
+import {
+  User,
+  Mail,
+  Phone,
+  Building,
+  Edit,
+  Save,
+  Camera,
+  CheckCircle,
+} from "lucide-react";
 
 export default function ProfileForm() {
   const [isEditing, setIsEditing] = useState(false);
@@ -84,7 +99,11 @@ export default function ProfileForm() {
         <div className="flex items-center space-x-6">
           <div className="relative">
             <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center text-white text-2xl font-bold">
-              {profile?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'U'}
+              {profile?.name
+                ?.split(" ")
+                .map((n: string) => n[0])
+                .join("")
+                .toUpperCase() || "U"}
             </div>
             {isEditing && (
               <Button
@@ -98,11 +117,14 @@ export default function ProfileForm() {
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">
-              {profile?.name || 'User Name'}
+              {profile?.name || "User Name"}
             </h3>
             <p className="body-sm text-gray-600">{profile?.email}</p>
             <p className="body-sm text-gray-500">
-              Member since {profile?.memberSince ? new Date(profile.memberSince).toLocaleDateString() : 'Unknown'}
+              Member since{" "}
+              {profile?.memberSince
+                ? new Date(profile.memberSince).toLocaleDateString()
+                : "Unknown"}
             </p>
             {profile?.lastLogin && (
               <p className="body-sm text-gray-500">
@@ -117,20 +139,29 @@ export default function ProfileForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Full Name */}
             <div className="space-y-2">
-              <Label className="body-sm font-semibold flex items-center" htmlFor="name">
+              <Label
+                className="body-sm font-semibold flex items-center"
+                htmlFor="name"
+              >
                 <User className="mr-2 h-4 w-4" />
                 Full Name *
               </Label>
               <Input
                 id="name"
-                {...form.register('name')}
+                {...form.register("name")}
                 disabled={!isEditing}
-                className={form.formState.errors.name ? 'border-red-500' : ''}
+                className={form.formState.errors.name ? "border-red-500" : ""}
                 placeholder="Enter your full name"
-                aria-describedby={form.formState.errors.name ? 'name-error' : undefined}
+                aria-describedby={
+                  form.formState.errors.name ? "name-error" : undefined
+                }
               />
               {form.formState.errors.name && (
-                <p id="name-error" className="text-sm text-red-600" role="alert">
+                <p
+                  id="name-error"
+                  className="text-sm text-red-600"
+                  role="alert"
+                >
                   {form.formState.errors.name.message}
                 </p>
               )}
@@ -138,74 +169,109 @@ export default function ProfileForm() {
 
             {/* Email Address */}
             <div className="space-y-2">
-              <Label className="body-sm font-semibold flex items-center" htmlFor="email">
+              <Label
+                className="body-sm font-semibold flex items-center"
+                htmlFor="email"
+              >
                 <Mail className="mr-2 h-4 w-4" />
                 Email Address *
               </Label>
               <Input
                 id="email"
                 type="email"
-                {...form.register('email')}
+                {...form.register("email")}
                 disabled={!isEditing}
-                className={form.formState.errors.email ? 'border-red-500' : ''}
+                className={form.formState.errors.email ? "border-red-500" : ""}
                 placeholder="Enter your email address"
-                aria-describedby={form.formState.errors.email ? 'email-error' : undefined}
+                aria-describedby={
+                  form.formState.errors.email ? "email-error" : undefined
+                }
               />
               {form.formState.errors.email && (
-                <p id="email-error" className="text-sm text-red-600" role="alert">
+                <p
+                  id="email-error"
+                  className="text-sm text-red-600"
+                  role="alert"
+                >
                   {form.formState.errors.email.message}
                 </p>
               )}
               {!profile?.emailVerified && (
                 <p className="text-sm text-yellow-600">
-                  Email not verified. <button type="button" className="underline">Send verification email</button>
+                  Email not verified.{" "}
+                  <button type="button" className="underline">
+                    Send verification email
+                  </button>
                 </p>
               )}
             </div>
 
             {/* Phone Number */}
             <div className="space-y-2">
-              <Label className="body-sm font-semibold flex items-center" htmlFor="phone">
+              <Label
+                className="body-sm font-semibold flex items-center"
+                htmlFor="phone"
+              >
                 <Phone className="mr-2 h-4 w-4" />
                 Phone Number
               </Label>
               <Input
                 id="phone"
                 type="tel"
-                {...form.register('phone')}
+                {...form.register("phone")}
                 disabled={!isEditing}
-                className={form.formState.errors.phone ? 'border-red-500' : ''}
+                className={form.formState.errors.phone ? "border-red-500" : ""}
                 placeholder="Enter your phone number"
-                aria-describedby={form.formState.errors.phone ? 'phone-error' : undefined}
+                aria-describedby={
+                  form.formState.errors.phone ? "phone-error" : undefined
+                }
               />
               {form.formState.errors.phone && (
-                <p id="phone-error" className="text-sm text-red-600" role="alert">
+                <p
+                  id="phone-error"
+                  className="text-sm text-red-600"
+                  role="alert"
+                >
                   {form.formState.errors.phone.message}
                 </p>
               )}
-              {!profile?.phoneVerified && form.watch('phone') && (
+              {!profile?.phoneVerified && form.watch("phone") && (
                 <p className="text-sm text-yellow-600">
-                  Phone not verified. <button type="button" className="underline">Send verification SMS</button>
+                  Phone not verified.{" "}
+                  <button type="button" className="underline">
+                    Send verification SMS
+                  </button>
                 </p>
               )}
             </div>
 
             {/* Company */}
             <div className="space-y-2">
-              <Label className="body-sm font-semibold flex items-center" htmlFor="company">
+              <Label
+                className="body-sm font-semibold flex items-center"
+                htmlFor="company"
+              >
                 <Building className="mr-2 h-4 w-4" />
                 Company
               </Label>
               <Input
                 id="company"
-                {...form.register('company')}
+                {...form.register("company")}
                 disabled={!isEditing}
-                className={form.formState.errors.company ? 'border-red-500' : ''}
+                className={
+                  form.formState.errors.company ? "border-red-500" : ""
+                }
                 placeholder="Enter your company name"
-                aria-describedby={form.formState.errors.company ? 'company-error' : undefined}
+                aria-describedby={
+                  form.formState.errors.company ? "company-error" : undefined
+                }
               />
               {form.formState.errors.company && (
-                <p id="company-error" className="text-sm text-red-600" role="alert">
+                <p
+                  id="company-error"
+                  className="text-sm text-red-600"
+                  role="alert"
+                >
                   {form.formState.errors.company.message}
                 </p>
               )}
@@ -219,10 +285,12 @@ export default function ProfileForm() {
                 <Button
                   type="submit"
                   className="bg-primary hover:bg-primary/90"
-                  disabled={form.formState.isSubmitting || !form.formState.isDirty}
+                  disabled={
+                    form.formState.isSubmitting || !form.formState.isDirty
+                  }
                 >
                   <Save className="mr-2 h-4 w-4" />
-                  {form.formState.isSubmitting ? 'Saving...' : 'Save Changes'}
+                  {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
                 </Button>
                 <Button
                   type="button"
@@ -242,7 +310,9 @@ export default function ProfileForm() {
           <div className="pt-4 border-t space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-700">Account Status:</span>
+                <span className="font-medium text-gray-700">
+                  Account Status:
+                </span>
                 <span className="ml-2 text-green-600">Active</span>
               </div>
               <div>
@@ -251,7 +321,9 @@ export default function ProfileForm() {
               </div>
               <div>
                 <span className="font-medium text-gray-700">Time Zone:</span>
-                <span className="ml-2">{Intl.DateTimeFormat().resolvedOptions().timeZone}</span>
+                <span className="ml-2">
+                  {Intl.DateTimeFormat().resolvedOptions().timeZone}
+                </span>
               </div>
               <div>
                 <span className="font-medium text-gray-700">Language:</span>

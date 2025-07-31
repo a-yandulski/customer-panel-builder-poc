@@ -11,6 +11,7 @@ The profile and account management system provides users with comprehensive cont
 ### Core Components
 
 #### Hooks (`client/hooks/useProfile.ts`)
+
 - **useProfile()** - Manages user profile data (name, email, phone, company)
 - **useAddress()** - Handles billing and legal address management
 - **usePasswordChange()** - Provides password change functionality with strength validation
@@ -18,6 +19,7 @@ The profile and account management system provides users with comprehensive cont
 - **useSecurity()** - Fetches and displays security status information
 
 #### Form Components
+
 - **ProfileForm** (`client/components/account/ProfileForm.tsx`) - Personal information editing
 - **AddressForm** (`client/components/account/AddressForm.tsx`) - Billing and legal address management
 - **PasswordChangeForm** (`client/components/account/PasswordChangeForm.tsx`) - Password change with strength meter
@@ -25,6 +27,7 @@ The profile and account management system provides users with comprehensive cont
 - **SecurityStatus** (`client/components/account/SecurityStatus.tsx`) - Security overview and recommendations
 
 #### Main Page
+
 - **Account** (`client/pages/Account.tsx`) - Main account management interface with tabbed navigation
 
 ### API Endpoints
@@ -32,14 +35,17 @@ The profile and account management system provides users with comprehensive cont
 All profile-related endpoints are implemented in MSW handlers (`client/mocks/handlers.ts`):
 
 #### Profile Management
+
 - `GET /api/user/profile` - Fetch user profile information
 - `PUT /api/user/profile` - Update user profile with validation
 
-#### Address Management  
+#### Address Management
+
 - `GET /api/user/address` - Fetch billing and legal addresses
 - `PUT /api/user/address` - Update addresses with validation
 
 #### Security & Authentication
+
 - `POST /api/user/password` - Change password with security checks
 - `POST /api/user/2fa/toggle` - Enable/disable two-factor authentication
 - `POST /api/user/2fa/verify` - Verify 2FA setup codes
@@ -49,6 +55,7 @@ All profile-related endpoints are implemented in MSW handlers (`client/mocks/han
 ## Features
 
 ### 1. Profile Management
+
 - **Personal Information**: Name, email, phone, company
 - **Real-time Validation**: Using React Hook Form with Zod schemas
 - **Email Verification**: Status display and verification triggers
@@ -56,6 +63,7 @@ All profile-related endpoints are implemented in MSW handlers (`client/mocks/han
 - **Avatar Management**: Profile picture upload (UI ready)
 
 ### 2. Address Management
+
 - **Billing Address**: Required primary address for billing
 - **Legal Address**: Optional separate legal address for contracts
 - **Address Validation**: Real-time validation with error messaging
@@ -63,7 +71,8 @@ All profile-related endpoints are implemented in MSW handlers (`client/mocks/han
 - **Address Verification**: Backend validation and verification status
 
 ### 3. Security Settings
-- **Password Management**: 
+
+- **Password Management**:
   - Current password verification
   - Strong password requirements
   - Real-time strength meter
@@ -75,12 +84,14 @@ All profile-related endpoints are implemented in MSW handlers (`client/mocks/han
   - Enable/disable with password confirmation
 
 ### 4. Security Dashboard
+
 - **Security Score**: Overall account security rating
 - **Activity Monitoring**: Login history and suspicious activity detection
 - **Security Recommendations**: Personalized security improvement suggestions
 - **Session Management**: Active session tracking
 
 ### 5. Privacy Controls
+
 - **Notification Preferences**: Email, SMS, and push notification settings
 - **Data Export**: Account data download functionality
 - **Account Deletion**: Secure account deletion workflow
@@ -88,26 +99,30 @@ All profile-related endpoints are implemented in MSW handlers (`client/mocks/han
 ## Validation & Error Handling
 
 ### Form Validation
+
 All forms use React Hook Form with Zod schemas for validation:
 
 ```typescript
 // Profile validation schema
 const profileSchema = z.object({
-  name: z.string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(100, 'Name must be less than 100 characters'),
-  email: z.string()
-    .email('Please enter a valid email address'),
-  phone: z.string()
-    .regex(/^\+?[\d\s\-\(\)]+$/, 'Please enter a valid phone number')
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be less than 100 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  phone: z
+    .string()
+    .regex(/^\+?[\d\s\-\(\)]+$/, "Please enter a valid phone number")
     .optional(),
-  company: z.string()
-    .max(100, 'Company name must be less than 100 characters')
+  company: z
+    .string()
+    .max(100, "Company name must be less than 100 characters")
     .optional(),
 });
 ```
 
 ### Error Scenarios
+
 The MSW handlers simulate realistic error scenarios:
 
 - **401 Unauthorized**: Invalid or expired tokens
@@ -130,7 +145,8 @@ The MSW handlers simulate realistic error scenarios:
 ## Security Features
 
 ### Password Security
-- **Strength Requirements**: 
+
+- **Strength Requirements**:
   - Minimum 8 characters
   - Upper and lowercase letters
   - Numbers and special characters
@@ -139,12 +155,14 @@ The MSW handlers simulate realistic error scenarios:
 - **Secure Storage**: Passwords never stored in plain text
 
 ### Two-Factor Authentication
+
 - **TOTP Support**: Compatible with Google Authenticator, Authy, etc.
 - **Backup Codes**: 8 single-use backup codes for emergency access
 - **QR Code Setup**: Visual setup process for authenticator apps
 - **Recovery Process**: Secure account recovery with backup codes
 
 ### Session Security
+
 - **Active Session Tracking**: Monitor login sessions across devices
 - **Suspicious Activity Detection**: Flag unusual login patterns
 - **Automatic Logout**: Session timeout for security
@@ -153,17 +171,20 @@ The MSW handlers simulate realistic error scenarios:
 ## Responsive Design
 
 ### Mobile Optimization
+
 - **Mobile-First Design**: Optimized for small screens
 - **Touch-Friendly**: Large tap targets and gestures
 - **Responsive Forms**: Adaptive form layouts
 - **Mobile Navigation**: Simplified navigation for mobile devices
 
 ### Tablet Support
+
 - **Medium Screen Layout**: Optimized for tablet viewing
 - **Touch Interface**: Tablet-specific interactions
 - **Landscape/Portrait**: Adaptive layouts for orientation changes
 
 ### Desktop Experience
+
 - **Full Feature Set**: Complete functionality on desktop
 - **Keyboard Shortcuts**: Power user keyboard navigation
 - **Multi-Column Layouts**: Efficient use of screen space
@@ -171,28 +192,30 @@ The MSW handlers simulate realistic error scenarios:
 ## API Integration
 
 ### Authentication
+
 All API calls require authentication via Bearer token:
 
 ```typescript
 const getAuthToken = () => {
-  return localStorage.getItem('fake_auth_token') || 'mock-token';
+  return localStorage.getItem("fake_auth_token") || "mock-token";
 };
 
-const response = await fetch('/api/user/profile', {
+const response = await fetch("/api/user/profile", {
   headers: {
-    'Authorization': `Bearer ${getAuthToken()}`,
-    'Content-Type': 'application/json',
+    Authorization: `Bearer ${getAuthToken()}`,
+    "Content-Type": "application/json",
   },
 });
 ```
 
 ### Error Handling
+
 Consistent error handling across all API calls:
 
 ```typescript
 if (!response.ok) {
   const errorData = await response.json();
-  
+
   if (errorData.details) {
     // Handle field-specific validation errors
     Object.entries(errorData.details).forEach(([field, messages]) => {
@@ -201,20 +224,21 @@ if (!response.ok) {
       });
     });
   }
-  
-  throw new Error(errorData.error || 'Operation failed');
+
+  throw new Error(errorData.error || "Operation failed");
 }
 ```
 
 ## Usage Examples
 
 ### Basic Profile Update
+
 ```typescript
 import { useProfile } from '@/hooks/useProfile';
 
 function MyComponent() {
   const { form, updateProfile } = useProfile();
-  
+
   const onSubmit = async (data) => {
     try {
       await updateProfile(data);
@@ -223,7 +247,7 @@ function MyComponent() {
       // Error handling
     }
   };
-  
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <input {...form.register('name')} />
@@ -234,20 +258,21 @@ function MyComponent() {
 ```
 
 ### Password Change with Validation
+
 ```typescript
 import { usePasswordChange } from '@/hooks/useProfile';
 
 function PasswordForm() {
   const { form, changePassword, getPasswordStrength } = usePasswordChange();
-  
+
   const newPassword = form.watch('newPassword');
   const strength = getPasswordStrength(newPassword || '');
-  
+
   return (
     <form onSubmit={form.handleSubmit(changePassword)}>
-      <input 
-        type="password" 
-        {...form.register('newPassword')} 
+      <input
+        type="password"
+        {...form.register('newPassword')}
       />
       <div>Strength: {strength}%</div>
       <button type="submit">Change Password</button>
@@ -257,17 +282,18 @@ function PasswordForm() {
 ```
 
 ### Two-Factor Authentication Setup
+
 ```typescript
 import { useTwoFactor } from '@/hooks/useProfile';
 
 function TwoFactorSetup() {
   const { toggleTwoFactor, verifyTwoFactor } = useTwoFactor();
-  
+
   const handleEnable = async () => {
     const result = await toggleTwoFactor(true, password);
     // Handle QR code and setup process
   };
-  
+
   return (
     <div>
       <button onClick={handleEnable}>Enable 2FA</button>
@@ -279,15 +305,16 @@ function TwoFactorSetup() {
 ## Testing
 
 ### Unit Tests
+
 Test individual components and hooks:
 
 ```typescript
-import { renderHook } from '@testing-library/react';
-import { useProfile } from '@/hooks/useProfile';
+import { renderHook } from "@testing-library/react";
+import { useProfile } from "@/hooks/useProfile";
 
-test('should fetch profile data', async () => {
+test("should fetch profile data", async () => {
   const { result } = renderHook(() => useProfile());
-  
+
   await waitFor(() => {
     expect(result.current.profile).toBeDefined();
   });
@@ -295,6 +322,7 @@ test('should fetch profile data', async () => {
 ```
 
 ### Integration Tests
+
 Test complete user flows:
 
 ```typescript
@@ -303,13 +331,13 @@ import ProfileForm from '@/components/account/ProfileForm';
 
 test('should update profile successfully', async () => {
   render(<ProfileForm />);
-  
+
   fireEvent.change(screen.getByLabelText('Full Name'), {
     target: { value: 'John Doe' }
   });
-  
+
   fireEvent.click(screen.getByText('Save Changes'));
-  
+
   await waitFor(() => {
     expect(screen.getByText('Profile updated successfully')).toBeInTheDocument();
   });
@@ -319,12 +347,14 @@ test('should update profile successfully', async () => {
 ## Performance Considerations
 
 ### Form Optimization
+
 - **Debounced Validation**: Prevent excessive API calls during typing
 - **Optimistic Updates**: Immediate UI feedback before server confirmation
 - **Lazy Loading**: Load components only when needed
 - **Memoization**: Cache expensive calculations
 
 ### API Optimization
+
 - **Request Batching**: Combine related API calls
 - **Caching**: Cache profile data to reduce API calls
 - **Error Boundaries**: Graceful degradation on API failures
@@ -333,6 +363,7 @@ test('should update profile successfully', async () => {
 ## Future Enhancements
 
 ### Planned Features
+
 1. **Social Login Integration**: OAuth with Google, Facebook, etc.
 2. **Advanced 2FA**: WebAuthn/FIDO2 support
 3. **Profile Picture Upload**: Direct image upload functionality
@@ -340,6 +371,7 @@ test('should update profile successfully', async () => {
 5. **Data Portability**: Enhanced export/import capabilities
 
 ### Technical Improvements
+
 1. **Real-time Validation**: WebSocket-based real-time validation
 2. **Progressive Web App**: Offline functionality
 3. **Advanced Analytics**: User behavior tracking
@@ -351,41 +383,46 @@ test('should update profile successfully', async () => {
 ### Common Issues
 
 #### Profile Update Fails
+
 - Check network connectivity
 - Verify authentication token validity
 - Review validation errors in form state
 - Check MSW handler responses in developer tools
 
 #### 2FA Setup Problems
+
 - Ensure system time is synchronized
 - Verify authenticator app compatibility
 - Check QR code generation
 - Review backup code generation
 
 #### Address Validation Errors
+
 - Verify address format requirements
 - Check country/state selection
 - Review postal code format
 - Ensure all required fields are filled
 
 ### Debug Mode
+
 Enable debug logging in development:
 
 ```typescript
 // Set in environment variables
-VITE_DEBUG_PROFILE=true
+VITE_DEBUG_PROFILE = true;
 
 // Or in code
-const DEBUG = import.meta.env.VITE_DEBUG_PROFILE === 'true';
+const DEBUG = import.meta.env.VITE_DEBUG_PROFILE === "true";
 
 if (DEBUG) {
-  console.log('Profile data:', profileData);
+  console.log("Profile data:", profileData);
 }
 ```
 
 ## Contributing
 
 ### Code Style
+
 - Use TypeScript for all new code
 - Follow React Hook Form patterns for forms
 - Implement comprehensive error handling
@@ -393,6 +430,7 @@ if (DEBUG) {
 - Write unit tests for new components
 
 ### Pull Request Process
+
 1. Create feature branch from main
 2. Implement changes with tests
 3. Update documentation
@@ -402,18 +440,21 @@ if (DEBUG) {
 ## Security Considerations
 
 ### Data Protection
+
 - Never log sensitive information
 - Use HTTPS for all API communications
 - Implement proper session management
 - Follow OWASP security guidelines
 
 ### Privacy Compliance
+
 - Implement data retention policies
 - Provide data export functionality
 - Allow account deletion
 - Respect user privacy preferences
 
 ### Vulnerability Management
+
 - Regular security audits
 - Dependency vulnerability scanning
 - Penetration testing

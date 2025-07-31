@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Alert,
-  AlertDescription,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -29,7 +26,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { 
+import {
   ArrowLeft,
   Send,
   Paperclip,
@@ -50,9 +47,15 @@ import {
   ExternalLink,
   Tag,
   Calendar,
-  Loader2
+  Loader2,
 } from "lucide-react";
-import { useTicketDetails, useFileUpload, useTicketUpdates, type Ticket, type TicketMessage } from "@/hooks/useSupport";
+import {
+  useTicketDetails,
+  useFileUpload,
+  useTicketUpdates,
+  type Ticket,
+  type TicketMessage,
+} from "@/hooks/useSupport";
 import { toast } from "@/hooks/use-toast";
 
 interface TicketConversationProps {
@@ -62,28 +65,41 @@ interface TicketConversationProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: "open", label: "Open", description: "Ticket is open and needs attention" },
-  { value: "in_progress", label: "In Progress", description: "Being worked on by support team" },
-  { value: "waiting", label: "Waiting", description: "Waiting for customer response" },
+  {
+    value: "open",
+    label: "Open",
+    description: "Ticket is open and needs attention",
+  },
+  {
+    value: "in_progress",
+    label: "In Progress",
+    description: "Being worked on by support team",
+  },
+  {
+    value: "waiting",
+    label: "Waiting",
+    description: "Waiting for customer response",
+  },
   { value: "solved", label: "Solved", description: "Issue has been resolved" },
 ];
 
-export default function TicketConversation({ 
-  ticketId, 
+export default function TicketConversation({
+  ticketId,
   onBack,
-  onTicketUpdate 
+  onTicketUpdate,
 }: TicketConversationProps) {
-  const { ticket, loading, error, replyToTicket, updateTicketStatus, refetch } = useTicketDetails(ticketId);
+  const { ticket, loading, error, replyToTicket, updateTicketStatus, refetch } =
+    useTicketDetails(ticketId);
   const { validateFiles, formatFileSize, downloadAttachment } = useFileUpload();
   const { notifications } = useTicketUpdates(ticketId);
-  
+
   const [replyMessage, setReplyMessage] = useState("");
   const [replyAttachments, setReplyAttachments] = useState<File[]>([]);
   const [isReplying, setIsReplying] = useState(false);
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const dragCounterRef = useRef(0);
@@ -139,17 +155,17 @@ export default function TicketConversation({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getFileIcon = (attachment: any) => {
-    if (attachment.type?.startsWith('image/')) {
+    if (attachment.type?.startsWith("image/")) {
       return <Image className="h-4 w-4" />;
     }
     return <FileText className="h-4 w-4" />;
@@ -175,7 +191,7 @@ export default function TicketConversation({
   };
 
   const removeAttachment = (index: number) => {
-    setReplyAttachments(prev => prev.filter((_, i) => i !== index));
+    setReplyAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleDragEnter = (e: React.DragEvent) => {
@@ -251,12 +267,12 @@ export default function TicketConversation({
       await updateTicketStatus(newStatus);
       setShowStatusDialog(false);
       setNewStatus("");
-      
+
       onTicketUpdate?.({ ...ticket, status: newStatus as any });
 
       toast({
         title: "Status Updated",
-        description: `Ticket status changed to ${newStatus.replace('_', ' ')}`,
+        description: `Ticket status changed to ${newStatus.replace("_", " ")}`,
       });
     } catch (error) {
       // Error already handled in hook
@@ -278,8 +294,12 @@ export default function TicketConversation({
       <Card>
         <CardContent className="text-center py-12">
           <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-xl font-medium text-gray-700 mb-2">Select a Ticket</h3>
-          <p className="text-gray-600">Choose a ticket from the list to view the conversation.</p>
+          <h3 className="text-xl font-medium text-gray-700 mb-2">
+            Select a Ticket
+          </h3>
+          <p className="text-gray-600">
+            Choose a ticket from the list to view the conversation.
+          </p>
         </CardContent>
       </Card>
     );
@@ -302,9 +322,7 @@ export default function TicketConversation({
         <CardContent className="py-12">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {error || "Ticket not found"}
-            </AlertDescription>
+            <AlertDescription>{error || "Ticket not found"}</AlertDescription>
           </Alert>
           <div className="text-center mt-6 space-x-3">
             <Button variant="outline" onClick={refetch}>
@@ -334,7 +352,9 @@ export default function TicketConversation({
             </Button>
           )}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{ticket.subject}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {ticket.subject}
+            </h1>
             <div className="flex items-center space-x-2 mt-1">
               <p className="text-gray-600">Ticket {ticket.id}</p>
               <Button
@@ -346,7 +366,9 @@ export default function TicketConversation({
                 <Copy className="h-3 w-3" />
               </Button>
               <span className="text-gray-400">•</span>
-              <p className="text-gray-600">Created {formatDate(ticket.created)}</p>
+              <p className="text-gray-600">
+                Created {formatDate(ticket.created)}
+              </p>
             </div>
           </div>
         </div>
@@ -354,10 +376,13 @@ export default function TicketConversation({
           <Badge className={getStatusColor(ticket.status)}>
             <div className="flex items-center space-x-1">
               {getStatusIcon(ticket.status)}
-              <span>{ticket.status.replace('_', ' ')}</span>
+              <span>{ticket.status.replace("_", " ")}</span>
             </div>
           </Badge>
-          <Badge variant="outline" className={getPriorityColor(ticket.priority)}>
+          <Badge
+            variant="outline"
+            className={getPriorityColor(ticket.priority)}
+          >
             {ticket.priority} priority
           </Badge>
           {ticket.status !== "solved" && (
@@ -385,14 +410,19 @@ export default function TicketConversation({
                         <SelectItem key={status.value} value={status.value}>
                           <div>
                             <div className="font-medium">{status.label}</div>
-                            <div className="text-xs text-gray-500">{status.description}</div>
+                            <div className="text-xs text-gray-500">
+                              {status.description}
+                            </div>
                           </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={() => setShowStatusDialog(false)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowStatusDialog(false)}
+                    >
                       Cancel
                     </Button>
                     <Button onClick={handleStatusChange} disabled={!newStatus}>
@@ -411,25 +441,35 @@ export default function TicketConversation({
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <Label className="text-sm font-medium text-gray-700">Category</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                Category
+              </Label>
               <div className="flex items-center space-x-1 mt-1">
                 <Tag className="h-4 w-4 text-gray-500" />
                 <span className="text-sm capitalize">{ticket.category}</span>
               </div>
             </div>
             <div>
-              <Label className="text-sm font-medium text-gray-700">Priority</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                Priority
+              </Label>
               <p className="text-sm mt-1 capitalize">{ticket.priority}</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-gray-700">Assigned Agent</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                Assigned Agent
+              </Label>
               <div className="flex items-center space-x-1 mt-1">
                 <User className="h-4 w-4 text-gray-500" />
-                <span className="text-sm">{ticket.assignedAgent || "Unassigned"}</span>
+                <span className="text-sm">
+                  {ticket.assignedAgent || "Unassigned"}
+                </span>
               </div>
             </div>
             <div>
-              <Label className="text-sm font-medium text-gray-700">Last Updated</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                Last Updated
+              </Label>
               <div className="flex items-center space-x-1 mt-1">
                 <Calendar className="h-4 w-4 text-gray-500" />
                 <span className="text-sm">{formatDate(ticket.updated)}</span>
@@ -482,7 +522,9 @@ export default function TicketConversation({
                   >
                     <User className="h-3 w-3" />
                   </div>
-                  <span className="text-sm font-semibold">{message.author}</span>
+                  <span className="text-sm font-semibold">
+                    {message.author}
+                  </span>
                   <span
                     className={`text-xs ${
                       message.authorType === "customer"
@@ -494,7 +536,7 @@ export default function TicketConversation({
                   </span>
                 </div>
                 <p className="text-sm whitespace-pre-wrap">{message.message}</p>
-                
+
                 {message.attachments && message.attachments.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-xs font-medium">Attachments:</p>
@@ -506,7 +548,9 @@ export default function TicketConversation({
                         <div className="flex items-center space-x-2">
                           {getFileIcon(attachment)}
                           <div>
-                            <p className="text-xs font-medium">{attachment.name}</p>
+                            <p className="text-xs font-medium">
+                              {attachment.name}
+                            </p>
                             <p className="text-xs opacity-80">
                               {formatFileSize(attachment.size)}
                             </p>
@@ -515,7 +559,9 @@ export default function TicketConversation({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => downloadAttachment(attachment.id, attachment.name)}
+                          onClick={() =>
+                            downloadAttachment(attachment.id, attachment.name)
+                          }
                           className="text-current hover:bg-black/10"
                         >
                           <Download className="h-3 w-3" />
@@ -553,8 +599,8 @@ export default function TicketConversation({
             {/* File Upload Area */}
             <div
               className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
-                isDragOver 
-                  ? "border-primary bg-primary/5" 
+                isDragOver
+                  ? "border-primary bg-primary/5"
                   : "border-gray-300 hover:border-primary/50"
               }`}
               onDragEnter={handleDragEnter}
@@ -562,9 +608,13 @@ export default function TicketConversation({
               onDragOver={handleDragOver}
               onDrop={handleDrop}
             >
-              <Upload className={`h-6 w-6 mx-auto mb-2 ${isDragOver ? 'text-primary' : 'text-gray-400'}`} />
+              <Upload
+                className={`h-6 w-6 mx-auto mb-2 ${isDragOver ? "text-primary" : "text-gray-400"}`}
+              />
               <p className="text-sm text-gray-600 mb-2">
-                {isDragOver ? "Drop files here" : "Drop files here or click to upload"}
+                {isDragOver
+                  ? "Drop files here"
+                  : "Drop files here or click to upload"}
               </p>
               <input
                 ref={fileInputRef}
@@ -598,7 +648,7 @@ export default function TicketConversation({
                     >
                       <div className="flex items-center space-x-2">
                         <div className="text-gray-500">
-                          {file.type.startsWith('image/') ? (
+                          {file.type.startsWith("image/") ? (
                             <Image className="h-4 w-4" />
                           ) : (
                             <FileText className="h-4 w-4" />
@@ -606,7 +656,9 @@ export default function TicketConversation({
                         </div>
                         <div>
                           <p className="text-sm font-medium">{file.name}</p>
-                          <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                          <p className="text-xs text-gray-500">
+                            {formatFileSize(file.size)}
+                          </p>
                         </div>
                       </div>
                       <Button
@@ -623,7 +675,7 @@ export default function TicketConversation({
               </div>
             )}
 
-            <Button 
+            <Button
               onClick={handleReply}
               disabled={isReplying || !replyMessage.trim()}
               className="w-full"
