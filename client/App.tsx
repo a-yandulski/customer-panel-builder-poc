@@ -7,6 +7,8 @@ import { ToastProvider } from "@/components/ui/toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Auth0Provider } from "@/contexts/AuthContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
+import ToastContainer from "@/components/notifications/ToastContainer";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import DashboardErrorBoundary from "@/components/dashboard/DashboardErrorBoundary";
 import Index from "./pages/Index";
@@ -16,6 +18,7 @@ import Services from "./pages/Services";
 import Billing from "./pages/Billing";
 import Support from "./pages/Support";
 import Account from "./pages/Account";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 import { setupMSW } from "./mocks/setup";
 
