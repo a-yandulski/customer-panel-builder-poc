@@ -116,217 +116,41 @@ export default function Support() {
     },
   ]);
 
-  if (selectedTicket) {
+  // Handle conversation view
+  if (activeView === "conversation") {
+    return (
+      <AppShell>
+        <TicketConversation
+          ticketId={selectedTicket?.id || null}
+          onBack={handleBackToList}
+          onTicketUpdate={handleTicketUpdate}
+        />
+      </AppShell>
+    );
+  }
+
+  // Handle create ticket view
+  if (activeView === "create") {
     return (
       <AppShell>
         <div className="space-y-6">
-          {/* Ticket Header */}
+          {/* Header */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={() => setSelectedTicket(null)}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Tickets
-              </Button>
-              <div>
-                <h1 className="h2 text-gray-900">{selectedTicket.subject}</h1>
-                <p className="body-sm text-gray-600 mt-1">
-                  Ticket {selectedTicket.id} • Created {selectedTicket.created}
-                </p>
-              </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Create Support Ticket</h1>
+              <p className="text-gray-600 mt-1">
+                Get help with your services by creating a support ticket
+              </p>
             </div>
-            <div className="flex items-center space-x-3">
-              <Badge className={getStatusColor(selectedTicket.status)}>
-                {selectedTicket.status}
-              </Badge>
-              <Badge className={getPriorityColor(selectedTicket.priority)}>
-                {selectedTicket.priority} Priority
-              </Badge>
-              {selectedTicket.status !== "Solved" && (
-                <Button variant="outline">Close Ticket</Button>
-              )}
-            </div>
+            <Button variant="outline" onClick={handleBackToList}>
+              Back to Tickets
+            </Button>
           </div>
 
-          {/* Ticket Info */}
-          <Card className="shadow-md">
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <Label className="body-sm font-semibold text-gray-700">
-                    Category
-                  </Label>
-                  <p className="body-sm text-gray-900">
-                    {selectedTicket.category}
-                  </p>
-                </div>
-                <div>
-                  <Label className="body-sm font-semibold text-gray-700">
-                    Status
-                  </Label>
-                  <p className="body-sm text-gray-900">
-                    {selectedTicket.status}
-                  </p>
-                </div>
-                <div>
-                  <Label className="body-sm font-semibold text-gray-700">
-                    Priority
-                  </Label>
-                  <p className="body-sm text-gray-900">
-                    {selectedTicket.priority}
-                  </p>
-                </div>
-                <div>
-                  <Label className="body-sm font-semibold text-gray-700">
-                    Assigned Agent
-                  </Label>
-                  <p className="body-sm text-gray-900">
-                    {selectedTicket.agent || "Unassigned"}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Conversation Thread */}
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle>Conversation</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {selectedTicket.messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.authorType === "customer" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-2xl p-4 rounded-lg space-y-2 ${
-                      message.authorType === "customer"
-                        ? "bg-primary text-white"
-                        : "bg-gray-100 text-gray-900"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                          message.authorType === "customer"
-                            ? "bg-white/20"
-                            : "bg-gray-300"
-                        }`}
-                      >
-                        <User className="h-3 w-3" />
-                      </div>
-                      <span className="body-sm font-semibold">
-                        {message.author}
-                      </span>
-                      <span
-                        className={`body-sm ${
-                          message.authorType === "customer"
-                            ? "text-white/80"
-                            : "text-gray-500"
-                        }`}
-                      >
-                        {message.timestamp}
-                      </span>
-                    </div>
-                    <p className="body">{message.message}</p>
-                    {message.attachments && message.attachments.length > 0 && (
-                      <div className="space-y-2">
-                        {message.attachments.map((attachment) => (
-                          <div
-                            key={attachment.id}
-                            className="flex items-center space-x-2"
-                          >
-                            <Paperclip className="h-4 w-4" />
-                            <span className="body-sm">{attachment.name}</span>
-                            <Button variant="ghost" size="sm">
-                              <Download className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Reply Area */}
-          {selectedTicket.status !== "Solved" && (
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle>Reply to Ticket</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Textarea
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your message here..."
-                  rows={4}
-                />
-
-                {/* File Upload Area */}
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                  <p className="body-sm text-gray-600 mb-2">
-                    Drop files here or click to upload
-                  </p>
-                  <input
-                    type="file"
-                    multiple
-                    className="hidden"
-                    id="file-upload"
-                    onChange={(e) =>
-                      e.target.files && handleFileUpload(e.target.files)
-                    }
-                  />
-                  <label htmlFor="file-upload">
-                    <Button variant="outline" asChild>
-                      <span>Choose Files</span>
-                    </Button>
-                  </label>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Maximum 5 files, 5MB each
-                  </p>
-                </div>
-
-                {/* Attachment Preview */}
-                {attachments.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="body-sm font-semibold">Attachments</Label>
-                    <div className="space-y-2">
-                      {attachments.map((attachment) => (
-                        <div
-                          key={attachment.id}
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <Paperclip className="h-4 w-4 text-gray-500" />
-                            <span className="body-sm">{attachment.name}</span>
-                            <span className="text-xs text-gray-500">
-                              ({formatFileSize(attachment.size)})
-                            </span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeAttachment(attachment.id)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  <Send className="mr-2 h-4 w-4" />
-                  Send Reply
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+          <TicketCreateForm
+            onTicketCreated={handleTicketCreated}
+            onCancel={handleBackToList}
+          />
         </div>
       </AppShell>
     );
