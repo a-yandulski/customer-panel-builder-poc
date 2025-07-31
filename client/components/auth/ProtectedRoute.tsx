@@ -1,6 +1,7 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
+import { createUrlWithBasePath } from "@/lib/utils";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -44,6 +45,11 @@ export default function ProtectedRoute({
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
+    // Perform the actual redirect to login page
+    useEffect(() => {
+      window.location.href = createUrlWithBasePath("/login");
+    }, []);
+    
     return fallback || <LoadingSpinner message="Redirecting to login..." />;
   }
 
