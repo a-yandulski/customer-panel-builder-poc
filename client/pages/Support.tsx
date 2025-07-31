@@ -156,300 +156,86 @@ export default function Support() {
     );
   }
 
+  // Main tickets list view
   return (
     <AppShell>
       <div className="space-y-6">
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="h1 text-gray-900">Support Center</h1>
-            <p className="body text-gray-600 mt-1">
-              Get help with your services, manage support tickets, and browse
-              our knowledge base
+            <h1 className="text-3xl font-bold text-gray-900">Support Center</h1>
+            <p className="text-gray-600 mt-1">
+              Get help with your services, manage support tickets, and browse our knowledge base
             </p>
           </div>
-          <Button
-            className="bg-primary hover:bg-primary/90"
-            onClick={() => setActiveTab("create")}
-          >
+          <Button onClick={handleCreateTicket}>
             <Plus className="mr-2 h-4 w-4" />
             Create Ticket
           </Button>
         </div>
 
         {/* Support Navigation */}
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-6"
-        >
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="create">Create Ticket</TabsTrigger>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="tickets">My Tickets</TabsTrigger>
             <TabsTrigger value="knowledge">Knowledge Base</TabsTrigger>
           </TabsList>
 
-          {/* Create Ticket Tab */}
-          <TabsContent value="create" className="space-y-6">
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle>Create Support Ticket</CardTitle>
-                <CardDescription className="body-sm">
-                  Describe your issue and we'll help you resolve it as quickly
-                  as possible
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="category" className="body-sm font-semibold">
-                      Category
-                    </Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="billing">Billing</SelectItem>
-                        <SelectItem value="technical">Technical</SelectItem>
-                        <SelectItem value="domain">Domain</SelectItem>
-                        <SelectItem value="hosting">Hosting</SelectItem>
-                        <SelectItem value="general">General</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Recent Tickets */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Recent Tickets</h3>
+                <TicketList
+                  onTicketSelect={handleTicketSelect}
+                  onCreateTicket={handleCreateTicket}
+                  compact={true}
+                />
+              </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="priority" className="body-sm font-semibold">
-                      Priority
-                    </Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select priority" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="normal">Normal</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="subject" className="body-sm font-semibold">
-                    Subject
-                  </Label>
-                  <Input
-                    id="subject"
-                    placeholder="Brief description of your issue"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="description"
-                    className="body-sm font-semibold"
-                  >
-                    Description
-                  </Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Please provide detailed information about your issue, including any error messages and steps you've already tried."
-                    rows={6}
-                  />
-                </div>
-
-                {/* File Upload Area */}
-                <div className="space-y-2">
-                  <Label className="body-sm font-semibold">
-                    Attachments (Optional)
-                  </Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                    <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="body-sm text-gray-600 mb-2">
-                      Drop files here or click to upload
-                    </p>
-                    <input
-                      type="file"
-                      multiple
-                      className="hidden"
-                      id="ticket-file-upload"
-                      onChange={(e) =>
-                        e.target.files && handleFileUpload(e.target.files)
-                      }
-                    />
-                    <label htmlFor="ticket-file-upload">
-                      <Button variant="outline" asChild>
-                        <span>Choose Files</span>
-                      </Button>
-                    </label>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Maximum 5 files, 5MB each. Supported formats: JPG, PNG,
-                      PDF, DOC, TXT
-                    </p>
-                  </div>
-                </div>
-
-                {/* Attachment Preview */}
-                {attachments.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="body-sm font-semibold">
-                      Attached Files
-                    </Label>
-                    <div className="space-y-2">
-                      {attachments.map((attachment) => (
-                        <div
-                          key={attachment.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <Paperclip className="h-4 w-4 text-gray-500" />
-                            <div>
-                              <p className="body-sm font-medium">
-                                {attachment.name}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {formatFileSize(attachment.size)}
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeAttachment(attachment.id)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
+              {/* Quick Actions */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+                <div className="space-y-3">
+                  <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={handleCreateTicket}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <Plus className="h-5 w-5 text-primary" />
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Submit Ticket
-                </Button>
-              </CardContent>
-            </Card>
+                        <div>
+                          <p className="font-medium">Create New Ticket</p>
+                          <p className="text-sm text-gray-600">Get help with your services</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab("knowledge")}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <FileText className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Browse Knowledge Base</p>
+                          <p className="text-sm text-gray-600">Find answers to common questions</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           {/* My Tickets Tab */}
           <TabsContent value="tickets" className="space-y-6">
-            {/* Search and Filter */}
-            <Card className="shadow-md">
-              <CardContent className="pt-6">
-                <div className="flex flex-col lg:flex-row gap-4 items-center">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="Search tickets..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  <div className="flex gap-3">
-                    <Select
-                      value={statusFilter}
-                      onValueChange={setStatusFilter}
-                    >
-                      <SelectTrigger className="w-32">
-                        <Filter className="mr-2 h-4 w-4" />
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="Open">Open</SelectItem>
-                        <SelectItem value="In Progress">In Progress</SelectItem>
-                        <SelectItem value="Waiting">Waiting</SelectItem>
-                        <SelectItem value="Solved">Solved</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Tickets List */}
-            <div className="space-y-4">
-              {filteredTickets.map((ticket) => (
-                <Card
-                  key={ticket.id}
-                  className="shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-                >
-                  <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4 flex-1">
-                        <div className="p-3 bg-primary/10 rounded-lg">
-                          <MessageCircle className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 text-lg mb-1">
-                            {ticket.subject}
-                          </h3>
-                          <div className="flex items-center space-x-4 body-sm text-gray-600">
-                            <span>#{ticket.id}</span>
-                            <span>•</span>
-                            <span>{ticket.category}</span>
-                            <span>•</span>
-                            <span>Created {ticket.created}</span>
-                            {ticket.agent && (
-                              <>
-                                <span>•</span>
-                                <span>Assigned to {ticket.agent}</span>
-                              </>
-                            )}
-                          </div>
-                          <p className="body-sm text-gray-500 mt-1">
-                            Last updated: {ticket.updated}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <div className="text-right">
-                          <Badge className={getStatusColor(ticket.status)}>
-                            {ticket.status}
-                          </Badge>
-                          <Badge
-                            className={`${getPriorityColor(ticket.priority)} mt-2`}
-                          >
-                            {ticket.priority}
-                          </Badge>
-                        </div>
-                        <Button
-                          variant="outline"
-                          onClick={() => setSelectedTicket(ticket)}
-                        >
-                          View Conversation
-                          <ChevronRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-
-              {filteredTickets.length === 0 && (
-                <Card className="shadow-md">
-                  <CardContent className="pt-12 pb-12 text-center">
-                    <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="h3 text-gray-700 mb-2">No tickets found</h3>
-                    <p className="body text-gray-600 mb-4">
-                      {searchTerm || statusFilter !== "all"
-                        ? "Try adjusting your search or filter criteria"
-                        : "You haven't created any support tickets yet"}
-                    </p>
-                    <Button onClick={() => setActiveTab("create")}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Create Your First Ticket
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+            <TicketList
+              onTicketSelect={handleTicketSelect}
+              onCreateTicket={handleCreateTicket}
+            />
           </TabsContent>
 
           {/* Knowledge Base Tab */}
