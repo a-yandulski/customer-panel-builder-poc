@@ -17,7 +17,7 @@ import {
   AlertCircle,
   AlertTriangle,
   Info,
-  MarkEmailRead,
+  MailCheck,
   Settings,
   Trash2,
   ExternalLink,
@@ -169,7 +169,7 @@ function NotificationItem({
                   className="h-6 w-6 p-0"
                   aria-label={notification.isRead ? 'Mark as unread' : 'Mark as read'}
                 >
-                  <MarkEmailRead className="h-3 w-3" />
+                  <MailCheck className="h-3 w-3" />
                 </Button>
                 
                 <Button
@@ -340,7 +340,7 @@ export default function NotificationCenter() {
                     disabled={unreadCount === 0}
                     className="w-full justify-start h-8"
                   >
-                    <MarkEmailRead className="mr-2 h-4 w-4" />
+                    <MailCheck className="mr-2 h-4 w-4" />
                     Mark all as read
                   </Button>
                   
