@@ -664,6 +664,16 @@ export function useNotifications() {
 
 // Hook for toast notifications only
 export function useToast() {
-  const { showToast, dismissToast, toasts } = useNotifications();
-  return { showToast, dismissToast, toasts };
+  try {
+    const { showToast, dismissToast, toasts } = useNotifications();
+    return { showToast, dismissToast, toasts };
+  } catch (error) {
+    // Fallback if context is not available
+    console.warn('useToast: NotificationContext not available, using fallbacks');
+    return {
+      showToast: () => {},
+      dismissToast: () => {},
+      toasts: [] as Toast[]
+    };
+  }
 }
