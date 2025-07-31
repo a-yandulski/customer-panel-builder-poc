@@ -5,6 +5,8 @@ import { createServer } from "./server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // Set base path for GitHub Pages deployment
+  base: mode === 'production' ? '/customer-panel-builder-poc/' : '/',
   server: {
     host: "::",
     port: 8080,
@@ -22,6 +24,10 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./client"),
       "@shared": path.resolve(__dirname, "./shared"),
     },
+  },
+  // Enable MSW in production for demo purposes
+  define: {
+    'import.meta.env.VITE_ENABLE_MSW': mode === 'production' ? '"true"' : 'undefined',
   },
 }));
 

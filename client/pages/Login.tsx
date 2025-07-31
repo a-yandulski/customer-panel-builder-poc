@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { createUrlWithBasePath } from "@/lib/utils";
 
 export default function Login() {
   const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth();
@@ -76,7 +77,7 @@ export default function Login() {
     setIsLoggingIn(false);
 
     // Trigger a page reload to reinitialize auth state
-    window.location.href = "/dashboard";
+    window.location.href = createUrlWithBasePath("/dashboard");
   };
 
   // Show loading state while Auth0 is initializing

@@ -2,6 +2,12 @@ import { worker } from "./browser";
 import { shouldEnableMSW } from "./config";
 import "./test-utils"; // Import test utilities for global access
 
+// Get the base path for the service worker
+const getServiceWorkerUrl = (): string => {
+  const basePath = import.meta.env.BASE_URL || '/';
+  return `${basePath}mockServiceWorker.js`.replace(/\/+/g, '/');
+};
+
 // Initialize MSW
 export const setupMSW = async (): Promise<void> => {
   if (!shouldEnableMSW()) {
@@ -13,11 +19,12 @@ export const setupMSW = async (): Promise<void> => {
     await worker.start({
       onUnhandledRequest: "warn", // Warn about unhandled requests
       serviceWorker: {
-        url: "/mockServiceWorker.js",
+        url: getServiceWorkerUrl(),
       },
     });
 
     console.log("🎭 MSW started successfully");
+    console.log(`📋 Service Worker URL: ${getServiceWorkerUrl()}`);
     console.log("📋 Available test scenarios:");
     console.log("  • Login with invalid@example.com (401 Unauthorized)");
     console.log("  • Login with locked@example.com (403 Forbidden)");

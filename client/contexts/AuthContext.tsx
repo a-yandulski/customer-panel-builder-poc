@@ -11,6 +11,7 @@ import {
   Auth0ProviderOptions,
 } from "@auth0/auth0-react";
 import { User } from "@auth0/auth0-spa-js";
+import { createUrlWithBasePath } from "@/lib/utils";
 
 interface AuthContextType {
   user: User | undefined;
@@ -105,11 +106,11 @@ function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [auth0.isLoading, fakeAuthLoading]);
 
-  const fakeLogout = () => {
+  const fakeLogout = async () => {
     localStorage.removeItem("fake_auth_user");
     localStorage.removeItem("fake_auth_token");
     setFakeUser(null);
-    window.location.href = "/login";
+    window.location.href = createUrlWithBasePath("/login");
   };
 
   const fakeGetAccessToken = async () => {
