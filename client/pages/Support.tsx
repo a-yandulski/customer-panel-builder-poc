@@ -45,92 +45,28 @@ export default function Support() {
   const [activeTab, setActiveTab] = useState("overview");
   const [activeView, setActiveView] = useState<"list" | "create" | "conversation">("list");
 
-  const [tickets] = useState<Ticket[]>([
-    {
-      id: "TKT-2024-001",
-      subject: "Domain transfer issue - example.com not working",
-      status: "Open",
-      priority: "High",
-      category: "Domain",
-      created: "Dec 10, 2024",
-      updated: "Dec 11, 2024",
-      agent: "Sarah Johnson",
-      messages: [
-        {
-          id: "1",
-          author: "John Doe",
-          authorType: "customer",
-          message:
-            "I'm having trouble transferring my domain example.com to your service. I initiated the transfer 3 days ago but it's still showing as pending. Can you please help?",
-          timestamp: "Dec 10, 2024 9:15 AM",
-        },
-        {
-          id: "2",
-          author: "Sarah Johnson",
-          authorType: "agent",
-          message:
-            "Hi John, I've reviewed your domain transfer request. The transfer is currently awaiting authorization from your previous registrar. I've expedited the process and you should receive an authorization email within the next few hours. Please check your email and approve the transfer.",
-          timestamp: "Dec 10, 2024 11:30 AM",
-        },
-        {
-          id: "3",
-          author: "John Doe",
-          authorType: "customer",
-          message:
-            "Thanks Sarah! I received the email and approved the transfer. How long should I expect it to take now?",
-          timestamp: "Dec 10, 2024 2:45 PM",
-        },
-      ],
-    },
-    {
-      id: "TKT-2024-002",
-      subject: "Email not working after server migration",
-      status: "In Progress",
-      priority: "Normal",
-      category: "Technical",
-      created: "Dec 8, 2024",
-      updated: "Dec 9, 2024",
-      agent: "Mike Chen",
-      messages: [
-        {
-          id: "1",
-          author: "Jane Smith",
-          authorType: "customer",
-          message:
-            "After the recent server migration, my email accounts aren't working. I can't send or receive emails through Outlook.",
-          timestamp: "Dec 8, 2024 3:20 PM",
-        },
-      ],
-    },
-    {
-      id: "TKT-2024-003",
-      subject: "SSL certificate installation completed",
-      status: "Solved",
-      priority: "Low",
-      category: "Technical",
-      created: "Dec 5, 2024",
-      updated: "Dec 6, 2024",
-      agent: "Alex Rivera",
-      messages: [
-        {
-          id: "1",
-          author: "Bob Wilson",
-          authorType: "customer",
-          message:
-            "I need help installing an SSL certificate on my website business.net",
-          timestamp: "Dec 5, 2024 10:00 AM",
-        },
-        {
-          id: "2",
-          author: "Alex Rivera",
-          authorType: "agent",
-          message:
-            "I've successfully installed your SSL certificate. Your website is now secure with HTTPS. Please allow up to 24 hours for full propagation.",
-          timestamp: "Dec 5, 2024 2:30 PM",
-        },
-      ],
-    },
-  ]);
+  const handleTicketSelect = (ticket: Ticket) => {
+    setSelectedTicket(ticket);
+    setActiveView("conversation");
+  };
+
+  const handleCreateTicket = () => {
+    setActiveView("create");
+  };
+
+  const handleBackToList = () => {
+    setSelectedTicket(null);
+    setActiveView("list");
+  };
+
+  const handleTicketCreated = (ticket: Ticket) => {
+    setSelectedTicket(ticket);
+    setActiveView("conversation");
+  };
+
+  const handleTicketUpdate = (ticket: Ticket) => {
+    setSelectedTicket(ticket);
+  };
 
   const [knowledgeArticles] = useState<KnowledgeArticle[]>([
     {
