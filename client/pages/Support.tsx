@@ -42,11 +42,8 @@ type KnowledgeArticle = {
 
 export default function Support() {
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [activeTab, setActiveTab] = useState("create");
+  const [activeTab, setActiveTab] = useState("overview");
+  const [activeView, setActiveView] = useState<"list" | "create" | "conversation">("list");
 
   const [tickets] = useState<Ticket[]>([
     {
