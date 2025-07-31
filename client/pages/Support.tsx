@@ -28,43 +28,7 @@ import TicketCreateForm from "@/components/support/TicketCreateForm";
 import TicketConversation from "@/components/support/TicketConversation";
 import { type Ticket } from "@/hooks/useSupport";
 
-type TicketStatus = "Open" | "In Progress" | "Waiting" | "Solved";
-type TicketPriority = "Low" | "Normal" | "High" | "Urgent";
-type TicketCategory =
-  | "Billing"
-  | "Technical"
-  | "Domain"
-  | "Hosting"
-  | "General";
 
-type Attachment = {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  url?: string;
-};
-
-type TicketMessage = {
-  id: string;
-  author: string;
-  authorType: "customer" | "agent";
-  message: string;
-  timestamp: string;
-  attachments?: Attachment[];
-};
-
-type Ticket = {
-  id: string;
-  subject: string;
-  status: TicketStatus;
-  priority: TicketPriority;
-  category: TicketCategory;
-  created: string;
-  updated: string;
-  agent?: string;
-  messages: TicketMessage[];
-};
 
 type KnowledgeArticle = {
   id: string;
