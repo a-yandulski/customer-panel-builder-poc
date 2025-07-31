@@ -31,7 +31,6 @@ const App = () => (
         <TooltipProvider>
           <NotificationProvider>
             <Sonner />
-            <ToastContainer />
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
@@ -94,6 +93,7 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
+            <ToastContainer />
           </NotificationProvider>
         </TooltipProvider>
       </ToastProvider>
