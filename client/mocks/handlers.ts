@@ -2894,6 +2894,416 @@ export const handlers = [
   }),
 
   // =======================
+  // NOTIFICATION SYSTEM
+  // =======================
+
+  // Get unread notification count
+  http.get("/api/notifications/unreadCount", async ({ request }) => {
+    await delay(randomDelay(100, 500));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate server errors (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Notification service temporarily unavailable" },
+        { status: 500 },
+      );
+    }
+
+    // Simulate rate limiting (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Too many requests. Please wait before refreshing." },
+        { status: 429 },
+        { headers: { "Retry-After": "30" } },
+      );
+    }
+
+    // Mock notification data with varying unread counts
+    const unreadCount = Math.floor(Math.random() * 8) + 1; // 1-8 unread notifications
+
+    return HttpResponse.json({
+      unreadCount,
+      timestamp: new Date().toISOString(),
+    });
+  }),
+
+  // Get notification list with pagination
+  http.get("/api/notifications", async ({ request }) => {
+    await delay(randomDelay(200, 800));
+
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "20");
+    const category = url.searchParams.get("category");
+    const onlyUnread = url.searchParams.get("onlyUnread") === "true";
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate network timeout (2% chance)
+    if (shouldFail(2)) {
+      await delay(8000);
+      return HttpResponse.json(
+        { error: "Request timeout. Please try again." },
+        { status: 408 },
+      );
+    }
+
+    // Simulate pagination service error (4% chance)
+    if (shouldFail(4) && page > 1) {
+      return HttpResponse.json(
+        { error: "Failed to load notifications page. Please refresh." },
+        { status: 503 },
+      );
+    }
+
+    // Mock notification data
+    const notificationsData = [
+      {
+        id: "notif_001",
+        title: "Domain renewal reminder",
+        message: "Your domain example.com will expire in 30 days. Click to renew now.",
+        type: "warning",
+        category: "domain",
+        priority: "high",
+        isRead: false,
+        timestamp: "2024-12-12T14:30:00Z",
+        actionUrl: "/billing?action=renew&domain=example.com",
+        metadata: {
+          domainName: "example.com",
+          expiryDate: "2025-01-12T00:00:00Z",
+        },
+      },
+      {
+        id: "notif_002",
+        title: "New support ticket reply",
+        message: "Our support team replied to your ticket: 'Domain Transfer Issue'",
+        type: "info",
+        category: "support",
+        priority: "medium",
+        isRead: false,
+        timestamp: "2024-12-12T11:15:00Z",
+        actionUrl: "/support/tickets/TKT-2024-001",
+        metadata: {
+          ticketId: "TKT-2024-001",
+          agentName: "Sarah Johnson",
+        },
+      },
+      {
+        id: "notif_003",
+        title: "Payment successful",
+        message: "Your payment of $47.00 for hosting renewal has been processed successfully.",
+        type: "success",
+        category: "billing",
+        priority: "low",
+        isRead: Math.random() > 0.5,
+        timestamp: "2024-12-11T16:22:00Z",
+        actionUrl: "/billing/invoices/inv_001",
+        metadata: {
+          amount: 47.00,
+          currency: "USD",
+          invoiceId: "inv_001",
+        },
+      },
+      {
+        id: "notif_004",
+        title: "Security alert",
+        message: "New login detected from New York, NY. If this wasn't you, please secure your account.",
+        type: "error",
+        category: "security",
+        priority: "high",
+        isRead: false,
+        timestamp: "2024-12-11T09:45:00Z",
+        actionUrl: "/account?tab=security",
+        metadata: {
+          location: "New York, NY, US",
+          ipAddress: "192.168.1.100",
+          device: "Desktop",
+        },
+      },
+      {
+        id: "notif_005",
+        title: "SSL certificate installed",
+        message: "Your SSL certificate for example.com has been successfully installed and activated.",
+        type: "success",
+        category: "technical",
+        priority: "low",
+        isRead: true,
+        timestamp: "2024-12-10T13:30:00Z",
+        actionUrl: "/services/ssl",
+        metadata: {
+          domainName: "example.com",
+          certificateType: "Let's Encrypt",
+        },
+      },
+      {
+        id: "notif_006",
+        title: "Maintenance scheduled",
+        message: "Server maintenance scheduled for Dec 15, 2024 from 2:00 AM - 4:00 AM EST.",
+        type: "warning",
+        category: "system",
+        priority: "medium",
+        isRead: Math.random() > 0.3,
+        timestamp: "2024-12-09T10:00:00Z",
+        actionUrl: "/dashboard",
+        metadata: {
+          maintenanceStart: "2024-12-15T02:00:00Z",
+          maintenanceEnd: "2024-12-15T04:00:00Z",
+          affectedServices: ["hosting", "email"],
+        },
+      },
+    ];
+
+    // Filter notifications
+    let filteredNotifications = [...notificationsData];
+
+    if (category && category !== "all") {
+      filteredNotifications = filteredNotifications.filter(
+        (notif) => notif.category === category,
+      );
+    }
+
+    if (onlyUnread) {
+      filteredNotifications = filteredNotifications.filter(
+        (notif) => !notif.isRead,
+      );
+    }
+
+    // Sort by timestamp (newest first)
+    filteredNotifications.sort((a, b) =>
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+
+    // Paginate results
+    const totalCount = filteredNotifications.length;
+    const totalPages = Math.ceil(totalCount / limit);
+    const startIndex = (page - 1) * limit;
+    const paginatedNotifications = filteredNotifications.slice(startIndex, startIndex + limit);
+
+    return HttpResponse.json({
+      notifications: paginatedNotifications,
+      pagination: {
+        page,
+        limit,
+        totalPages,
+        totalCount,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+      unreadCount: notificationsData.filter(n => !n.isRead).length,
+    });
+  }),
+
+  // Mark notification as read
+  http.patch("/api/notifications/:notificationId/read", async ({ params, request }) => {
+    await delay(randomDelay(100, 400));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate notification not found
+    if (params.notificationId === "notif_999") {
+      return HttpResponse.json(
+        { error: "Notification not found" },
+        { status: 404 },
+      );
+    }
+
+    // Simulate server error (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Failed to update notification status" },
+        { status: 500 },
+      );
+    }
+
+    return HttpResponse.json({
+      notification: {
+        id: params.notificationId,
+        isRead: true,
+        updatedAt: new Date().toISOString(),
+      },
+      unreadCount: Math.max(0, Math.floor(Math.random() * 5)), // Random remaining count
+    });
+  }),
+
+  // Mark notification as unread
+  http.patch("/api/notifications/:notificationId/unread", async ({ params, request }) => {
+    await delay(randomDelay(100, 400));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate server error (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Failed to update notification status" },
+        { status: 500 },
+      );
+    }
+
+    return HttpResponse.json({
+      notification: {
+        id: params.notificationId,
+        isRead: false,
+        updatedAt: new Date().toISOString(),
+      },
+      unreadCount: Math.floor(Math.random() * 8) + 1,
+    });
+  }),
+
+  // Mark all notifications as read
+  http.post("/api/notifications/mark-all-read", async ({ request }) => {
+    await delay(randomDelay(300, 800));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate server error (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Failed to mark all notifications as read" },
+        { status: 500 },
+      );
+    }
+
+    return HttpResponse.json({
+      success: true,
+      unreadCount: 0,
+      updatedAt: new Date().toISOString(),
+    });
+  }),
+
+  // Delete notification
+  http.delete("/api/notifications/:notificationId", async ({ params, request }) => {
+    await delay(randomDelay(200, 600));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate notification not found
+    if (params.notificationId === "notif_999") {
+      return HttpResponse.json(
+        { error: "Notification not found" },
+        { status: 404 },
+      );
+    }
+
+    // Simulate server error (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Failed to delete notification" },
+        { status: 500 },
+      );
+    }
+
+    return HttpResponse.json({
+      success: true,
+      unreadCount: Math.max(0, Math.floor(Math.random() * 5)),
+    });
+  }),
+
+  // Get notification preferences
+  http.get("/api/notifications/preferences", async ({ request }) => {
+    await delay(randomDelay(200, 600));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    return HttpResponse.json({
+      preferences: {
+        email: {
+          security: true,
+          billing: true,
+          support: true,
+          marketing: false,
+          system: true,
+        },
+        push: {
+          security: true,
+          billing: true,
+          support: false,
+          marketing: false,
+          system: true,
+        },
+        sms: {
+          security: true,
+          billing: false,
+          support: false,
+          marketing: false,
+          system: false,
+        },
+      },
+    });
+  }),
+
+  // Update notification preferences
+  http.put("/api/notifications/preferences", async ({ request }) => {
+    await delay(randomDelay(300, 800));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+
+    // Simulate validation error (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Invalid preference settings" },
+        { status: 400 },
+      );
+    }
+
+    return HttpResponse.json({
+      preferences: body.preferences,
+      updatedAt: new Date().toISOString(),
+    });
+  }),
+
+  // =======================
   // NETWORK ERROR SIMULATIONS
   // =======================
 
