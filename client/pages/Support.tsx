@@ -116,67 +116,6 @@ export default function Support() {
     },
   ]);
 
-  const getStatusColor = (status: TicketStatus) => {
-    switch (status) {
-      case "Open":
-        return "bg-primary text-white";
-      case "In Progress":
-        return "bg-warning text-white";
-      case "Waiting":
-        return "bg-orange-500 text-white";
-      case "Solved":
-        return "bg-success text-white";
-      default:
-        return "bg-gray-500 text-white";
-    }
-  };
-
-  const getPriorityColor = (priority: TicketPriority) => {
-    switch (priority) {
-      case "Low":
-        return "text-gray-600 bg-gray-100";
-      case "Normal":
-        return "text-blue-600 bg-blue-100";
-      case "High":
-        return "text-orange-600 bg-orange-100";
-      case "Urgent":
-        return "text-red-600 bg-red-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
-  };
-
-  const handleFileUpload = (files: FileList) => {
-    const newAttachments: Attachment[] = Array.from(files).map((file) => ({
-      id: Date.now().toString() + Math.random(),
-      name: file.name,
-      size: file.size,
-      type: file.type,
-    }));
-    setAttachments((prev) => [...prev, ...newAttachments]);
-  };
-
-  const removeAttachment = (id: string) => {
-    setAttachments((prev) => prev.filter((att) => att.id !== id));
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const filteredTickets = tickets.filter((ticket) => {
-    const matchesSearch =
-      ticket.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || ticket.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
   if (selectedTicket) {
     return (
       <AppShell>
