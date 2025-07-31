@@ -300,8 +300,14 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to fetch notifications");
+          let errorMessage = "Failed to fetch notifications";
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+          } catch {
+            // If we can't parse the error response, use the default message
+          }
+          throw new Error(errorMessage);
         }
 
         const data = await response.json();
