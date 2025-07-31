@@ -13,7 +13,7 @@ import {
   Bell,
   Search,
   Filter,
-  MarkEmailRead,
+  MailCheck,
   Trash2,
   Settings,
   RefreshCw,
@@ -204,7 +204,7 @@ function NotificationCard({
                   className="h-8 w-8 p-0"
                   aria-label={notification.isRead ? 'Mark as unread' : 'Mark as read'}
                 >
-                  <MarkEmailRead className="h-4 w-4" />
+                  <MailCheck className="h-4 w-4" />
                 </Button>
                 
                 <Button
@@ -437,7 +437,7 @@ export default function NotificationsPage() {
                     onClick={handleBulkMarkAsRead}
                     className="border-blue-300 text-blue-700 hover:bg-blue-100"
                   >
-                    <MarkEmailRead className="mr-2 h-4 w-4" />
+                    <MailCheck className="mr-2 h-4 w-4" />
                     Mark as Read
                   </Button>
                   
@@ -499,7 +499,7 @@ export default function NotificationsPage() {
                   size="sm"
                   onClick={markAllAsRead}
                 >
-                  <MarkEmailRead className="mr-2 h-4 w-4" />
+                  <MailCheck className="mr-2 h-4 w-4" />
                   Mark all as read
                 </Button>
               )}
