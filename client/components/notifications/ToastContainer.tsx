@@ -109,8 +109,20 @@ function ToastComponent({ toast, onDismiss }: ToastProps) {
 }
 
 export default function ToastContainer() {
-  const { toasts, dismissToast } = useToast();
   const [container, setContainer] = useState<HTMLElement | null>(null);
+
+  // Safely access the toast context with error handling
+  let toasts: Toast[] = [];
+  let dismissToast: (id: string) => void = () => {};
+
+  try {
+    const toastContext = useToast();
+    toasts = toastContext.toasts;
+    dismissToast = toastContext.dismissToast;
+  } catch (error) {
+    // Context not available yet, use empty defaults
+    console.warn('ToastContainer: NotificationContext not available yet');
+  }
 
   useEffect(() => {
     // Create or get the toast container
