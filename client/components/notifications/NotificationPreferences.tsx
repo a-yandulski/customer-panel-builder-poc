@@ -15,7 +15,7 @@ import {
   MessageSquare,
   Shield,
   CreditCard,
-  HeadphonesIcon,
+  Headphones,
   AlertTriangle,
   Server,
   Globe,
@@ -61,7 +61,7 @@ const NOTIFICATION_CATEGORIES: NotificationCategory[] = [
     id: 'support',
     name: 'Support Tickets',
     description: 'Ticket updates, agent responses, resolution notices',
-    icon: <HeadphonesIcon className="h-5 w-5 text-blue-600" />,
+    icon: <Headphones className="h-5 w-5 text-blue-600" />,
     channels: { email: true, push: false, sms: false },
   },
   {
