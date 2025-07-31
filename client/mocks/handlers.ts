@@ -1380,67 +1380,651 @@ export const handlers = [
   }),
 
   // =======================
-  // SUPPORT TICKETS
+  // SUPPORT TICKET SYSTEM
   // =======================
 
-  // Get support tickets
-  http.get("/api/support/tickets", async () => {
-    await delay(randomDelay());
+  // Enhanced mock ticket data
+  http.get("/api/tickets", async ({ request }) => {
+    await delay(randomDelay(300, 1200));
 
-    // Simulate occasional service unavailable
-    if (shouldFail(5)) {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+    const search = url.searchParams.get("search")?.toLowerCase() || "";
+    const status = url.searchParams.get("status");
+    const sortBy = url.searchParams.get("sortBy") || "created";
+    const sortOrder = url.searchParams.get("sortOrder") || "desc";
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
       return HttpResponse.json(
-        { error: "Support system maintenance in progress" },
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate server errors (7% chance)
+    if (shouldFail(7)) {
+      return HttpResponse.json(
+        { error: "Support system temporarily unavailable" },
+        { status: 500 },
+      );
+    }
+
+    // Simulate pagination service errors (3% chance)
+    if (shouldFail(3) && page > 1) {
+      return HttpResponse.json(
+        { error: "Failed to load page. Please try again." },
         { status: 503 },
       );
     }
 
-    return HttpResponse.json({ tickets: mockTickets });
+    const ticketsData = [
+      {
+        id: "TKT-2024-001",
+        subject: "Domain transfer issue - example.com not working",
+        status: "open",
+        priority: "high",
+        category: "domain",
+        created: "2024-12-10T09:15:00Z",
+        updated: "2024-12-11T11:30:00Z",
+        assignedAgent: "Sarah Johnson",
+        lastReplyBy: "agent",
+        messageCount: 3,
+        hasAttachments: false,
+        tags: ["domain-transfer", "urgent"],
+        firstMessage: "I'm having trouble transferring my domain example.com to your service...",
+      },
+      {
+        id: "TKT-2024-002",
+        subject: "Email not working after server migration",
+        status: "in_progress",
+        priority: "normal",
+        category: "technical",
+        created: "2024-12-08T15:20:00Z",
+        updated: "2024-12-09T10:45:00Z",
+        assignedAgent: "Mike Chen",
+        lastReplyBy: "customer",
+        messageCount: 2,
+        hasAttachments: true,
+        tags: ["email", "server-migration"],
+        firstMessage: "After the recent server migration, my email accounts aren't working...",
+      },
+      {
+        id: "TKT-2024-003",
+        subject: "SSL certificate installation completed",
+        status: "solved",
+        priority: "low",
+        category: "technical",
+        created: "2024-12-05T10:00:00Z",
+        updated: "2024-12-06T14:30:00Z",
+        assignedAgent: "Alex Rivera",
+        lastReplyBy: "agent",
+        messageCount: 2,
+        hasAttachments: false,
+        tags: ["ssl", "completed"],
+        firstMessage: "I need help installing an SSL certificate on my website...",
+      },
+      {
+        id: "TKT-2024-004",
+        subject: "Billing discrepancy for November invoice",
+        status: "waiting",
+        priority: "normal",
+        category: "billing",
+        created: "2024-12-07T13:15:00Z",
+        updated: "2024-12-08T09:22:00Z",
+        assignedAgent: "Jennifer Davis",
+        lastReplyBy: "agent",
+        messageCount: 4,
+        hasAttachments: true,
+        tags: ["billing", "invoice"],
+        firstMessage: "I noticed an incorrect charge on my November invoice...",
+      },
+      {
+        id: "TKT-2024-005",
+        subject: "Website loading slowly since hosting upgrade",
+        status: "open",
+        priority: "high",
+        category: "hosting",
+        created: "2024-12-09T08:30:00Z",
+        updated: "2024-12-09T16:15:00Z",
+        assignedAgent: null,
+        lastReplyBy: "customer",
+        messageCount: 1,
+        hasAttachments: false,
+        tags: ["performance", "hosting"],
+        firstMessage: "My website has been loading very slowly since the hosting upgrade...",
+      },
+    ];
+
+    // Filter tickets
+    let filteredTickets = ticketsData;
+
+    if (search) {
+      filteredTickets = filteredTickets.filter(
+        (ticket) =>
+          ticket.subject.toLowerCase().includes(search) ||
+          ticket.id.toLowerCase().includes(search) ||
+          ticket.firstMessage.toLowerCase().includes(search),
+      );
+    }
+
+    if (status && status !== "all") {
+      filteredTickets = filteredTickets.filter(
+        (ticket) => ticket.status === status,
+      );
+    }
+
+    // Sort tickets
+    filteredTickets.sort((a, b) => {
+      let aValue, bValue;
+
+      switch (sortBy) {
+        case "created":
+          aValue = new Date(a.created).getTime();
+          bValue = new Date(b.created).getTime();
+          break;
+        case "updated":
+          aValue = new Date(a.updated).getTime();
+          bValue = new Date(b.updated).getTime();
+          break;
+        case "subject":
+          aValue = a.subject.toLowerCase();
+          bValue = b.subject.toLowerCase();
+          break;
+        case "priority":
+          const priorityOrder = { low: 1, normal: 2, high: 3, urgent: 4 };
+          aValue = priorityOrder[a.priority as keyof typeof priorityOrder];
+          bValue = priorityOrder[b.priority as keyof typeof priorityOrder];
+          break;
+        default:
+          aValue = a.created;
+          bValue = b.created;
+      }
+
+      if (sortOrder === "desc") {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    });
+
+    // Paginate results
+    const totalCount = filteredTickets.length;
+    const totalPages = Math.ceil(totalCount / limit);
+    const startIndex = (page - 1) * limit;
+    const paginatedTickets = filteredTickets.slice(startIndex, startIndex + limit);
+
+    return HttpResponse.json({
+      tickets: paginatedTickets,
+      pagination: {
+        page,
+        limit,
+        totalPages,
+        totalCount,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+      filters: { search, status, sortBy, sortOrder, page, limit },
+    });
   }),
 
-  // Create support ticket
-  http.post("/api/support/tickets", async ({ request }) => {
-    await delay(randomDelay());
+  // Individual ticket details with conversation
+  http.get("/api/tickets/:ticketId", async ({ params, request }) => {
+    await delay(randomDelay(200, 800));
 
-    const body = (await request.json()) as any;
-
-    // Simulate validation errors
-    if (!body.subject || !body.message) {
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
       return HttpResponse.json(
-        {
-          error: "Validation failed",
-          details: {
-            subject: !body.subject ? ["Subject is required"] : [],
-            message: !body.message ? ["Message is required"] : [],
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate ticket not found (5% chance or specific IDs)
+    if (params.ticketId === "TKT-999" || shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Ticket not found or access denied" },
+        { status: 404 },
+      );
+    }
+
+    // Simulate forbidden access (2% chance)
+    if (shouldFail(2)) {
+      return HttpResponse.json(
+        { error: "You don't have permission to view this ticket" },
+        { status: 403 },
+      );
+    }
+
+    // Simulate server error (4% chance)
+    if (shouldFail(4)) {
+      return HttpResponse.json(
+        { error: "Failed to load ticket conversation" },
+        { status: 500 },
+      );
+    }
+
+    // Return mock ticket conversation based on ID
+    const ticketConversations: Record<string, any> = {
+      "TKT-2024-001": {
+        id: "TKT-2024-001",
+        subject: "Domain transfer issue - example.com not working",
+        status: "open",
+        priority: "high",
+        category: "domain",
+        created: "2024-12-10T09:15:00Z",
+        updated: "2024-12-11T11:30:00Z",
+        assignedAgent: "Sarah Johnson",
+        tags: ["domain-transfer", "urgent"],
+        messages: [
+          {
+            id: "msg_001",
+            author: "John Doe",
+            authorType: "customer",
+            message: "I'm having trouble transferring my domain example.com to your service. I initiated the transfer 3 days ago but it's still showing as pending. Can you please help?",
+            timestamp: "2024-12-10T09:15:00Z",
+            attachments: [],
           },
+          {
+            id: "msg_002",
+            author: "Sarah Johnson",
+            authorType: "agent",
+            message: "Hi John, I've reviewed your domain transfer request. The transfer is currently awaiting authorization from your previous registrar. I've expedited the process and you should receive an authorization email within the next few hours. Please check your email and approve the transfer.",
+            timestamp: "2024-12-10T11:30:00Z",
+            attachments: [],
+          },
+          {
+            id: "msg_003",
+            author: "John Doe",
+            authorType: "customer",
+            message: "Thanks Sarah! I received the email and approved the transfer. How long should I expect it to take now?",
+            timestamp: "2024-12-10T14:45:00Z",
+            attachments: [],
+          },
+        ],
+      },
+      "TKT-2024-002": {
+        id: "TKT-2024-002",
+        subject: "Email not working after server migration",
+        status: "in_progress",
+        priority: "normal",
+        category: "technical",
+        created: "2024-12-08T15:20:00Z",
+        updated: "2024-12-09T10:45:00Z",
+        assignedAgent: "Mike Chen",
+        tags: ["email", "server-migration"],
+        messages: [
+          {
+            id: "msg_001",
+            author: "Jane Smith",
+            authorType: "customer",
+            message: "After the recent server migration, my email accounts aren't working. I can't send or receive emails through Outlook. I've tried re-configuring the settings but nothing seems to work.",
+            timestamp: "2024-12-08T15:20:00Z",
+            attachments: [
+              {
+                id: "att_001",
+                name: "outlook-settings.png",
+                size: 245760,
+                type: "image/png",
+                url: "/api/attachments/att_001",
+              },
+            ],
+          },
+          {
+            id: "msg_002",
+            author: "Mike Chen",
+            authorType: "agent",
+            message: "Hi Jane, I can see the migration has affected your email configuration. The server settings have changed. Please update your Outlook with these new settings: IMAP Server: mail.newserver.com, Port: 993, Security: SSL/TLS. I'll send you a detailed configuration guide.",
+            timestamp: "2024-12-09T10:45:00Z",
+            attachments: [
+              {
+                id: "att_002",
+                name: "email-configuration-guide.pdf",
+                size: 1048576,
+                type: "application/pdf",
+                url: "/api/attachments/att_002",
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    const ticket = ticketConversations[params.ticketId as string] || {
+      id: params.ticketId,
+      subject: "Sample Ticket",
+      status: "open",
+      priority: "normal",
+      category: "general",
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+      assignedAgent: null,
+      tags: [],
+      messages: [
+        {
+          id: "msg_001",
+          author: "Customer",
+          authorType: "customer",
+          message: "This is a sample ticket message.",
+          timestamp: new Date().toISOString(),
+          attachments: [],
         },
+      ],
+    };
+
+    return HttpResponse.json({ ticket });
+  }),
+
+  // Create new ticket with file upload support
+  http.post("/api/tickets", async ({ request }) => {
+    await delay(randomDelay(800, 2500));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    try {
+      const formData = await request.formData();
+      const subject = formData.get("subject") as string;
+      const message = formData.get("message") as string;
+      const category = formData.get("category") as string;
+      const priority = formData.get("priority") as string;
+      const files = formData.getAll("attachments") as File[];
+
+      // Comprehensive validation
+      const errors: Record<string, string[]> = {};
+
+      if (!subject || subject.trim().length < 3) {
+        errors.subject = ["Subject must be at least 3 characters long"];
+      }
+      if (subject && subject.length > 200) {
+        errors.subject = ["Subject must be less than 200 characters"];
+      }
+
+      if (!message || message.trim().length < 10) {
+        errors.message = ["Message must be at least 10 characters long"];
+      }
+      if (message && message.length > 5000) {
+        errors.message = ["Message must be less than 5000 characters"];
+      }
+
+      if (!category) {
+        errors.category = ["Please select a category"];
+      }
+
+      if (!priority) {
+        errors.priority = ["Please select a priority level"];
+      }
+
+      // File validation
+      if (files.length > 5) {
+        errors.attachments = ["Maximum 5 files allowed"];
+      }
+
+      const maxFileSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = [
+        "image/jpeg", "image/png", "image/gif", "image/webp",
+        "application/pdf", "text/plain", "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ];
+
+      for (const file of files) {
+        if (file.size > maxFileSize) {
+          errors.attachments = [...(errors.attachments || []), `File ${file.name} exceeds 5MB limit`];
+        }
+        if (!allowedTypes.includes(file.type)) {
+          errors.attachments = [...(errors.attachments || []), `File type ${file.type} not allowed`];
+        }
+      }
+
+      if (Object.keys(errors).length > 0) {
+        return HttpResponse.json(
+          { error: "Validation failed", details: errors },
+          { status: 422 },
+        );
+      }
+
+      // Simulate payload too large error (2% chance or large files)
+      const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+      if (totalSize > 20 * 1024 * 1024 || shouldFail(2)) {
+        return HttpResponse.json(
+          { error: "Request entity too large. Total file size exceeds limit." },
+          { status: 413 },
+        );
+      }
+
+      // Simulate file processing failures (3% chance)
+      if (shouldFail(3)) {
+        return HttpResponse.json(
+          { error: "File processing failed. Please try again or reduce file sizes." },
+          { status: 507 },
+        );
+      }
+
+      // Simulate rate limiting for ticket creation (5% chance)
+      if (shouldFail(5)) {
+        return HttpResponse.json(
+          { error: "Too many tickets created recently. Please wait before creating another." },
+          {
+            status: 429,
+            headers: { "Retry-After": "300" },
+          },
+        );
+      }
+
+      // Simulate server error (3% chance)
+      if (shouldFail(3)) {
+        return HttpResponse.json(
+          { error: "Failed to create ticket. Please try again." },
+          { status: 500 },
+        );
+      }
+
+      // Process attachments
+      const attachments = files.map((file, index) => ({
+        id: `att_${Date.now()}_${index}`,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        url: `/api/attachments/att_${Date.now()}_${index}`,
+      }));
+
+      const newTicket = {
+        id: "TKT-" + Math.random().toString(36).substr(2, 6).toUpperCase(),
+        subject: subject.trim(),
+        status: "open",
+        priority: priority || "normal",
+        category: category || "general",
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+        assignedAgent: null,
+        messages: [
+          {
+            id: "msg_001",
+            author: "Customer",
+            authorType: "customer",
+            message: message.trim(),
+            timestamp: new Date().toISOString(),
+            attachments,
+          },
+        ],
+      };
+
+      return HttpResponse.json({ ticket: newTicket }, { status: 201 });
+    } catch (error) {
+      return HttpResponse.json(
+        { error: "Invalid request format" },
         { status: 400 },
       );
     }
+  }),
 
-    // Simulate rate limiting for ticket creation
-    if (shouldFail(10)) {
+  // Reply to ticket
+  http.post("/api/tickets/:ticketId/reply", async ({ params, request }) => {
+    await delay(randomDelay(500, 1500));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
       return HttpResponse.json(
-        {
-          error:
-            "Too many tickets created. Please wait before creating another.",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": "300" },
-        },
+        { error: "Authentication required" },
+        { status: 401 },
       );
     }
 
-    const newTicket = {
-      id: "TKT-" + Math.random().toString(36).substr(2, 6).toUpperCase(),
-      subject: body.subject,
-      status: "open",
-      priority: body.priority || "medium",
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      const formData = await request.formData();
+      const message = formData.get("message") as string;
+      const files = formData.getAll("attachments") as File[];
 
-    return HttpResponse.json({ ticket: newTicket }, { status: 201 });
+      // Validation
+      if (!message || message.trim().length < 1) {
+        return HttpResponse.json(
+          { error: "Message cannot be empty" },
+          { status: 400 },
+        );
+      }
+
+      if (message.length > 5000) {
+        return HttpResponse.json(
+          { error: "Message too long. Maximum 5000 characters allowed." },
+          { status: 400 },
+        );
+      }
+
+      // Simulate ticket not found
+      if (params.ticketId === "TKT-999") {
+        return HttpResponse.json(
+          { error: "Ticket not found" },
+          { status: 404 },
+        );
+      }
+
+      // Simulate rate limiting for replies (8% chance)
+      if (shouldFail(8)) {
+        return HttpResponse.json(
+          { error: "Too many replies sent recently. Please wait before sending another." },
+          {
+            status: 429,
+            headers: { "Retry-After": "60" },
+          },
+        );
+      }
+
+      // Simulate server error (3% chance)
+      if (shouldFail(3)) {
+        return HttpResponse.json(
+          { error: "Failed to send reply. Please try again." },
+          { status: 500 },
+        );
+      }
+
+      // Process attachments
+      const attachments = files.map((file, index) => ({
+        id: `att_${Date.now()}_${index}`,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        url: `/api/attachments/att_${Date.now()}_${index}`,
+      }));
+
+      const newMessage = {
+        id: `msg_${Date.now()}`,
+        author: "Customer",
+        authorType: "customer",
+        message: message.trim(),
+        timestamp: new Date().toISOString(),
+        attachments,
+      };
+
+      return HttpResponse.json({ message: newMessage }, { status: 201 });
+    } catch (error) {
+      return HttpResponse.json(
+        { error: "Invalid request format" },
+        { status: 400 },
+      );
+    }
+  }),
+
+  // Update ticket status
+  http.patch("/api/tickets/:ticketId", async ({ params, request }) => {
+    await delay(randomDelay(300, 800));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+
+    // Simulate ticket not found
+    if (params.ticketId === "TKT-999") {
+      return HttpResponse.json(
+        { error: "Ticket not found" },
+        { status: 404 },
+      );
+    }
+
+    // Simulate forbidden action (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "You don't have permission to modify this ticket" },
+        { status: 403 },
+      );
+    }
+
+    return HttpResponse.json({
+      ticket: {
+        id: params.ticketId,
+        status: body.status,
+        updatedAt: new Date().toISOString(),
+      },
+    });
+  }),
+
+  // Download attachment
+  http.get("/api/attachments/:attachmentId", async ({ params, request }) => {
+    await delay(randomDelay(200, 1000));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate attachment not found (5% chance)
+    if (params.attachmentId === "att_999" || shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Attachment not found or has been deleted" },
+        { status: 404 },
+      );
+    }
+
+    // Simulate service error (2% chance)
+    if (shouldFail(2)) {
+      return HttpResponse.json(
+        { error: "File storage service temporarily unavailable" },
+        { status: 503 },
+      );
+    }
+
+    // Redirect to mock file URL
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: `https://mockfiles.example.com/${params.attachmentId}`,
+      },
+    });
   }),
 
   // =======================
