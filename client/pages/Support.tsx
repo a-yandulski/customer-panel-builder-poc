@@ -241,7 +241,7 @@ export default function Support() {
           {/* Knowledge Base Tab */}
           <TabsContent value="knowledge" className="space-y-6">
             {/* Search Bar */}
-            <Card className="shadow-md">
+            <Card>
               <CardContent className="pt-6">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -254,13 +254,13 @@ export default function Support() {
             </Card>
 
             {/* Featured Articles */}
-            <Card className="shadow-md">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Star className="mr-2 h-5 w-5 text-warning" />
+                  <Star className="mr-2 h-5 w-5 text-yellow-500" />
                   Featured Articles
                 </CardTitle>
-                <CardDescription className="body-sm">
+                <CardDescription>
                   Our most helpful and popular support articles
                 </CardDescription>
               </CardHeader>
@@ -271,7 +271,7 @@ export default function Support() {
                     .map((article) => (
                       <Card
                         key={article.id}
-                        className="border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+                        className="border hover:shadow-md transition-shadow cursor-pointer"
                       >
                         <CardContent className="pt-4">
                           <div className="flex items-center justify-between">
@@ -283,7 +283,7 @@ export default function Support() {
                                 <h4 className="font-semibold text-gray-900 mb-1">
                                   {article.title}
                                 </h4>
-                                <div className="flex items-center space-x-3 body-sm text-gray-500">
+                                <div className="flex items-center space-x-3 text-sm text-gray-500">
                                   <Badge variant="outline">
                                     {article.category}
                                   </Badge>
@@ -323,7 +323,7 @@ export default function Support() {
               ].map((category) => (
                 <Card
                   key={category}
-                  className="shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                  className="hover:shadow-lg transition-shadow cursor-pointer"
                 >
                   <CardContent className="pt-6 text-center">
                     <div className="p-3 bg-primary/10 rounded-lg w-fit mx-auto mb-4">
@@ -332,7 +332,7 @@ export default function Support() {
                     <h3 className="font-semibold text-gray-900 mb-2">
                       {category}
                     </h3>
-                    <p className="body-sm text-gray-600 mb-4">
+                    <p className="text-sm text-gray-600 mb-4">
                       {
                         knowledgeArticles.filter((a) => a.category === category)
                           .length
@@ -349,18 +349,15 @@ export default function Support() {
             </div>
 
             {/* Still Need Help CTA */}
-            <Card className="shadow-md bg-primary/5 border-primary/20">
+            <Card className="bg-primary/5 border-primary/20">
               <CardContent className="pt-8 pb-8 text-center">
                 <AlertCircle className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="h3 text-gray-900 mb-2">Still need help?</h3>
-                <p className="body text-gray-600 mb-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Still need help?</h3>
+                <p className="text-gray-600 mb-6">
                   Can't find what you're looking for? Our support team is here
                   to help you with any questions.
                 </p>
-                <Button
-                  className="bg-primary hover:bg-primary/90"
-                  onClick={() => setActiveTab("create")}
-                >
+                <Button onClick={handleCreateTicket}>
                   <Plus className="mr-2 h-4 w-4" />
                   Create Support Ticket
                 </Button>
