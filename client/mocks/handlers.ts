@@ -158,6 +158,525 @@ export const handlers = [
   }),
 
   // =======================
+  // PROFILE & ACCOUNT MANAGEMENT
+  // =======================
+
+  // Get user profile with error scenarios
+  http.get("/api/user/profile", async ({ request }) => {
+    await delay(randomDelay(200, 800));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate unauthorized access (token expired) (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Token expired. Please login again." },
+        { status: 401 },
+      );
+    }
+
+    // Simulate server error (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Profile service temporarily unavailable" },
+        { status: 500 },
+      );
+    }
+
+    const profileData = {
+      id: "user_001",
+      name: "John Doe",
+      email: "john.doe@example.com",
+      phone: "+1 (555) 123-4567",
+      company: "Example Corp",
+      avatar: "https://gravatar.com/avatar/example",
+      memberSince: "2022-01-15T00:00:00Z",
+      emailVerified: true,
+      phoneVerified: false,
+      twoFactorEnabled: false,
+      lastLogin: "2024-12-12T10:30:00Z",
+    };
+
+    return HttpResponse.json({ profile: profileData });
+  }),
+
+  // Update user profile with validation scenarios
+  http.put("/api/user/profile", async ({ request }) => {
+    await delay(randomDelay(500, 1500));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+
+    // Comprehensive validation errors
+    const errors: Record<string, string[]> = {};
+
+    if (!body.name || body.name.trim().length < 2) {
+      errors.name = ["Name must be at least 2 characters long"];
+    }
+    if (body.name && body.name.length > 100) {
+      errors.name = ["Name must be less than 100 characters"];
+    }
+
+    if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+      errors.email = ["Please enter a valid email address"];
+    }
+
+    if (body.phone && !/^\+?[\d\s\-\(\)]+$/.test(body.phone)) {
+      errors.phone = ["Please enter a valid phone number"];
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return HttpResponse.json(
+        { error: "Validation failed", details: errors },
+        { status: 400 },
+      );
+    }
+
+    // Simulate email conflict (5% chance)
+    if (body.email === "existing@example.com" || shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Email address is already in use" },
+        { status: 409 },
+      );
+    }
+
+    // Simulate profile sync failure (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Failed to sync profile data. Please try again." },
+        { status: 503 },
+      );
+    }
+
+    // Simulate server error (2% chance)
+    if (shouldFail(2)) {
+      return HttpResponse.json(
+        { error: "Profile update failed" },
+        { status: 500 },
+      );
+    }
+
+    return HttpResponse.json({
+      profile: {
+        id: "user_001",
+        name: body.name,
+        email: body.email,
+        phone: body.phone,
+        company: body.company,
+        updatedAt: new Date().toISOString(),
+      },
+    });
+  }),
+
+  // Get user address information
+  http.get("/api/user/address", async ({ request }) => {
+    await delay(randomDelay(200, 600));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate address not found (4% chance)
+    if (shouldFail(4)) {
+      return HttpResponse.json(
+        { error: "Address information not found" },
+        { status: 404 },
+      );
+    }
+
+    // Simulate network timeout (2% chance)
+    if (shouldFail(2)) {
+      await delay(8000);
+      return HttpResponse.json(
+        { error: "Request timeout. Please try again." },
+        { status: 408 },
+      );
+    }
+
+    const addressData = {
+      billing: {
+        street: "123 Main Street",
+        city: "New York",
+        state: "NY",
+        postalCode: "10001",
+        country: "United States",
+        verified: true,
+      },
+      legal: {
+        street: "123 Main Street",
+        city: "New York",
+        state: "NY",
+        postalCode: "10001",
+        country: "United States",
+        verified: true,
+      },
+      sameAsBilling: true,
+    };
+
+    return HttpResponse.json({ addresses: addressData });
+  }),
+
+  // Update user address with validation
+  http.put("/api/user/address", async ({ request }) => {
+    await delay(randomDelay(800, 2000));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+
+    // Address validation
+    const errors: Record<string, string[]> = {};
+
+    if (!body.billing) {
+      errors.billing = ["Billing address is required"];
+    } else {
+      const billing = body.billing;
+      if (!billing.street || billing.street.trim().length < 5) {
+        errors["billing.street"] = ["Street address must be at least 5 characters"];
+      }
+      if (!billing.city || billing.city.trim().length < 2) {
+        errors["billing.city"] = ["City is required"];
+      }
+      if (!billing.state || billing.state.trim().length < 2) {
+        errors["billing.state"] = ["State/Province is required"];
+      }
+      if (!billing.postalCode || !/^[\w\s\-]{3,10}$/.test(billing.postalCode)) {
+        errors["billing.postalCode"] = ["Valid postal code is required"];
+      }
+      if (!billing.country) {
+        errors["billing.country"] = ["Country is required"];
+      }
+    }
+
+    // Legal address validation (if provided and not same as billing)
+    if (body.legal && !body.sameAsBilling) {
+      const legal = body.legal;
+      if (!legal.street || legal.street.trim().length < 5) {
+        errors["legal.street"] = ["Street address must be at least 5 characters"];
+      }
+      if (!legal.city || legal.city.trim().length < 2) {
+        errors["legal.city"] = ["City is required"];
+      }
+      if (!legal.state || legal.state.trim().length < 2) {
+        errors["legal.state"] = ["State/Province is required"];
+      }
+      if (!legal.postalCode || !/^[\w\s\-]{3,10}$/.test(legal.postalCode)) {
+        errors["legal.postalCode"] = ["Valid postal code is required"];
+      }
+      if (!legal.country) {
+        errors["legal.country"] = ["Country is required"];
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return HttpResponse.json(
+        { error: "Address validation failed", details: errors },
+        { status: 422 },
+      );
+    }
+
+    // Simulate address verification failure (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Address verification failed. Please check the address details." },
+        { status: 422 },
+      );
+    }
+
+    // Simulate service unavailable (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Address service temporarily unavailable" },
+        { status: 503 },
+      );
+    }
+
+    return HttpResponse.json({
+      addresses: {
+        billing: body.billing,
+        legal: body.sameAsBilling ? body.billing : body.legal,
+        sameAsBilling: body.sameAsBilling,
+        updatedAt: new Date().toISOString(),
+      },
+    });
+  }),
+
+  // Change password with security validations
+  http.post("/api/user/password", async ({ request }) => {
+    await delay(randomDelay(1000, 2500));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+
+    // Password validation
+    const errors: Record<string, string[]> = {};
+
+    if (!body.currentPassword) {
+      errors.currentPassword = ["Current password is required"];
+    }
+
+    if (!body.newPassword) {
+      errors.newPassword = ["New password is required"];
+    } else {
+      if (body.newPassword.length < 8) {
+        errors.newPassword = ["Password must be at least 8 characters long"];
+      }
+      if (!/(?=.*[a-z])/.test(body.newPassword)) {
+        errors.newPassword = [...(errors.newPassword || []), "Password must contain at least one lowercase letter"];
+      }
+      if (!/(?=.*[A-Z])/.test(body.newPassword)) {
+        errors.newPassword = [...(errors.newPassword || []), "Password must contain at least one uppercase letter"];
+      }
+      if (!/(?=.*\d)/.test(body.newPassword)) {
+        errors.newPassword = [...(errors.newPassword || []), "Password must contain at least one number"];
+      }
+      if (!/(?=.*[!@#$%^&*])/.test(body.newPassword)) {
+        errors.newPassword = [...(errors.newPassword || []), "Password must contain at least one special character"];
+      }
+    }
+
+    if (!body.confirmPassword) {
+      errors.confirmPassword = ["Please confirm your new password"];
+    } else if (body.newPassword !== body.confirmPassword) {
+      errors.confirmPassword = ["Passwords do not match"];
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return HttpResponse.json(
+        { error: "Validation failed", details: errors },
+        { status: 400 },
+      );
+    }
+
+    // Simulate incorrect current password (15% chance)
+    if (body.currentPassword === "wrongpassword" || shouldFail(15)) {
+      return HttpResponse.json(
+        { error: "Current password is incorrect" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate password reuse policy violation (8% chance)
+    if (shouldFail(8)) {
+      return HttpResponse.json(
+        { error: "New password cannot be the same as your last 5 passwords" },
+        { status: 422 },
+      );
+    }
+
+    // Simulate security policy violation (3% chance)
+    if (shouldFail(3)) {
+      return HttpResponse.json(
+        { error: "Password change blocked due to security policy. Please contact support." },
+        { status: 403 },
+      );
+    }
+
+    // Simulate server error (2% chance)
+    if (shouldFail(2)) {
+      return HttpResponse.json(
+        { error: "Password change failed. Please try again." },
+        { status: 500 },
+      );
+    }
+
+    return HttpResponse.json({
+      success: true,
+      message: "Password changed successfully",
+      updatedAt: new Date().toISOString(),
+    });
+  }),
+
+  // Enable/disable 2FA
+  http.post("/api/user/2fa/toggle", async ({ request }) => {
+    await delay(randomDelay(800, 2000));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+
+    // Simulate missing current password for security
+    if (!body.currentPassword) {
+      return HttpResponse.json(
+        { error: "Current password required for security changes" },
+        { status: 400 },
+      );
+    }
+
+    // Simulate incorrect password (10% chance)
+    if (shouldFail(10)) {
+      return HttpResponse.json(
+        { error: "Incorrect password" },
+        { status: 401 },
+      );
+    }
+
+    // Simulate 2FA service error (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Two-factor authentication service temporarily unavailable" },
+        { status: 503 },
+      );
+    }
+
+    const enabled = body.enabled === true;
+
+    return HttpResponse.json({
+      twoFactorEnabled: enabled,
+      secretKey: enabled ? "JBSWY3DPEHPK3PXP" : null,
+      qrCodeUrl: enabled ? "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/CustomerPanel:john.doe@example.com?secret=JBSWY3DPEHPK3PXP&issuer=CustomerPanel" : null,
+      backupCodes: enabled ? [
+        "1A2B3C4D", "5E6F7G8H", "9I0J1K2L", "3M4N5O6P",
+        "7Q8R9S0T", "1U2V3W4X", "5Y6Z7A8B", "9C0D1E2F"
+      ] : null,
+      updatedAt: new Date().toISOString(),
+    });
+  }),
+
+  // Verify 2FA code during setup
+  http.post("/api/user/2fa/verify", async ({ request }) => {
+    await delay(randomDelay(300, 800));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+
+    if (!body.code || !/^\d{6}$/.test(body.code)) {
+      return HttpResponse.json(
+        { error: "Invalid verification code format" },
+        { status: 400 },
+      );
+    }
+
+    // Simulate invalid code (20% chance)
+    if (body.code === "000000" || shouldFail(20)) {
+      return HttpResponse.json(
+        { error: "Invalid verification code" },
+        { status: 400 },
+      );
+    }
+
+    // Simulate code expired (5% chance)
+    if (shouldFail(5)) {
+      return HttpResponse.json(
+        { error: "Verification code has expired" },
+        { status: 400 },
+      );
+    }
+
+    return HttpResponse.json({
+      verified: true,
+      message: "Two-factor authentication verified successfully",
+    });
+  }),
+
+  // Generate new backup codes
+  http.post("/api/user/2fa/backup-codes", async ({ request }) => {
+    await delay(randomDelay(500, 1000));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+
+    if (!body.currentPassword) {
+      return HttpResponse.json(
+        { error: "Current password required for security operation" },
+        { status: 400 },
+      );
+    }
+
+    // Simulate incorrect password (10% chance)
+    if (shouldFail(10)) {
+      return HttpResponse.json(
+        { error: "Incorrect password" },
+        { status: 401 },
+      );
+    }
+
+    const newBackupCodes = Array.from({ length: 8 }, () =>
+      Math.random().toString(36).substring(2, 10).toUpperCase()
+    );
+
+    return HttpResponse.json({
+      backupCodes: newBackupCodes,
+      generatedAt: new Date().toISOString(),
+    });
+  }),
+
+  // Get user security summary
+  http.get("/api/user/security", async ({ request }) => {
+    await delay(randomDelay(200, 600));
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return HttpResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    return HttpResponse.json({
+      security: {
+        passwordStrength: "strong",
+        passwordLastChanged: "2024-12-10T14:30:00Z",
+        twoFactorEnabled: false,
+        loginSessions: 3,
+        lastLoginFrom: "New York, NY, US",
+        suspiciousActivity: false,
+        securityScore: 85,
+      },
+    });
+  }),
+
+  // =======================
   // AUTHENTICATION ENDPOINTS
   // =======================
 
