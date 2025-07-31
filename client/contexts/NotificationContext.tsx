@@ -569,21 +569,26 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     [showToast],
   );
 
-  // Initial data load
+  // Initial data load with delay for MSW to be ready
   useEffect(() => {
-    fetchNotifications();
-    fetchUnreadCount();
+    // Add a small delay to ensure MSW is fully initialized
+    const timer = setTimeout(() => {
+      fetchNotifications();
+      fetchUnreadCount();
 
-    // Fetch preferences
-    fetch("/api/notifications/preferences", {
-      headers: {
-        Authorization: `Bearer ${getAuthToken()}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data) => data && setPreferences(data.preferences))
-      .catch((err) => console.error("Failed to fetch preferences:", err));
+      // Fetch preferences
+      fetch("/api/notifications/preferences", {
+        headers: {
+          Authorization: `Bearer ${getAuthToken()}`,
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data) => data && setPreferences(data.preferences))
+        .catch((err) => console.error("Failed to fetch preferences:", err));
+    }, 1000); // 1 second delay to allow MSW to initialize
+
+    return () => clearTimeout(timer);
   }, [fetchNotifications, fetchUnreadCount]);
 
   // Persist notifications to localStorage
