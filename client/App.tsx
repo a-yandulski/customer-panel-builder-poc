@@ -29,61 +29,72 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
         <TooltipProvider>
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <DashboardErrorBoundary>
-                      <Dashboard />
-                    </DashboardErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/services"
-                element={
-                  <ProtectedRoute>
-                    <Services />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/billing"
-                element={
-                  <ProtectedRoute requiredScopes={["invoices:read"]}>
-                    <Billing />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/support"
-                element={
-                  <ProtectedRoute
-                    requiredScopes={["tickets:read", "tickets:write"]}
-                  >
-                    <Support />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/account"
-                element={
-                  <ProtectedRoute
-                    requiredScopes={["profile:read", "profile:write"]}
-                  >
-                    <Account />
-                  </ProtectedRoute>
-                }
-              />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <NotificationProvider>
+            <Sonner />
+            <ToastContainer />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardErrorBoundary>
+                        <Dashboard />
+                      </DashboardErrorBoundary>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/services"
+                  element={
+                    <ProtectedRoute>
+                      <Services />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/billing"
+                  element={
+                    <ProtectedRoute requiredScopes={["invoices:read"]}>
+                      <Billing />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/support"
+                  element={
+                    <ProtectedRoute
+                      requiredScopes={["tickets:read", "tickets:write"]}
+                    >
+                      <Support />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/account"
+                  element={
+                    <ProtectedRoute
+                      requiredScopes={["profile:read", "profile:write"]}
+                    >
+                      <Account />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/notifications"
+                  element={
+                    <ProtectedRoute>
+                      <Notifications />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </NotificationProvider>
         </TooltipProvider>
       </ToastProvider>
     </QueryClientProvider>
